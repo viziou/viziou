@@ -46,5 +46,5 @@ jobs:
       with:
         path: ~/
         name: runner-artifact-${{ github.sha }}
-        retention-days: 7
-        compression-level: 3
+        retention-days: 2
+        compression-level: 9
