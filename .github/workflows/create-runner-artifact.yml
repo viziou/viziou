@@ -1,0 +1,50 @@
+
+name: Create Runner Artifact (Debugging)
+
+on: workflow_dispatch
+  #push:
+  #  branches: [ "main" ]
+  #pull_request:    # probably shouldn't do a full deploy if it's just a PR
+  #  branches: [ "main" ]
+
+
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "gh-pages"
+  cancel-in-progress: false
+
+jobs:
+  setup-and-save:
+    runs-on: ubuntu-latest
+    
+    environment: github-pages
+
+    strategy: # TODO: strategy needs to be moved out of setup job
+      matrix:
+        node-version: [v20.x]  # can add different versions of node here
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Upload Runner Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        path: ~/
+        name: runner-artifact-${{ github.sha }}
+        retention-days: 7
+        compression-level: 3
