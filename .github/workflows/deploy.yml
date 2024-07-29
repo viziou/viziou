@@ -42,7 +42,7 @@ jobs:
       run: npm ci
 
     - name: Save Runner # each step runs on a fresh instance (possibly just merge setup and testing?)
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       with:
         path: ~/
         key: ${{ github.sha }}
@@ -56,7 +56,7 @@ jobs:
 
     steps:
     - name: Restore Runner
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       id: restore-cache
       with:
         path: ~/
@@ -68,7 +68,7 @@ jobs:
       run: npm run test
 
     - name: Save Runner
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       with:
         path: ~/
         key: ${{ steps.restore-cache.outputs.cache-primary-key }}
@@ -82,7 +82,7 @@ jobs:
 
     steps:
     - name: Restore Runner
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       id: restore-cache
       with:
         path: ~/
