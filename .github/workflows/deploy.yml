@@ -24,7 +24,7 @@ jobs:
     
     environment: github-pages
 
-    strategy:
+    strategy: # TODO: strategy needs to be moved out of setup job
       matrix:
         node-version: [v20.x]  # can add different versions of node here
 
@@ -41,6 +41,12 @@ jobs:
     - name: Install Dependencies
       run: npm ci
 
+    - name: Save Runner # each step runs on a fresh instance (possibly just merge setup and testing?)
+      uses: actions/cache/save@v3
+      with:
+        path: ~/
+        key: ${{ github.sha }}
+
   test:
     needs: setup
 
@@ -48,9 +54,24 @@ jobs:
     
     environment: github-pages
 
-    steps:  
+    steps:
+    - name: Restore Runner
+      uses: actions/cache/restore@v3
+      id: restore-cache
+      with:
+        path: ~/
+        key: ${{ github.sha }} # TODO: handle a cache miss by manually setting up again
+        fail-on-cache-miss: true
+
+
     - name: Run Node.js Tests # TODO: Decide on and add a testing framework, both for the React frontend and the Node.js / C++ / WASM backend
       run: npm run test
+
+    - name: Save Runner
+      uses: actions/cache/save@v3
+      with:
+        path: ~/
+        key: ${{ steps.restore-cache.outputs.cache-primary-key }}
       
   build:
     needs: [test, setup]
@@ -60,6 +81,14 @@ jobs:
     environment: github-pages
 
     steps:
+    - name: Restore Runner
+      uses: actions/cache/restore@v3
+      id: restore-cache
+      with:
+        path: ~/
+        key: ${{ github.sha }} # TODO: handle a cache miss by setting up and testing again
+        fail-on-cache-miss: true
+
     - name: Transpile Typescript + Build w/ Vite
       run: npm run build
 
@@ -67,6 +96,8 @@ jobs:
       uses: actions/upload-pages-artifact@v3
       with: 
         path: ./dist  # Vite deploys to dist, not build folder
+
+      # no need to save runner here since deployment doesn't require the project (the artifact has been uploaded)
 
   deploy:
     needs: [test, setup, build]
