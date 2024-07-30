@@ -15,92 +15,63 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "gh-pages"
+  group: "gh-pages" # this is basically a mutex key
   cancel-in-progress: false
 
 jobs:
-  setup:
+  test:
     runs-on: ubuntu-latest
     
-    environment: github-pages
-
-    strategy: # TODO: strategy needs to be moved out of setup job
-      matrix:
-        node-version: [v20.x]  # can add different versions of node here
+    environment: github-pages # for importing any relevant environment variables (use env object)
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
     
-    - name: Setup Node.js ${{ matrix.node-version }}
+    - name: Setup Node.js ${{ env.USE_NODE_VERSION }}
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: ${{ env.USE_NODE_VERSION }}
         cache: 'npm'
         
     - name: Install Dependencies
       run: npm ci
 
-    - name: Save Runner # each step runs on a fresh instance (possibly just merge setup and testing?)
-      uses: actions/cache/save@v4
-      with:
-        path: ~/
-        key: ${{ github.sha }}
-
-  test:
-    needs: setup
-
-    runs-on: ubuntu-latest
-    
-    environment: github-pages
-
-    steps:
-    - name: Restore Runner
-      uses: actions/cache/restore@v4
-      id: restore-cache
-      with:
-        path: ~/
-        key: ${{ github.sha }} # TODO: handle a cache miss by manually setting up again
-        fail-on-cache-miss: true
-
-
-    - name: Run Node.js Tests # TODO: Decide on and add a testing framework, both for the React frontend and the Node.js / C++ / WASM backend
+    - name: Run Node.js Tests # TODO: We've decided on Mocha.js + Chai?
       run: npm run test
-
-    - name: Save Runner
-      uses: actions/cache/save@v4
-      with:
-        path: ~/
-        key: ${{ steps.restore-cache.outputs.cache-primary-key }}
       
   build:
-    needs: [test, setup]
-
     runs-on: ubuntu-latest
     
     environment: github-pages
 
     steps:
-    - name: Restore Runner
-      uses: actions/cache/restore@v4
-      id: restore-cache
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ env.USE_NODE_VERSION }}
+      uses: actions/setup-node@v4
       with:
-        path: ~/
-        key: ${{ github.sha }} # TODO: handle a cache miss by setting up and testing again
-        fail-on-cache-miss: true
+        node-version: ${{ env.USE_NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install Dependencies
+      run: npm ci
 
     - name: Transpile Typescript + Build w/ Vite
       run: npm run build
 
     - name: Upload Build Artifact
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v4
       with: 
         path: ./dist  # Vite deploys to dist, not build folder
+        name: github-pages-${{ github.sha }}
+        retention-days: 90
 
       # no need to save runner here since deployment doesn't require the project (the artifact has been uploaded)
 
   deploy:
-    needs: [test, setup, build]
+    needs: [test, build]
 
     runs-on: ubuntu-latest
 
@@ -112,3 +83,5 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
+      with:
+        artifact_name: github-pages-${{ github.sha }}
