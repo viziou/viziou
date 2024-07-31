@@ -3,7 +3,7 @@ import '../styles/Navbar.css';
 const Navbar = () => {
   return (
     <header className="header">
-        <a href='/' className='logo'>Intersection of Union
+        <a href='/' className='logo'>Viziou
             <img src="src/assets/react.svg" alt="Intersection of Union" className="logo-image" />
         </a>
 
