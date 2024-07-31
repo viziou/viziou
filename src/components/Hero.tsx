@@ -18,7 +18,7 @@ const Hero = () => {
                     <button className="btn btn-explore-2d">Explore 2D</button>
                 </Link>
 
-                <Link to="/2D-Environment">
+                <Link to="/3D-Environment">
                     <button className="btn btn-explore-3d">Explore 3D</button>
                 </Link>
                     
