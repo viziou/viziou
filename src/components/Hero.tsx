@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import '../styles/Hero.css';
 
 const Hero = () => {
@@ -12,8 +13,15 @@ const Hero = () => {
             <p>Explore the world of two-dimensional and three-dimensional intersecting polytopes.</p>
 
             <div className="hero-buttons">
-                <button className="btn btn-explore-2d">Explore 2D</button>
-                <button className="btn btn-explore-3d">Explore 3D</button>
+
+                <Link to="/2D-Environment">
+                    <button className="btn btn-explore-2d">Explore 2D</button>
+                </Link>
+
+                <Link to="/2D-Environment">
+                    <button className="btn btn-explore-3d">Explore 3D</button>
+                </Link>
+                    
             </div>
 
             <div className="hero-info">
