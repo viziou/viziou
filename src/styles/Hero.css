@@ -1,0 +1,94 @@
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10%;
+    color: white;
+    height: 100vh;
+    cursor: default;
+  }
+  
+.hero-content {
+    max-width: 50%;
+}
+
+.hero h1 {
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+.hero h1 span {
+    display: block;
+    font-size: 64px;
+    color: #fb61c8; 
+}
+
+.hero p {
+    font-size: 20px;
+    margin-bottom: 40px;
+}
+
+.hero-buttons {
+    margin-bottom: 40px;
+    display: flex;
+    gap: 20px;
+}
+
+.btn {
+    font-size: 20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-explore-2d {
+    background-color: #585ad8;
+    color: white;
+}
+
+.btn-explore-2d:hover {
+    background-color: #4043e0;
+}
+
+.btn-explore-3d {
+    background-color: #585ad8; 
+    color: white;
+}
+
+.btn-explore-3d:hover {
+    background-color: #4043e0;
+}
+
+.hero-info p {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+.hero-image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 40%;
+}
+
+.hero-image img {
+    max-width: 100%;
+}
+
+.hero-stats {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.stat h2 {
+    font-size: 22px;
+    margin-bottom: 5px;
+}
+
+.stat p {
+    font-size: 15px;
+}
+
