@@ -1,5 +1,6 @@
 import '../styles/Navbar.css';
 import PlaceholderLogo from '../assets/react.svg';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   return (
@@ -9,9 +10,9 @@ const Navbar = () => {
         </a>
 
         <nav className='navbar'>
-            <a href='/2D-Environment'>2D Environment</a>
-            <a href='/3D-Environment'>3D Environment</a>
-            <a href='/about'>About</a>
+            <Link to='/2D-Environment'>2D Environment</Link>
+            <Link to='/3D-Environment'>3D Environment</Link>
+            <Link to='/about'>About</Link>
         </nav>
     </header>
   );
