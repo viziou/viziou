@@ -1,10 +1,11 @@
 import '../styles/Navbar.css';
+import PlaceholderLogo from '../assets/react.svg';
 
 const Navbar = () => {
   return (
     <header className="header">
         <a href='/' className='logo'>Viziou
-            <img src="src/assets/react.svg" alt="Intersection of Union" className="logo-image" />
+            <img src={PlaceholderLogo} alt="Intersection of Union" className="logo-image" />
         </a>
 
         <nav className='navbar'>
