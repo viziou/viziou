@@ -9,9 +9,9 @@ const Navbar = () => {
         </a>
 
         <nav className='navbar'>
-            <a href='/'>2D Environment</a>
-            <a href='/'>3D Environment</a>
-            <a href='/'>About</a>
+            <a href='/2D-Environment'>2D Environment</a>
+            <a href='/3D-Environment'>3D Environment</a>
+            <a href='/about'>About</a>
         </nav>
     </header>
   );
