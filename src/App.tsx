@@ -15,6 +15,7 @@ function App() {
       <div>
         <Navbar />
         <Routes>
+          <Route index element={<Hero />} />
           <Route path="/" element={<Hero />} />
 
           <Route path="/2D-Environment" element={<TwoD />} />
