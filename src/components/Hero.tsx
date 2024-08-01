@@ -6,8 +6,8 @@ const Hero = () => {
     <section className="hero">
         <div className="hero-content">
             <h1>
-                Interact<br />
-                <span>Model, and Create.</span>
+                <span>Interact<br /></span>
+                Model, and Create.
             </h1>
 
             <p>Explore the world of two-dimensional and three-dimensional intersecting polytopes.</p>
@@ -42,6 +42,12 @@ const Hero = () => {
                 <p>Developers</p>
             </div>
             
+        </div>
+
+        <div className="hero-shapes">
+            <div className="hero-shapes-blur-1"></div>
+            <div className="hero-shapes-blur-2"></div>
+            <div className="hero-shapes-blur-3"></div>
         </div>
 
     </section>
