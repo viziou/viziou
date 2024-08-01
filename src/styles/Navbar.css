@@ -1,3 +1,8 @@
+:root {
+    /*========== Colors ==========*/
+    --white-colour: hsl(0, 100%, 100%);
+}
+
 .header {
     position: fixed;
     top: 0;
@@ -10,12 +15,17 @@
     z-index: 100;
 }
 
-.logo{
+.logo {
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 25px;
+}
+
+.logo-image {
+    max-width: 35px; 
+    height: auto;
 }
 
 .navbar a {
@@ -24,18 +34,22 @@
   }
   
 .navbar a::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 100%;
     left: 0;
     width: 0;
     height: 2px;
-    background: white;
+    background: var(--white-colour);
     transition: .3s;
 }
 
 .navbar a:hover::before {
     width: 100%
+}
+
+.navbar .active::before {
+    width: 100%; 
 }
 
 @media only screen and (max-width: 600px) {

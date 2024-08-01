@@ -1,9 +1,21 @@
+:root {
+    /*========== Colors ==========*/
+    --first-colour: hsl(203, 71%, 60%);
+    --second-colour: hsl(277, 56%, 68%);
+    --text-colour: hsl(203, 8%, 98%);
+    --body-colour: hsl(259, 20%, 18%);
+    --btn-colour: hsl(239, 62%, 60%);
+    --btn-hover-colour: hsl(239, 72%, 56%);
+  
+    /*========== Font and typography ==========*/
+}
+
 .hero {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10%;
-    color: white;
+    color: var(--text-colour);
     height: 100vh;
     cursor: default;
   }
@@ -12,15 +24,21 @@
     max-width: 50%;
 }
 
-.hero h1 {
+.hero h1 span {
     font-size: 40px;
     margin-bottom: 20px;
+
+    background: linear-gradient(90deg,
+                                var(--second-colour) 0%,
+                                var(--first-colour) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.hero h1 span {
+.hero h1 {
     display: block;
     font-size: 64px;
-    color: #fb61c8; 
+    color: var(--text-colour); 
 }
 
 .hero p {
@@ -44,21 +62,21 @@
 }
 
 .btn-explore-2d {
-    background-color: #585ad8;
-    color: white;
+    background-color: var(--btn-colour);
+    color: var(--text-colour);
 }
 
 .btn-explore-2d:hover {
-    background-color: #4043e0;
+    background-color: var(--btn-hover-colour);
 }
 
 .btn-explore-3d {
-    background-color: #585ad8; 
-    color: white;
+    background-color: var(--btn-colour); 
+    color: var(--text-colour);
 }
 
 .btn-explore-3d:hover {
-    background-color: #4043e0;
+    background-color: var(--btn-hover-colour);
 }
 
 .hero-info p {
@@ -81,6 +99,8 @@
     display: flex;
     flex-direction: column;
     margin-top: 20px;
+    position: absolute; 
+    right: 10%;
 }
 
 .stat h2 {
@@ -91,4 +111,53 @@
 .stat p {
     font-size: 15px;
 }
+  
+.hero-shapes-blur-1, 
+.hero-shapes-blur-2, 
+.hero-shapes-blur-3 {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    animation: float-blur-shapes 3s ease-in-out infinite;
+}
 
+.hero-shapes-blur-1 {
+    width: 150px;
+    height: 150px;
+    background-color: var(--first-colour);
+    top: 10px;
+    left: 10px;
+  }
+  
+.hero-shapes-blur-2,
+.hero-shapes-blur-3 {
+    width: 250px;
+    height: 250px;
+}
+
+.hero-shapes-blur-2 {
+    background-color: var(--first-colour);
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+}
+
+.hero-shapes-blur-3 {
+    background-color: var(--second-colour);
+    left: 10px;
+    bottom: 10px;
+}
+
+@keyframes float-blur-shapes {
+    0% {
+      transform: translateY(.5rem);
+    }
+  
+    50% {
+      transform: translateY(4rem);
+    }
+  
+    100% {
+      transform: translateY(.5rem);
+    }
+}
