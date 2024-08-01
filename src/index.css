@@ -8,10 +8,11 @@
 }
 
 body {
-  background: url(./assets/main-background.png) no-repeat;
+  background: hsl(259, 20%, 18%);
   background-size: cover;
   background-position: center;
   min-height: 100vh;
+  overflow: hidden;
 }
 
 a {
