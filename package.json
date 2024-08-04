@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test": "mocha test/**/*.test.[jt]s?(x)"
+    "test": "cross-env TS_NODE_PROJECT='tsconfig.mocha.json' mocha test/**/*.test.[jt]s?(x)"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -25,6 +25,7 @@
     "@typescript-eslint/parser": "^7.15.0",
     "@vitejs/plugin-react": "^4.3.1",
     "chai": "^5.1.1",
+    "cross-env": "^7.0.3",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
