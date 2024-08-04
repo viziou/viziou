@@ -1,5 +1,5 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code, run tests
+# and then deploy to a GitHub pages website.
 
 name: CI + CD
 
@@ -19,10 +19,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  test:
+  test-build-deploy:
     runs-on: ubuntu-latest
-    
-    environment: github-pages # for importing any relevant environment variables (use env object)
+
+    environment:
+      name: github-pages  # for importing any relevant environment variables (use env object)
+      url: ${{ steps.deployment.outputs.page_url }}  # includes URL on github deploy UI graph
 
     steps:
     - name: Checkout repository
@@ -37,26 +39,8 @@ jobs:
     - name: Install Dependencies
       run: npm ci
 
-    - name: Run Node.js Tests # TODO: We've decided on Mocha.js + Chai?
+    - name: Run Mocha + Chai Tests # TODO: We've decided on Mocha.js + Chai?
       run: npm run test
-      
-  build:
-    runs-on: ubuntu-latest
-    
-    environment: github-pages
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js ${{ env.USE_NODE_VERSION }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.USE_NODE_VERSION }}
-        cache: 'npm'
-
-    - name: Install Dependencies
-      run: npm ci
 
     - name: Transpile Typescript + Build w/ Vite
       run: npm run build
@@ -65,21 +49,9 @@ jobs:
       uses: actions/upload-pages-artifact@v3
       with: 
         path: ./dist  # Vite deploys to dist, not build folder
-        name: github-pages-${{ github.sha }}
+        name: github-pages-${{ github.sha }}  # TODO: get a consistent hash across pull requests and pushes to main
         retention-days: 90
 
-      # no need to save runner here since deployment doesn't require the project (the artifact has been uploaded)
-
-  deploy:
-    needs: [test, build]
-
-    runs-on: ubuntu-latest
-
-    environment: 
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
