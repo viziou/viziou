@@ -2,8 +2,8 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { expect } from "chai";
 
-describe("Render Test", () => {
-    it("save button is rendering", () => {
+describe("Save Button Test", () => {
+    it("is rendering", () => {
         render(<button>Save</button>);
 
         const button = screen.getByText("Save");

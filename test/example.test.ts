@@ -13,7 +13,7 @@ const should = setupShould();
 * */
 
 // traditional mocha test style
-test("simple math", ()=> {
+test("Simple Math Testing", ()=> {
     const x = 1 + 2;
     assert.equal(x, 3); // traditional assert style
     assert.isAtLeast(x,0);
@@ -21,14 +21,14 @@ test("simple math", ()=> {
 })
 
 // modern mocha style + chai BDD style
-describe("more math tests", () => {
-    it("assert with expect-style", () => {
+describe("More Math Tests", () => {
+    it("using expect-style", () => {
         const x = 999;
         expect(x-x).to.equal(0)
         expect(!!(x-x)).is.false // 'to' and 'is' are language chains for readability
     })
 
-    it("assert with should-style", () => {
+    it("using should-style", () => {
         const x = 3**2;
         // notice how with 'should' framework,
         x.should.be.a('number');
