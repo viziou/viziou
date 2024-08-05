@@ -24,6 +24,8 @@ class Point2D {
 	}
 }
 
+// TODO: Enforce conditions on Polygon requiring >= 3 vertices
+
 class Polygon2D {
     private _vertices: Point2D[];
 
@@ -31,7 +33,7 @@ class Polygon2D {
         this._vertices = [...vertices];
     }
 
-    private _sortCCW() {
+    private _sortCW() {
         return
     }
 
@@ -53,11 +55,10 @@ class Polygon2D {
         return sum/2;
     }
 
-    public contains(point: Point2D): boolean {
-        var count: number = 0;
+    public contains(testPoint: Point2D): boolean {
+        var flag: boolean = false;
         var p: Point2D;
         var q: Point2D;
-        var xIntersect: number;
 
         // Loop over every edge of the polygon
         for (var i = 0; i < this._vertices.length; i++) {
@@ -65,18 +66,18 @@ class Polygon2D {
             p = this._vertices[i];
             q = this._vertices[(i + 1) % this._vertices.length];
 
-            // Get intersection x-value of horizontal right ray of point with edge defined by p and q
-            xIntersect = ((p.x - q.x) / (p.y - q.y)) * (point.y - p.y) + p.x
-
-            // TODO: Fix to do vertical ray if the two points p and q are horizontal (currently leads to DivBy0 error)
-
-            // Verify the conditions of ray and intersection of edge within boundaries
-            // TODO: Investigate how intersection with endpoints of edges should be handled as to not accidentally count it twice
-            //       when comparing with another edge sharing the same endpoint.
-            if (xIntersect >= point.x && ((p.x < xIntersect && xIntersect < q.x) || (q.x < xIntersect && xIntersect < p.x)))
-                count += 1;
+            // Special case check of when ray directly hits the inclusive p coordinate. This case
+            // will help resolve situations when the horizontal ray is on top of an edge.
+            if (testPoint.y == p.y && testPoint.x < p.x) {
+                flag = !flag;
+            }
+            // Verify that testPoint.y is in the range defined by the endpoints p (inc) and q (exc) y-coordinate
+            else if ((p.y > testPoint.y && q.y < testPoint.y) || (p.y < testPoint.y && q.y > testPoint.y)
+                && (testPoint.x < (p.x - q.x)*(testPoint.y - p.y)/(p.y - q.y) + p.x)) {
+                flag = !flag;
+            }
         }
-        return true;
+        return flag;
     }
 }
 
