@@ -33,6 +33,14 @@ class Polygon2D {
         this._vertices = [...vertices];
     }
 
+    /**
+     * Getter vertices
+     * @return {Point2D[]}
+     */
+	public get vertices(): Point2D[] {
+		return [...this._vertices];
+	}
+
     private _sortCW() {
         return
     }
@@ -66,13 +74,8 @@ class Polygon2D {
             p = this._vertices[i];
             q = this._vertices[(i + 1) % this._vertices.length];
 
-            // Special case check of when ray directly hits the inclusive p coordinate. This case
-            // will help resolve situations when the horizontal ray is on top of an edge.
-            if (testPoint.y == p.y && testPoint.x < p.x) {
-                flag = !flag;
-            }
             // Verify that testPoint.y is in the range defined by the endpoints p (inc) and q (exc) y-coordinate
-            else if ((p.y > testPoint.y && q.y < testPoint.y) || (p.y < testPoint.y && q.y > testPoint.y)
+            if ((p.y > testPoint.y && q.y < testPoint.y) || (p.y < testPoint.y && q.y > testPoint.y)
                 && (testPoint.x < (p.x - q.x)*(testPoint.y - p.y)/(p.y - q.y) + p.x)) {
                 flag = !flag;
             }
@@ -82,4 +85,4 @@ class Polygon2D {
 }
 
 
-export default { Point2D, Polygon2D };
+export { Point2D, Polygon2D };
