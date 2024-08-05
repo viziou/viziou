@@ -1,7 +1,7 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code, run tests
 # and then deploy to a GitHub pages website.
 
-name: Testing + Build
+name: Testing & Building
 
 on:
   push: # test on all pushes except to main and any branch that includes 'notest' or 'skiptest'
@@ -22,7 +22,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  test-build-deploy:
+  test-and-build:
     runs-on: ubuntu-latest
 
     environment:
