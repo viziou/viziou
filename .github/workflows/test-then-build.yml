@@ -27,7 +27,6 @@ jobs:
 
     environment:
       name: github-pages  # for importing any relevant environment variables (use env object)
-      #url: ${{ steps.deployment.outputs.page_url }}  # includes URL on github deploy UI graph
 
     steps:
     - name: Checkout repository
@@ -42,7 +41,7 @@ jobs:
     - name: Install Dependencies
       run: npm ci
 
-    - name: Run Mocha Tests # TODO: We've decided on Mocha.js + Chai?
+    - name: Run Mocha Tests
       run: npm run test
 
     - name: Transpile Typescript + Build w/ Vite
@@ -53,4 +52,4 @@ jobs:
       with: 
         path: ./dist  # Vite deploys to dist, not build folder
         name: github-pages-${{ (github.event_name == 'pull_request') && (github.event.pull_request.head.sha) || (github.sha) }}  # TODO: get a consistent hash across pull requests and pushes to main
-        retention-days: 14
+        retention-days: 14  # lower retention since this event will trigger a lot more

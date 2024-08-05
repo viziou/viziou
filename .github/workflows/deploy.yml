@@ -1,13 +1,11 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code, run tests
 # and then deploy to a GitHub pages website.
 
-name: CI + CD
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [ "main" ]
-  #pull_request:    # probably shouldn't do a full deploy if it's just a PR
-  #  branches: [ "main" ]
 
 permissions:
   contents: read
@@ -27,30 +25,42 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}  # includes URL on github deploy UI graph
 
     steps:
+    - name: Does artifact already exist?
+      id: artifact
+      uses: softwareforgood/check-artifact-v4-existence@v0
+      with:
+        name: github-pages-${{ github.sha }}
+
     - name: Checkout repository
+      if: ${{ !steps.artifact.outputs.exists }}
       uses: actions/checkout@v4
     
     - name: Setup Node.js ${{ env.USE_NODE_VERSION }}
+      if: ${{ !steps.artifact.outputs.exists }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.USE_NODE_VERSION }}
         cache: 'npm'
         
     - name: Install Dependencies
+      if: ${{ !steps.artifact.outputs.exists }}
       run: npm ci
 
-    - name: Run Mocha + Chai Tests # TODO: We've decided on Mocha.js + Chai?
+    - name: Run Mocha Tests
+      if: ${{ !steps.artifact.outputs.exists }}
       run: npm run test
 
     - name: Transpile Typescript + Build w/ Vite
+      if: ${{ !steps.artifact.outputs.exists }}
       run: npm run build
 
     - name: Upload Build Artifact
+      if: ${{ !steps.artifact.outputs.exists }}
       uses: actions/upload-pages-artifact@v3
       with: 
         path: ./dist  # Vite deploys to dist, not build folder
         name: github-pages-${{ github.sha }}  # TODO: get a consistent hash across pull requests and pushes to main
-        retention-days: 90
+        retention-days: 14
 
     - name: Deploy to GitHub Pages
       id: deployment
