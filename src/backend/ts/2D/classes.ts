@@ -64,11 +64,12 @@ class Polygon2D {
     }
 
     public contains(testPoint: Point2D): boolean {
-        var flag: boolean = false;
+        var flag1: boolean = false;
+        var flag2: boolean = false;
         var p: Point2D;
         var q: Point2D;
 
-        // Loop over every edge of the polygon
+        // Loop over every edge of the polygon and do right ray test
         for (var i = 0; i < this._vertices.length; i++) {
             // Get points of edge
             p = this._vertices[i];
@@ -77,10 +78,25 @@ class Polygon2D {
             // Verify that testPoint.y is in the range defined by the endpoints p (inc) and q (exc) y-coordinate
             if ((p.y > testPoint.y && q.y < testPoint.y) || (p.y < testPoint.y && q.y > testPoint.y)
                 && (testPoint.x < (p.x - q.x)*(testPoint.y - p.y)/(p.y - q.y) + p.x)) {
-                flag = !flag;
+                flag1 = !flag1;
             }
         }
-        return flag;
+
+        // Loop over every edge of the polygon and do left ray test
+        for (var i = 0; i < this._vertices.length; i++) {
+            // Get points of edge
+            p = this._vertices[i];
+            q = this._vertices[(i + 1) % this._vertices.length];
+
+            // Verify that testPoint.y is in the range defined by the endpoints p (inc) and q (exc) y-coordinate
+            if ((p.y > testPoint.y && q.y < testPoint.y) || (p.y < testPoint.y && q.y > testPoint.y)
+                && (testPoint.x > (p.x - q.x)*(testPoint.y - p.y)/(p.y - q.y) + p.x)) {
+                flag2 = !flag2;
+            }
+        }
+
+        // Both tests must return same true for point to be considered inside the polygon
+        return flag1 && flag2;
     }
 }
 
