@@ -5,11 +5,9 @@ name: Testing & Building
 
 on:
   push: # test on all pushes except to main and any branch that includes 'notest' or 'skiptest'
-    branches-ignore:
-      - 'main'
-      - '**notest**'
-      - '**skiptest**'
-  pull_request:
+    branches:
+      - '**'
+  pull_request:  # turns out triggering on pull request is not necessary because push gets triggered on update anyway
     branches: [ 'main' ]
 
 permissions:
@@ -24,6 +22,9 @@ concurrency:
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
+    # If it's a push event, then the branch name can't include 'notest' or 'skiptest'
+    # However, we still need these to trigger if it was a pull request to main, but also not run the workflow twice
+    if: (github.event_name == 'push' && !(contains(github.ref_name, 'notest') || contains(github.ref_name, 'skiptest'))) || (github.event_name == 'pull_request' && (contains(github.ref_name, 'notest') || contains(github.ref_name, 'skiptest')))
 
     environment:
       name: github-pages  # for importing any relevant environment variables (use env object)
