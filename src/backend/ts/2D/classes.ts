@@ -22,6 +22,15 @@ class Point2D {
 	public get y(): number {
 		return this._y;
 	}
+
+    public toList(): number[] {
+        return [this._x, this._y];
+    }
+}
+
+interface Edge {
+    p: Point2D;
+    q: Point2D;
 }
 
 // TODO: Enforce conditions on Polygon requiring >= 3 vertices
@@ -77,7 +86,7 @@ class Polygon2D {
 
             // Verify that testPoint.y is in the range defined by the endpoints p (inc) and q (exc) y-coordinate
             if ((p.y > testPoint.y && q.y < testPoint.y) || (p.y < testPoint.y && q.y > testPoint.y)
-                && (testPoint.x < (p.x - q.x)*(testPoint.y - p.y)/(p.y - q.y) + p.x)) {
+                && (testPoint.x <= (p.x - q.x)*(testPoint.y - p.y)/(p.y - q.y) + p.x)) {
                 flag1 = !flag1;
             }
         }
@@ -90,15 +99,16 @@ class Polygon2D {
 
             // Verify that testPoint.y is in the range defined by the endpoints p (inc) and q (exc) y-coordinate
             if ((p.y > testPoint.y && q.y < testPoint.y) || (p.y < testPoint.y && q.y > testPoint.y)
-                && (testPoint.x > (p.x - q.x)*(testPoint.y - p.y)/(p.y - q.y) + p.x)) {
+                && (testPoint.x >= (p.x - q.x)*(testPoint.y - p.y)/(p.y - q.y) + p.x)) {
                 flag2 = !flag2;
             }
         }
 
         // Both tests must return same true for point to be considered inside the polygon
-        return flag1 && flag2;
+        return flag1 || flag2;
     }
 }
 
 
 export { Point2D, Polygon2D };
+export type { Edge };
