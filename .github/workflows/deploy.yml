@@ -32,30 +32,30 @@ jobs:
         name: github-pages-${{ github.sha }}
 
     - name: Checkout repository
-      if: ${{ !steps.artifact.outputs.exists }}
+      if: ${{ steps.artifact.outputs.exists != 'true' }}
       uses: actions/checkout@v4
     
     - name: Setup Node.js ${{ env.USE_NODE_VERSION }}
-      if: ${{ !steps.artifact.outputs.exists }}
+      if: ${{ steps.artifact.outputs.exists != 'true' }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.USE_NODE_VERSION }}
         cache: 'npm'
         
     - name: Install Dependencies
-      if: ${{ !steps.artifact.outputs.exists }}
+      if: ${{ steps.artifact.outputs.exists != 'true' }}
       run: npm ci
 
     - name: Run Mocha Tests
-      if: ${{ !steps.artifact.outputs.exists }}
+      if: ${{ steps.artifact.outputs.exists != 'true' }}
       run: npm run test
 
     - name: Transpile Typescript + Build w/ Vite
-      if: ${{ !steps.artifact.outputs.exists }}
+      if: ${{ steps.artifact.outputs.exists != 'true' }}
       run: npm run build
 
     - name: Upload Build Artifact
-      if: ${{ !steps.artifact.outputs.exists }}
+      if: ${{ steps.artifact.outputs.exists != 'true' }}
       uses: actions/upload-pages-artifact@v3
       with: 
         path: ./dist  # Vite deploys to dist, not build folder
