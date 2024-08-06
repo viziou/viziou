@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     # If it's a push event, then the branch name can't include 'notest' or 'skiptest'
     # However, we still need these to trigger if it was a pull request to main, but also not run the workflow twice
-    if: (github.event_name == 'push' && !(contains(env.BRANCH_NAME, 'notest') || contains(env.BRANCH_NAME, 'skiptest'))) || (github.event_name == 'pull_request' && (contains(env.BRANCH_NAME, 'notest') || contains(env.BRANCH_NAME, 'skiptest')))
+    if: ${{ (github.event_name == 'push' && ! (contains('$BRANCH_NAME', 'notest') || contains('$BRANCH_NAME', 'skiptest'))) || (github.event_name == 'pull_request' && (contains('$BRANCH_NAME', 'notest') || contains('$BRANCH_NAME', 'skiptest'))) }}
 
     environment:
       name: github-pages  # for importing any relevant environment variables (use env object)
