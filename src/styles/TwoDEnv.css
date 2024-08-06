@@ -1,0 +1,49 @@
+:root {
+    /*========== Colors ==========*/
+    --first-colour: hsl(203, 71%, 60%);
+    --second-colour: hsl(277, 56%, 68%);
+    --text-colour: hsl(203, 8%, 98%);
+    --body-colour: hsl(259, 20%, 18%);
+    --btn-colour: hsl(239, 62%, 60%);
+    --btn-hover-colour: hsl(239, 72%, 56%);
+  
+    /*========== Font and typography ==========*/
+}
+
+.TwoDEnv {
+    padding-top: 4rem; 
+    padding-bottom: 5rem; 
+}
+ 
+main {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    gap: 3rem;
+}
+  
+button {
+    background-color: var(--btn-colour);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+  
+button:hover {
+    background-color: var(--btn-hover-colour);
+}
+  
