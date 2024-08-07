@@ -11,6 +11,7 @@ function getIntersectionPolygon(polygon1: Polygon2D, polygon2: Polygon2D): Polyg
             points.push(point);
         }
     }
+    // console.log(points);
 
     // Find all the points from polygon2 inside polygon1
     for (var point of polygon2.vertices) {
@@ -19,22 +20,23 @@ function getIntersectionPolygon(polygon1: Polygon2D, polygon2: Polygon2D): Polyg
             points.push(point);
         }
     }
-
+    // console.log(points);
     // For all edge pairs see if there is any valid intersection
     for (var i = 0; i < polygon1.getNumVertices(); i++) {
         for (var j = 0; j < polygon2.getNumVertices(); j++) {
-            var pointInt = findIntersection(polygon1.getEdge(i), polygon2.getEdge(j));
-            if (pointInt) {
+            var pointInt = findIntersectionPoint(polygon1.getEdge(i), polygon2.getEdge(j));
+            if (pointInt && !(polygon1.contains(pointInt) || polygon2.contains(pointInt)) ) {
                 points.push(pointInt);
             }
         }
     }
+    // console.log(points);
 
     // Create new Polygon object
     return new Polygon2D(points, true);
 }
 
-function findIntersection(edge1: Edge, edge2: Edge): Point2D | null {
+function findIntersectionPoint(edge1: Edge, edge2: Edge): Point2D | null {
     // Get intersection point
     var intersectionPoint = intersect(edge1.p.toList(), edge1.q.toList(), edge2.p.toList(), edge2.q.toList());
     
@@ -46,7 +48,7 @@ function findIntersection(edge1: Edge, edge2: Edge): Point2D | null {
     } else {
         var pointInt = new Point2D(Number(intersectionPoint[0]), Number(intersectionPoint[1]));
         // Check bounds for elligible point
-        if (onEdge(edge1, pointInt) && onEdge(edge2, pointInt)) {
+        if (pointInt.withinEdge(edge1) && pointInt.withinEdge(edge2)) {
             return pointInt;
         } else {
             return null;
@@ -54,13 +56,9 @@ function findIntersection(edge1: Edge, edge2: Edge): Point2D | null {
     }
 }
 
-function onEdge(edge: Edge, point: Point2D): boolean {
-    return (point.x >= edge.p.x && point.x < edge.q.x) || (point.x > edge.q.x && point.x <= edge.p.x);
-}
-
 function IoU(polygon1: Polygon2D, polygon2: Polygon2D): number {
     var areaOfIntersection: number = getIntersectionPolygon(polygon1, polygon2).calculateArea();
     return areaOfIntersection / (polygon1.calculateArea() + polygon2.calculateArea() - areaOfIntersection);
 }
 
-export { IoU };
+export { getIntersectionPolygon, IoU };
