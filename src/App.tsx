@@ -8,6 +8,8 @@ import TwoD from './pages/TwoDEnv';
 import ThreeD from './pages/ThreeDEnv';
 import PageNotFound from './pages/PageNotFound';
 
+import { PolygonProvider } from './context/AppContext';
+
 function App() {
 
   return (
@@ -18,7 +20,13 @@ function App() {
           <Route index element={<Hero />} />
           <Route path="/" element={<Hero />} />
 
-          <Route path="/2D-Environment" element={<TwoD />} />
+          <Route path="/2D-Environment" element={
+              <PolygonProvider>
+                  <TwoD />
+              </PolygonProvider>
+              }
+          />
+
           <Route path="/3D-Environment" element={<ThreeD />} />
           <Route path="/about" element={<About />} />
 
