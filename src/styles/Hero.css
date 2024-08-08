@@ -119,6 +119,7 @@
     border-radius: 50%;
     filter: blur(90px);
     animation: float-blur-shapes 3s ease-in-out infinite;
+    pointer-events: none;
 }
 
 .hero-shapes-blur-1 {
