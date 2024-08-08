@@ -4,9 +4,8 @@ import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js'
 
 import Scene2D from '../components/Scene2D';
 import { PolygonData } from '../utils/types';
-import { PolygonContext } from '../context/AppContext';
+import { PolygonContext } from '../contexts/PolygonContext';
 import '../styles/TwoDEnv.css';
-
 
 const getSquare = (): THREE.PlaneGeometry => {
     return new THREE.PlaneGeometry(1, 1); 
@@ -40,7 +39,7 @@ const TwoDEnv = () => {
     const context = useContext(PolygonContext);
 
     if (!context?.dispatch) {
-      throw new Error("TwoDEnv must be used within a PolygonProvider");
+        throw new Error("TwoDEnv must be used within a PolygonProvider");
     }
   
     const { polygons, dispatch } = context;
@@ -50,7 +49,7 @@ const TwoDEnv = () => {
             geometry: getSquare(),
             position: [
                 Math.random() * 4 - 2, // x coordinate
-                Math.random() * 4 - 2, // y coordinate
+                Math.random() * 4 - 2 // y coordinate
             ],
             colour: getRandomColour(),
         };
@@ -85,7 +84,6 @@ const TwoDEnv = () => {
                     <Scene2D polygons={polygons} />
                 </div>
             </main>
-  
 
             <div className="button-container">
                 <button onClick={addRandomPolygon}>Add Random Polygon</button>

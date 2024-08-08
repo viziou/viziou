@@ -10,21 +10,22 @@ export type Scene2DProps = {
     polygons: PolygonData[];
 }
 
-export type AddSquareAction = {
-    type: "ADD_SQUARE";
-    payload: PolygonData;
-};
+export type Polygon2DAction =
+  | { type: "ADD_SQUARE"; payload: PolygonData }
+  | { type: "ADD_RANDOM_POLYGON"; payload: PolygonData }
+  | { type: "CLEAR_POLYGONS" };
 
-export type AddRandomPolygonAction = {
-    type: "ADD_RANDOM_POLYGON";
-    payload: PolygonData;
-};
+export interface PolyhedronData {
+    geometry: THREE.BufferGeometry;
+    position: [number, number, number];
+    colour: string;
+}
 
-export type ClearPolygonsAction = {
-    type: "CLEAR_POLYGONS";
-};
+export type Scene3DProps = {
+    polyhedra: PolyhedronData[];
+}
 
-export type PolygonAction =
-    | AddSquareAction
-    | AddRandomPolygonAction
-    | ClearPolygonsAction;
+export type Polyhedron3DAction =
+  | { type: "ADD_CUBE"; payload: PolyhedronData }
+  | { type: "ADD_RANDOM_POLYHEDRON"; payload: PolyhedronData }
+  | { type: "CLEAR_POLYHEDRA" };

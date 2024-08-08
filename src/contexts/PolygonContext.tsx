@@ -1,5 +1,5 @@
-import React, { createContext, useReducer, ReactNode } from 'react';
-import { PolygonData, PolygonAction } from '../utils/types';
+import { createContext, useReducer, ReactNode } from 'react';
+import { PolygonData, Polygon2DAction } from '../utils/types';
 
 const initialState: PolygonContextInterface = {
     polygons: [],
@@ -7,12 +7,12 @@ const initialState: PolygonContextInterface = {
 
 interface PolygonContextInterface {
     polygons: PolygonData[];
-    dispatch?: React.Dispatch<PolygonAction>;
+    dispatch?: React.Dispatch<Polygon2DAction>;
 }
 
 export const PolygonContext = createContext<PolygonContextInterface | undefined>(undefined);
 
-function PolygonReducer(state: PolygonContextInterface, action: PolygonAction) {
+function PolygonReducer(state: PolygonContextInterface, action: Polygon2DAction) {
     switch (action.type) {
         case "ADD_SQUARE":
 
