@@ -37,7 +37,7 @@ const ThreeDEnv = () => {
     const context = useContext(PolyhedronContext);
 
     if (!context?.dispatch) {
-        throw new Error("TwoDEnv must be used within a PolyhedronProvider");
+        throw new Error("ThreeDEnv must be used within a PolyhedronProvider");
     }
 
     const { polyhedra, dispatch } = context;

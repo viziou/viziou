@@ -15,24 +15,18 @@ export const PolygonContext = createContext<PolygonContextInterface | undefined>
 function PolygonReducer(state: PolygonContextInterface, action: Polygon2DAction) {
     switch (action.type) {
         case "ADD_SQUARE":
-
-            console.log("Reducer ADD_SQUARE:", action.payload);
             return {
                 ...state,
                 polygons: [...state.polygons, action.payload],
             };
 
         case "ADD_RANDOM_POLYGON":
-
-            console.log("Reducer ADD_RANDOM_POLYGON:", action.payload);
             return {
                 ...state,
                 polygons: [...state.polygons, action.payload],
             };
 
         case "CLEAR_POLYGONS":
-
-            console.log("Reducer CLEAR_POLYGONS");
             return {
                 ...state,
                 polygons: [],
