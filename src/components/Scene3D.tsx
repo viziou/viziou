@@ -1,23 +1,22 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import { Scene3DProps } from '../utils/types';
+import Polyhedron from './Polyhedron';
 
-// temp imports (using 2D currently)
-import { Scene2DProps } from '../utils/types';
-import Polygon from './Polygon';
+const Scene3D = ({ polyhedra }: Scene3DProps) => {
+    return (
+        <Canvas style={{ height: "80vh", background: "#cccccc" }}>
 
+            <ambientLight intensity={0.5} />
 
-const Scene3D = ({ polygons }: Scene2DProps) => {
-  return (
-    <Canvas style={{ height: "80vh", background: "#cccccc" }}>
-
-        {polygons.map((polygon, index) => (
-            <Polygon key={index} position={polygon.position} geometry={polygon.geometry} colour={polygon.colour} />
-        ))}
+            {polyhedra.map((polyhedra, index) => (
+                <Polyhedron key={index} position={polyhedra.position} geometry={polyhedra.geometry} colour={polyhedra.colour} />
+            ))}
       
-        <OrbitControls/>
+            <OrbitControls/>
         
-    </Canvas>
-  );
+        </Canvas>
+    );
 };
 
 export default Scene3D;
