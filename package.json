@@ -19,7 +19,7 @@
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux",
     "postinstall": "electron-builder install-app-deps",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "start": "electron-vite preview",
     "test": "cross-env TS_NODE_PROJECT='tsconfig.mocha.json' mocha",
