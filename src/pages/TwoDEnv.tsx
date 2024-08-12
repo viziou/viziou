@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useContext } from 'react';
 import * as THREE from 'three';
+import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
+
 import Scene2D from '../components/Scene2D';
 import { PolygonData } from '../utils/types';
+import { PolygonContext } from '../contexts/PolygonContext';
 import '../styles/TwoDEnv.css';
-import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
 
 const getSquare = (): THREE.PlaneGeometry => {
     return new THREE.PlaneGeometry(1, 1); 
@@ -23,8 +25,8 @@ const getRandomGeometry = (): ConvexGeometry => {
 
 // generate random hex colours
 const getRandomColour = (): string => {
-    const letters = '0123456789ABCDEF';
-    let colour = '#';
+    const letters = "0123456789ABCDEF";
+    let colour = "#";
 
     for (let i = 0; i < 6; i++) {
         colour += letters[Math.floor(Math.random() * 16)];
@@ -34,19 +36,26 @@ const getRandomColour = (): string => {
 };
 
 const TwoDEnv = () => {
-    const [polygons, setPolygons] = useState<PolygonData[]>([]);
+    const context = useContext(PolygonContext);
+
+    if (!context?.dispatch) {
+        throw new Error("TwoDEnv must be used within a PolygonProvider");
+    }
+  
+    const { polygons, dispatch } = context;
 
     const addSquare = () => {
         const newPolygon: PolygonData = {
             geometry: getSquare(),
             position: [
                 Math.random() * 4 - 2, // x coordinate
-                Math.random() * 4 - 2, // y coordinate
+                Math.random() * 4 - 2 // y coordinate
             ],
             colour: getRandomColour(),
         };
 
-        setPolygons([...polygons, newPolygon]);
+        console.log("Dispatching ADD_SQUARE:", newPolygon);
+        dispatch({ type: "ADD_SQUARE", payload: newPolygon });
     };
 
     const addRandomPolygon = () => {
@@ -58,11 +67,14 @@ const TwoDEnv = () => {
             ],
             colour: getRandomColour(),
         };
-        setPolygons([...polygons, newPolygon]);
+
+        console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
+        dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
     };
 
     const clearPolygons = () => {
-        setPolygons([]);
+        console.log("Dispatching CLEAR_POLYGONS");
+        dispatch({ type: "CLEAR_POLYGONS" });
     };
 
     return (
@@ -72,7 +84,6 @@ const TwoDEnv = () => {
                     <Scene2D polygons={polygons} />
                 </div>
             </main>
-  
 
             <div className="button-container">
                 <button onClick={addRandomPolygon}>Add Random Polygon</button>
