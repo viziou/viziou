@@ -2,13 +2,30 @@
   "name": "viziou",
   "private": true,
   "version": "0.0.0",
+  "descripton": "Visualiation of IOU for convex 2D and 3D polyhedra",
+  "main": "./out/main/index.js",
+  "author": "Daniel, KC, Mub, Satya",
+  "homepage": "https://viziou.com",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev-electron": "electron-vite dev",
+    "dev-elec": "electron-vite dev",
     "build": "tsc -b && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "build-electron": "npm run typecheck && electron-vite build",
+    "build-elec": "npm run typecheck && electron-vite build",
+    "build:unpack": "npm run build && electron-builder --dir",
+    "build:win": "npm run build && electron-builder --win",
+    "build:mac": "electron-vite build && electron-builder --mac",
+    "build:linux": "electron-vite build && electron-builder --linux",
+    "postinstall": "electron-builder install-app-deps",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
     "preview": "vite preview",
-    "test": "cross-env TS_NODE_PROJECT='tsconfig.mocha.json' mocha"
+    "start": "electron-vite preview",
+    "test": "cross-env TS_NODE_PROJECT='tsconfig.mocha.json' mocha",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
+    "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web"
   },
   "dependencies": {
     "@react-three/drei": "^9.109.2",
@@ -16,9 +33,15 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.0",
-    "three": "^0.167.1"
+    "three": "^0.167.1",
+    "@electron-toolkit/preload": "^3.0.1",
+    "@electron-toolkit/utils": "^3.0.0",
+    "electron-updater": "^6.1.7"
   },
   "devDependencies": {
+    "@electron-toolkit/eslint-config-prettier": "^2.0.0",
+    "@electron-toolkit/eslint-config-ts": "^2.0.0",
+    "@electron-toolkit/tsconfig": "^1.0.1",
     "@testing-library/react": "^16.0.0",
     "@types/chai": "^4.3.17",
     "@types/mocha": "^10.0.7",
@@ -29,6 +52,8 @@
     "@vitejs/plugin-react": "^4.3.1",
     "chai": "^5.1.1",
     "cross-env": "^7.0.3",
+    "electron": "^31.0.2",
+    "electron-builder": "^24.13.3",
     "electron-vite": "^2.3.0",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
@@ -36,6 +61,7 @@
     "global-jsdom": "^24.0.0",
     "ignore-styles": "^5.0.1",
     "mocha": "^10.7.0",
+    "prettier": "^3.3.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.2.2",
     "vite": "^5.3.4"
