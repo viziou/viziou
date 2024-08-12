@@ -3,5 +3,5 @@
   "require": [
     "mocha.cjs"
   ],
-  "spec": "test/**/*.test.[jt]s?(x)"
+  "spec": "{test,src}/**/*.{test,spec}.ts?(x)"
 }
