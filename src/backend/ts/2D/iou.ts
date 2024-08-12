@@ -11,7 +11,6 @@ function getIntersectionPolygon(polygon1: Polygon2D, polygon2: Polygon2D): Polyg
             points.push(point);
         }
     }
-    // console.log(points);
 
     // Find all the points from polygon2 inside polygon1
     for (var point of polygon2.vertices) {
@@ -20,7 +19,7 @@ function getIntersectionPolygon(polygon1: Polygon2D, polygon2: Polygon2D): Polyg
             points.push(point);
         }
     }
-    // console.log(points);
+
     // For all edge pairs see if there is any valid intersection
     for (var i = 0; i < polygon1.getNumVertices(); i++) {
         for (var j = 0; j < polygon2.getNumVertices(); j++) {
@@ -30,7 +29,6 @@ function getIntersectionPolygon(polygon1: Polygon2D, polygon2: Polygon2D): Polyg
             }
         }
     }
-    // console.log(points);
 
     // Create new Polygon object
     return new Polygon2D(points, true);
@@ -48,7 +46,7 @@ function findIntersectionPoint(edge1: Edge, edge2: Edge): Point2D | null {
     } else {
         var pointInt = new Point2D(Number(intersectionPoint[0]), Number(intersectionPoint[1]));
         // Check bounds for elligible point
-        if (pointInt.withinEdge(edge1) && pointInt.withinEdge(edge2)) {
+        if (pointInt.withinEdgeSegment(edge1) && pointInt.withinEdgeSegment(edge2)) {
             return pointInt;
         } else {
             return null;

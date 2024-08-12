@@ -50,14 +50,13 @@ class Point2D {
         return this._x <= point.x && this._y <= point.y;
     }
     
-    public withinEdge(edge: Edge): boolean {
+    public withinEdgeSegment(edge: Edge): boolean {
         return ((this._x >= edge.p.x && this._x <= edge.q.x) || (this._x >= edge.q.x && this._x <= edge.p.x)) &&
                ((this._y >= edge.p.y && this._y <= edge.q.y) || (this._y >= edge.q.y && this._y <= edge.p.y)) &&
                !this.equals(edge.q);
-        // return (this.leq(edge.p) && this.gre(edge.q)) || (this.geq(edge.p) && this.less(edge.q));
     }
 
-    public onEdge(edge: Edge): boolean {
+    public onEdgeSegment(edge: Edge): boolean {
         // Determine if on the line defined by edge and within bounds
         var p = edge.p;
         var q = edge.q;
@@ -67,7 +66,8 @@ class Point2D {
         var B = q.x - p.x;
         var C = -(A*p.x + B*p.y);
 
-        return this.withinEdge(edge) && nearlyEqual(A*this._x + B*this._y + C, 0);
+        // Point is on the segment if within bounds and lies on line equation
+        return this.withinEdgeSegment(edge) && nearlyEqual(A*this._x + B*this._y + C, 0);
     }
 
     public toString(): string {
@@ -81,7 +81,6 @@ interface Edge {
 }
 
 // TODO: Enforce conditions on Polygon requiring >= 3 vertices
-
 class Polygon2D {
     private _vertices: Point2D[];
 
@@ -100,10 +99,12 @@ class Polygon2D {
 		return [...this._vertices];
 	}
 
-    public getMeanVertex() {
+    public getCentroid() {
         var x: number = 0;
         var y: number = 0;
         var numVertices: number = this.getNumVertices();
+
+        // Add up all coordinates and divide by number of vertices to get centre spot
         for (var point of this._vertices) {
             x += point.x;
             y += point.y;
@@ -113,7 +114,7 @@ class Polygon2D {
 
     private _sortCCW() {
         // Obtain centre point to reference from
-        var meanVertex: Point2D = this.getMeanVertex();
+        var meanVertex: Point2D = this.getCentroid();
 
         // Get angle from positive x-axis of each point
         var angles: number[] = this._vertices.map((point) => {
@@ -144,6 +145,7 @@ class Polygon2D {
             }
         });
 
+        // Return an array only consisting of the points
         return sortedCollection.map((value) => {
             return value[0];
         })
@@ -158,10 +160,11 @@ class Polygon2D {
         var p: Point2D;
         var q: Point2D;
 
-        // Loop over every consecutive pair of vertices in counterclockwise
+        // Loop over every edge counterclockwise
         for (var i = 0; i < this._vertices.length; i++) {
-            p = this._vertices[i];
-            q = this._vertices[(i + 1) % this._vertices.length];
+            var edge = this.getEdge(i)
+            var p = edge.p;
+            var q = edge.q;
             sum += (p.x*q.y - p.y*q.x);
         }
         return sum/2;
@@ -176,91 +179,45 @@ class Polygon2D {
         return false;
     }
 
-    // public includesOld(testPoint: Point2D): boolean {
-    //     var flag1: boolean = false;
-    //     var flag2: boolean = false;
-    //     var p: Point2D;
-    //     var q: Point2D;
-
-    //     // Loop over every edge of the polygon and do right ray test
-    //     for (var i = 0; i < this._vertices.length; i++) {
-    //         // Get points of edge
-    //         p = this._vertices[i];
-    //         q = this._vertices[(i + 1) % this._vertices.length];
-
-    //         // Verify that testPoint.y is in the range defined by the endpoints p (exc) and q (exc) y-coordinate
-    //         if (((p.y > testPoint.y && q.y < testPoint.y) || (p.y < testPoint.y && q.y > testPoint.y))
-    //             && (testPoint.x <= (p.x - q.x)*(testPoint.y - p.y)/(p.y - q.y) + p.x)) {
-    //             flag1 = !flag1;
-    //         }
-    //     }
-
-    //     // Loop over every edge of the polygon and do left ray test
-    //     for (var i = 0; i < this._vertices.length; i++) {
-    //         // Get points of edge
-    //         p = this._vertices[i];
-    //         q = this._vertices[(i + 1) % this._vertices.length];
-
-    //         // Verify that testPoint.y is in the range defined by the endpoints p (exc) and q (exc) y-coordinate
-    //         if (((p.y > testPoint.y && q.y < testPoint.y) || (p.y < testPoint.y && q.y > testPoint.y))
-    //             && (testPoint.x >= (p.x - q.x)*(testPoint.y - p.y)/(p.y - q.y) + p.x)) {
-    //             flag2 = !flag2;
-    //         }
-    //     }
-
-    //     // One of the tests must return same true for point to be considered inside the polygon
-    //     return flag1 || flag2;
-    // }
-
     public includes(testPoint: Point2D): boolean {
-        var flag1: boolean = false;
-        var flag2: boolean = false;
-        var p: Point2D;
-        var q: Point2D;
-
-        // **Detect if point is on the boundary**
-        // Loop over every edge of the polygon and check
+        // Iterate over every edge of the polygon in ccw order
         for (var i = 0; i < this._vertices.length; i++) {
-            // Get points of edge
+            // Get edge
             var edge = this.getEdge(i)
+            var p = edge.p;
+            var q = edge.q;
 
-            // Check if testPoint is on this line segment, endpoints p (inc) and q (exc)
-            if (testPoint.onEdge(edge)) {
-                return true;
+            // Obtain line equation coefficients of edge
+            var A = p.y - q.y;
+            var B = q.x - p.x;
+            var C = -(A*p.x + B*p.y);
+
+            // Ensure y-coefficient is positive and if zero, x-coefficient is positive
+            if (B < 0 || (B == 0 && A < 0)) {
+                A *= -1;
+                B *= -1;
+                C *= -1;
+            }
+
+            // Get vector direction
+            var dx = q.x - p.x;
+            var dy = q.y - p.y;
+            var angle = Math.atan2(dy, dx);
+
+            // Perform inequality test and return early if point fails
+            if (-Math.PI/2 <= angle && angle < Math.PI/2) {
+                if (!(A*testPoint.x + B*testPoint.y + C >= 0)) {
+                    return false;
+                }
+            } else {
+                if (!(A*testPoint.x + B*testPoint.y + C <= 0)) {
+                    return false;
+                }
             }
         }
 
-        // **Detect if point is inside convex polygon**
-        // Loop over every edge of the polygon and do RIGHT ray test
-        for (var i = 0; i < this._vertices.length; i++) {
-            // Get points of edge
-            var edge = this.getEdge(i)
-            p = edge.p
-            q = edge.q
-
-            // Verify that testPoint.y is in the range defined by the endpoints p (inc) and q (exc) y-coordinate
-            if (((p.y >= testPoint.y && q.y < testPoint.y) || (p.y <= testPoint.y && q.y > testPoint.y))
-                && (testPoint.x <= (p.x - q.x)*(testPoint.y - p.y)/(p.y - q.y) + p.x)) {
-                flag1 = !flag1;
-            }
-        }
-
-        // Loop over every edge of the polygon and do LEFT ray test
-        for (var i = 0; i < this._vertices.length; i++) {
-            // Get points of edge
-            var edge = this.getEdge(i)
-            p = edge.p
-            q = edge.q
-
-            // Verify that testPoint.y is in the range defined by the endpoints p (inc) and q (exc) y-coordinate
-            if (((p.y >= testPoint.y && q.y < testPoint.y) || (p.y <= testPoint.y && q.y > testPoint.y))
-                && (testPoint.x >= (p.x - q.x)*(testPoint.y - p.y)/(p.y - q.y) + p.x)) {
-                flag2 = !flag2;
-            }
-        }
-
-        // Both tests must return same true for point to be considered inside the polygon
-        return flag1 && flag2;
+        // Return true if passes all inequalities
+        return true;
     }
 
     public getEdge(idx: number): Edge {
