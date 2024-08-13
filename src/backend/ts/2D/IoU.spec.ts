@@ -44,7 +44,7 @@ describe("Testing IoU Functionality", () => {
             
     });
 
-    it("Polygon w/ < 3 vertices Test", () => {
+    it("Polygon w/ < 3 Vertices Test", () => {
             
     });
 
