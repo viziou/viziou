@@ -46,7 +46,7 @@ function findIntersectionPoint(edge1: Edge, edge2: Edge): Point2D | null {
     } else {
         var pointInt = new Point2D(Number(intersectionPoint[0]), Number(intersectionPoint[1]));
         // Check bounds for elligible point
-        if (pointInt.withinEdgeSegment(edge1) && pointInt.withinEdgeSegment(edge2)) {
+        if (pointInt.onEdgeSegment(edge1) && pointInt.onEdgeSegment(edge2)) {
             return pointInt;
         } else {
             return null;

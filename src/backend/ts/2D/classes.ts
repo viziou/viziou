@@ -50,10 +50,9 @@ class Point2D {
         return this._x <= point.x && this._y <= point.y;
     }
     
-    public withinEdgeSegment(edge: Edge): boolean {
+    private _withinEdgeSegment(edge: Edge): boolean {
         return ((this._x >= edge.p.x && this._x <= edge.q.x) || (this._x >= edge.q.x && this._x <= edge.p.x)) &&
-               ((this._y >= edge.p.y && this._y <= edge.q.y) || (this._y >= edge.q.y && this._y <= edge.p.y)) &&
-               !this.equals(edge.q);
+               ((this._y >= edge.p.y && this._y <= edge.q.y) || (this._y >= edge.q.y && this._y <= edge.p.y));
     }
 
     public onEdgeSegment(edge: Edge): boolean {
@@ -67,7 +66,7 @@ class Point2D {
         var C = -(A*p.x + B*p.y);
 
         // Point is on the segment if within bounds and lies on line equation
-        return this.withinEdgeSegment(edge) && nearlyEqual(A*this._x + B*this._y + C, 0);
+        return this._withinEdgeSegment(edge) && nearlyEqual(A*this._x + B*this._y + C, 0);
     }
 
     public toString(): string {
