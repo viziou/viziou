@@ -21,8 +21,8 @@ function getIntersectionPolygon(polygon1: Polygon2D, polygon2: Polygon2D): Polyg
     }
 
     // For all edge pairs see if there is any valid intersection
-    for (var i = 0; i < polygon1.getNumVertices(); i++) {
-        for (var j = 0; j < polygon2.getNumVertices(); j++) {
+    for (var i = 0; i < polygon1.numVertices; i++) {
+        for (var j = 0; j < polygon2.numVertices; j++) {
             var pointInt = findIntersectionPoint(polygon1.getEdge(i), polygon2.getEdge(j));
             if (pointInt && !(polygon1.contains(pointInt) || polygon2.contains(pointInt)) ) {
                 points.push(pointInt);

@@ -98,10 +98,14 @@ class Polygon2D {
 		return [...this._vertices];
 	}
 
+    public get numVertices(): number {
+        return this._vertices.length;
+    }
+
     public getCentroid() {
         var x: number = 0;
         var y: number = 0;
-        var numVertices: number = this.getNumVertices();
+        var numVertices: number = this.numVertices;
 
         // Add up all coordinates and divide by number of vertices to get centre spot
         for (var point of this._vertices) {
@@ -148,10 +152,6 @@ class Polygon2D {
         return sortedCollection.map((value) => {
             return value[0];
         })
-    }
-
-    public getNumVertices(): number {
-        return this._vertices.length;
     }
 
     public calculateArea(): number {
