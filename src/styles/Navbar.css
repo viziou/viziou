@@ -127,15 +127,3 @@
         transform: translateY(-8px) rotate(-45deg);
     }
 }
-
-/* Debugging or additional styles for layout control */
-.main-content {
-    padding-top: 100px; /* Adjust this to match the header height */
-    z-index: 50;
-    position: relative;
-}
-
-/* Optional debugging styles - to visualize layout */
-.header, .main-content {
-    border: 1px solid red; 
-}
