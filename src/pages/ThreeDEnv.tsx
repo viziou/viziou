@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import * as THREE from 'three';
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
 
@@ -77,23 +77,38 @@ const ThreeDEnv = () => {
         dispatch({ type: "CLEAR_POLYHEDRA" });
     };
 
+    const [overflowVisible, setOverflowVisible] = useState(false);
+
+    const toggleOverflowMenu = () => {
+        setOverflowVisible(!overflowVisible);
+    };
+
+    const closeOverflowMenu = () => {
+        setOverflowVisible(false);
+    };
+
     return (
         <div className="ThreeDEnv">
             <main>
-                <div className="canvas-container">
+                <div className="threed-canvas-container">
                     <Scene3D polyhedra={polyhedra} />
                 </div>
             </main>
 
-            <div className="button-container">
-                <button onClick={addRandomPolyhedron}>Add Random Polyhedron</button>
-                <button onClick={addCube}>Add Cube</button>
-                <button onClick={clearPolyhedra}>Clear Shapes</button>
+            <div className="threed-button-container">
+                <button className="threed-button" onClick={addRandomPolyhedron}>Add Random Polyhedron</button>
+                <button className="threed-button" onClick={addCube}>Add Cube</button>
+                <button className="threed-button" onClick={clearPolyhedra}>Clear Shapes</button>
                 
-                <button>Add Custom Shape</button>
-                <button>Export Scene</button>
-                <button>Import Shape</button>
+                <button className="overflow-button" onClick={toggleOverflowMenu}>⋮</button>
+                <div className={`overflow-menu ${overflowVisible ? 'show' : ''}`}>
+                    <button className="threed-button" onClick={() => { closeOverflowMenu(); }}>Add Custom Shape</button>
+                    <button className="threed-button" onClick={() => { closeOverflowMenu(); }}>Export Scene</button>
+                    <button className="threed-button" onClick={() => { closeOverflowMenu(); }}>Import Shape</button>
+                </div>
+
             </div>
+
         </div>
     );
 };

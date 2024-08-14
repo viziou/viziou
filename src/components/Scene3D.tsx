@@ -9,8 +9,8 @@ const Scene3D = ({ polyhedra }: Scene3DProps) => {
 
             <ambientLight intensity={0.5} />
 
-            {polyhedra.map((polyhedra, index) => (
-                <Polyhedron key={index} position={polyhedra.position} geometry={polyhedra.geometry} colour={polyhedra.colour} />
+            {polyhedra.map((polyhedron, index) => (
+                <Polyhedron key={index} position={polyhedron.position} geometry={polyhedron.geometry} colour={polyhedron.colour} />
             ))}
       
             <OrbitControls/>
