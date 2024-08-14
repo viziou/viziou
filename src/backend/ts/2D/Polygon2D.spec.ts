@@ -44,9 +44,9 @@ describe("Testing Class: Polygon2D", () => {
         it("Basic #2 - Octagon Centred at Origin", () => {
             // Setup octagon
             var points = [
-                new Point2D(1, 0), 
-                new Point2D(Math.sqrt(2)/2, Math.sqrt(2)/2), 
-                new Point2D(0, 1), 
+                new Point2D(1, 0),
+                new Point2D(Math.sqrt(2)/2, Math.sqrt(2)/2),
+                new Point2D(0, 1),
                 new Point2D(-Math.sqrt(2)/2, Math.sqrt(2)/2),
                 new Point2D(-1, 0),
                 new Point2D(-Math.sqrt(2)/2, -Math.sqrt(2)/2),
@@ -131,9 +131,9 @@ describe("Testing Class: Polygon2D", () => {
         it("Basic #3 - Octagon", () => {
             // Setup octagon
             var points = [
-                new Point2D(1, 0), 
-                new Point2D(Math.sqrt(2)/2, Math.sqrt(2)/2), 
-                new Point2D(0, 1), 
+                new Point2D(1, 0),
+                new Point2D(Math.sqrt(2)/2, Math.sqrt(2)/2),
+                new Point2D(0, 1),
                 new Point2D(-Math.sqrt(2)/2, Math.sqrt(2)/2),
                 new Point2D(-1, 0),
                 new Point2D(-Math.sqrt(2)/2, -Math.sqrt(2)/2),
@@ -148,7 +148,7 @@ describe("Testing Class: Polygon2D", () => {
             var areTheyEqual = nearlyEqual(calculatedArea, expectedArea);
             areTheyEqual.should.equal(true);
         });
-        
+
         it("Complex #1", () => {
             // Setup polygon
             var points = [new Point2D(0, 0), new Point2D(9, 0), new Point2D(1, 6), new Point2D(0, 3)];
@@ -172,9 +172,9 @@ describe("Testing Class: Polygon2D", () => {
         it("Complex #3", () => {
             // Setup octagon
             var points = [
-                new Point2D(1, 0), 
-                new Point2D(Math.sqrt(2)/2, Math.sqrt(2)/2), 
-                new Point2D(0, 1), 
+                new Point2D(1, 0),
+                new Point2D(Math.sqrt(2)/2, Math.sqrt(2)/2),
+                new Point2D(0, 1),
                 new Point2D(-Math.sqrt(2)/2, Math.sqrt(2)/2),
                 new Point2D(-1, 0),
                 new Point2D(-Math.sqrt(2)/2, -Math.sqrt(2)/2),
@@ -182,7 +182,7 @@ describe("Testing Class: Polygon2D", () => {
                 new Point2D(Math.sqrt(2)/2, -Math.sqrt(2)/2)
             ];
             var polygon = new Polygon2D(points, true);
-            
+
             // Move octagon via map
             polygon = polygon.map((point) => {
                 return new Point2D(point.x + 1000, point.y - 5000);
@@ -196,9 +196,9 @@ describe("Testing Class: Polygon2D", () => {
         it("Complex #4", () => {
             // Setup octagon
             var points = [
-                new Point2D(1, 0), 
-                new Point2D(Math.sqrt(2)/2, Math.sqrt(2)/2), 
-                new Point2D(0, 1), 
+                new Point2D(1, 0),
+                new Point2D(Math.sqrt(2)/2, Math.sqrt(2)/2),
+                new Point2D(0, 1),
                 new Point2D(-Math.sqrt(2)/2, Math.sqrt(2)/2),
                 new Point2D(-1, 0),
                 new Point2D(-Math.sqrt(2)/2, -Math.sqrt(2)/2),
@@ -206,7 +206,7 @@ describe("Testing Class: Polygon2D", () => {
                 new Point2D(Math.sqrt(2)/2, -Math.sqrt(2)/2)
             ];
             var polygon = new Polygon2D(points, true);
-            
+
             // Move octagon via map (scaled by 2x in each direction, area should x4)
             polygon = polygon.map((point) => {
                 return new Point2D(2*(point.x + 340), 2*(point.y + 17));
@@ -216,6 +216,44 @@ describe("Testing Class: Polygon2D", () => {
             var areTheyEqual = nearlyEqual(calculatedArea, expectedArea);
             areTheyEqual.should.equal(true);
         });
+
+        describe("Null Behaviour #1 - Empty", () => {
+          it("should be 0 (no sorting)", () => {
+            const emptyPolygon = new Polygon2D([]);
+            emptyPolygon.calculateArea().should.equal(0);
+          });
+
+          it("should be 0 (sorting)", () => {
+            const emptyPolygon = new Polygon2D([], true);
+            emptyPolygon.calculateArea().should.equal(0);
+          })
+        });
+
+        describe("Null Behaviour #2 - Singular ", () => {
+          it("should be 0 (no sort)", () => {
+            const point = new Polygon2D([new Point2D(1, 2)]);
+            point.calculateArea().should.equal(0)
+          });
+
+          it("should be 0 (sorting)", () => {
+            const point = new Polygon2D([new Point2D(1, 2)], true);
+            point.calculateArea().should.equal(0)
+          });
+        });
+
+        describe("Null Behaviour #3 - Line", () => {
+          it("should be 0 (no sort)", () => {
+            const line = new Polygon2D([new Point2D(-1, 0), new Point2D(-1, 0)]);
+            line.calculateArea().should.equal(0);
+          })
+
+          it("should be 0 (sorting)", () => {
+            const line = new Polygon2D([new Point2D(-1, 0), new Point2D(-1, 0)], true);
+            line.calculateArea().should.equal(0);
+          })
+
+        })
+
     });
 
     describe("Polygon2D.contains()", () => {
@@ -281,9 +319,9 @@ describe("Testing Class: Polygon2D", () => {
         it("On Vertex #2", () => {
             // Setup octagon
             var points = [
-                new Point2D(1, 0), 
-                new Point2D(Math.sqrt(2)/2, Math.sqrt(2)/2), 
-                new Point2D(0, 1), 
+                new Point2D(1, 0),
+                new Point2D(Math.sqrt(2)/2, Math.sqrt(2)/2),
+                new Point2D(0, 1),
                 new Point2D(-Math.sqrt(2)/2, Math.sqrt(2)/2),
                 new Point2D(-1, 0),
                 new Point2D(-Math.sqrt(2)/2, -Math.sqrt(2)/2),
@@ -291,7 +329,7 @@ describe("Testing Class: Polygon2D", () => {
                 new Point2D(Math.sqrt(2)/2, -Math.sqrt(2)/2)
             ];
             var polygon = new Polygon2D(points, true);
-            
+
             // Move octagon via map
             polygon = polygon.map((point) => {
                 return new Point2D(point.x + 340, point.y + 17);
@@ -320,9 +358,9 @@ describe("Testing Class: Polygon2D", () => {
         it("Outside Up", () => {
             // Setup octagon
             var points = [
-                new Point2D(1, 0), 
-                new Point2D(Math.sqrt(2)/2, Math.sqrt(2)/2), 
-                new Point2D(0, 1), 
+                new Point2D(1, 0),
+                new Point2D(Math.sqrt(2)/2, Math.sqrt(2)/2),
+                new Point2D(0, 1),
                 new Point2D(-Math.sqrt(2)/2, Math.sqrt(2)/2),
                 new Point2D(-1, 0),
                 new Point2D(-Math.sqrt(2)/2, -Math.sqrt(2)/2),
@@ -330,7 +368,7 @@ describe("Testing Class: Polygon2D", () => {
                 new Point2D(Math.sqrt(2)/2, -Math.sqrt(2)/2)
             ];
             var polygon = new Polygon2D(points, true);
-            
+
             // Move octagon via map
             polygon = polygon.map((point) => {
                 return new Point2D(point.x + 340, point.y + 17);
@@ -348,4 +386,18 @@ describe("Testing Class: Polygon2D", () => {
             isPointInside.should.equal(false);
         });
     });
+
+    describe("Sorting Behaviour", () => {
+      it("should not sort by default", () => {
+
+      })
+
+      it("should sort when asked", () => {
+
+      })
+
+      it("should not sort when asked not to", () => {
+
+      })
+    })
 });
