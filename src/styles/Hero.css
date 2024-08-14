@@ -162,3 +162,95 @@
       transform: translateY(.5rem);
     }
 }
+
+@media only screen and (max-width: 768px) {
+    .hero {
+        flex-direction: column;
+        padding: 5%;
+        text-align: center;
+        height: auto;
+    }
+
+    .hero-content {
+        padding-top: 100px; 
+        max-width: 100%;
+    }
+
+    .hero h1 {
+        font-size: 48px;
+    }
+
+    .hero h1 span {
+        font-size: 32px;
+    }
+
+    .hero p {
+        font-size: 18px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn {
+        font-size: 18px;
+        padding: 8px 16px;
+    }
+
+    .hero-image {
+        max-width: 100%;
+        margin-top: 20px;
+    }
+
+    .stat {
+        display: none;
+    }
+
+    .hero-shapes-blur-1,
+    .hero-shapes-blur-2,
+    .hero-shapes-blur-3 {
+        display: block; 
+        filter: blur(70px); 
+        width: 100px; 
+        height: 100px;
+    }
+
+    .hero-shapes-blur-1 {
+        top: 20px;
+        left: 20px;
+    }
+
+    .hero-shapes-blur-2 {
+        top: 40%;
+        right: 20px;
+    }
+
+    .hero-shapes-blur-3 {
+        left: 20px;
+        bottom: 20px;
+    }
+}
+
+@media only screen and (max-width: 375px) {
+    .hero h1 {
+        font-size: 36px;
+    }
+
+    .hero h1 span {
+        font-size: 28px;
+    }
+
+    .btn {
+        font-size: 16px;
+        padding: 6px 12px;
+    }
+
+    .hero-content {
+        padding-top: 120px; 
+    }    
+    
+    .hero-stats {
+        display: none;
+    }
+}

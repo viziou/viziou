@@ -28,11 +28,33 @@
     height: auto;
 }
 
+.hamburger {
+    display: none;
+    cursor: pointer;
+    z-index: 101;
+}
+
+.line {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px auto;
+    background-color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+}
+
 .navbar a {
     position: relative;
     margin-left: 40px;
-  }
-  
+    color: var(--white-colour);
+    text-decoration: none;
+}
+
 .navbar a::before {
     content: "";
     position: absolute;
@@ -41,11 +63,11 @@
     width: 0;
     height: 2px;
     background: var(--white-colour);
-    transition: .3s;
+    transition: 0.3s;
 }
 
 .navbar a:hover::before {
-    width: 100%
+    width: 100%;
 }
 
 .navbar .active::before {
@@ -53,13 +75,67 @@
 }
 
 @media only screen and (max-width: 600px) {
+    .hamburger {
+        display: block;
+    }
+
     .navbar {
-        display: none;
+        position: fixed;
+        top: 60px;
+        left: -100%; 
+        flex-direction: column;
+        background-color: rebeccapurple;
+        width: 100%;
+        text-align: center;
+        transition: left 0.3s ease;
+        z-index: 100; 
     }
 
-    .logo{
-        display: none;
+    .navbar.open {
+        left: 0;
     }
 
-    /* hamburger nav for future */
+    .navbar a {
+        margin: 20px 0;
+    }
+
+    .navbar a::before {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%; 
+        transform: translateX(-50%); 
+        width: 0;
+        height: 2px;
+        background: var(--white-colour);
+        transition: 0.3s;
+    }
+
+    .navbar .active::before {
+        width: 25%;
+    }
+
+    .hamburger.active .line:nth-child(2) {
+        opacity: 0;
+    }
+
+    .hamburger.active .line:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+
+    .hamburger.active .line:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+}
+
+/* Debugging or additional styles for layout control */
+.main-content {
+    padding-top: 100px; /* Adjust this to match the header height */
+    z-index: 50;
+    position: relative;
+}
+
+/* Optional debugging styles - to visualize layout */
+.header, .main-content {
+    border: 1px solid red; 
 }

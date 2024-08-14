@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import * as THREE from 'three';
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
 
@@ -77,25 +77,39 @@ const TwoDEnv = () => {
         dispatch({ type: "CLEAR_POLYGONS" });
     };
 
+    const [overflowVisible, setOverflowVisible] = useState(false);
+
+    const toggleOverflowMenu = () => {
+        setOverflowVisible(!overflowVisible);
+    };
+
+    const closeOverflowMenu = () => {
+        setOverflowVisible(false);
+    };
+
     return (
         <div className="TwoDEnv">
             <main>
-                <div className="canvas-container">
+                <div className="twod-canvas-container">
                     <Scene2D polygons={polygons} />
                 </div>
             </main>
 
-            <div className="button-container">
-                <button onClick={addRandomPolygon}>Add Random Polygon</button>
-                <button onClick={addSquare}>Add Square</button>
-                <button onClick={clearPolygons}>Clear Shapes</button>
+            <div className="twod-button-container">
+                <button className="twod-button" onClick={addRandomPolygon}>Add Random Polygon</button>
+                <button className="twod-button" onClick={addSquare}>Add Square</button>
+                <button className="twod-button" onClick={clearPolygons}>Clear Shapes</button>
 
-                <button>Add Custom Shape</button>
-                <button>Export Scene</button>
-                <button>Import Shape</button>
+                <button className="overflow-button" onClick={toggleOverflowMenu}>⋮</button>
+                <div className={`overflow-menu ${overflowVisible ? 'show' : ''}`}>
+                    <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Add Custom Shape</button>
+                    <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Export Scene</button>
+                    <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Import Shape</button>
+                </div>
+
             </div>
 
-      </div>
+        </div>
     );
 };
 
