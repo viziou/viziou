@@ -2,7 +2,7 @@ import { describe, it} from "mocha";
 import { should as setupShould } from "chai";
 import { Edge, Point2D, Polygon2D } from "./classes.ts";
 import { getIntersectionPolygon, IoU } from "./iou.ts";
-import { abs } from 'mathjs'
+import { abs, sqrt } from 'mathjs'
 import { nearlyEqual } from './utils.ts'
 const should = setupShould();
 
@@ -77,7 +77,23 @@ describe("Fuzzing Tests", () => {
   });
 
   describe("Circle PI Test", () => {
-    it("should approximately equal pi")
+    // 1 = x^2 + y^2  ->  y = sqrt(1-x^2)
+    const STEP_SIZE = 0.00001 // (1/0.001)*4 = 400000 points
+    const points: Point2D[] = []
+    // right to up to left
+    for (let x = 1; x >= -1; x -= STEP_SIZE) {
+      points.push(new Point2D(x, Math.sqrt(1 - x**2)))
+    }
+    // left to down to right
+    for (let x = -1; x <= 1; x += STEP_SIZE) {
+      points.push(new Point2D(x, -Math.sqrt(1 - x**2)))
+    }
+
+    const approximateCircle = new Polygon2D(points);
+
+    it("should approximately equal pi", () => {
+      approximateCircle.calculateArea().should.be.closeTo(Math.PI, 1e-5)
+    })
 
   })
 
