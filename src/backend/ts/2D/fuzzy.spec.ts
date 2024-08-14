@@ -51,9 +51,30 @@ describe("Fuzzing Tests", () => {
   });
 
   describe("Expanding Triangle Test", () => {
-    it("should follow f(x) = (x^2)/2 curve")
+    // Generate an array of tests (lazy)
+    const MAX_SIZE = 1000
+    const STEP_SIZE = 0.01
 
-  })
+    function* generateTests() {
+      for (let i = 0; i < MAX_SIZE; i += STEP_SIZE) {
+        yield {'polygon': new Polygon2D([
+            new Point2D(i/2, 0),
+            new Point2D(0, i),
+            new Point2D(-i/2, 0)
+          ]),
+          'expectedArea': (i**2)/2}
+      }
+    }
+
+    const generator = generateTests()
+
+    it("should follow f(x) = (x^2)/2 curve", () => {
+      for (const {polygon, expectedArea} of generator) {
+        const calculated = polygon.calculateArea();
+        calculated.should.be.equal(expectedArea);
+      }
+    });
+  });
 
   describe("Circle PI Test", () => {
     it("should approximately equal pi")
