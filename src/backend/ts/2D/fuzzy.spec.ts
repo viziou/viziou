@@ -36,4 +36,22 @@ describe("Fuzzing Tests", () => {
 
   })
 
+  describe("Null Behaviour - Single Point", () => {
+    it("should equal 0", () => {
+
+    })
+  })
+
+  describe("Null Behaviour - Single Line", () => {
+    it("should equal 0", () => {
+
+    })
+  })
+
+  describe("Identical Vertices", () => {
+    it("should equal 0", () => {
+
+    })
+  })
+
 })
