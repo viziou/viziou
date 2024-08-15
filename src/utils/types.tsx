@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 
 export type PolygonData = {
   position: [number, number];
@@ -7,27 +7,29 @@ export type PolygonData = {
 };
 
 export type Scene2DProps = {
-    polygons: PolygonData[];
-}
+  polygons: PolygonData[];
+};
 
 export type Polygon2DAction =
   | { type: "ADD_SQUARE"; payload: PolygonData }
   | { type: "ADD_RANDOM_POLYGON"; payload: PolygonData }
   | { type: "ADD_POINT", payload: PolygonData }
   | { type: "SET_POLYGONS"; payload: PolygonData[] }
-  | { type: "CLEAR_POLYGONS" };
+  | { type: "CLEAR_POLYGONS" }
+  | { type: "UPDATE_POSITION"; index: number; position: [number, number] };
 
 export interface PolyhedronData {
-    geometry: THREE.BufferGeometry;
-    position: [number, number, number];
-    colour: string;
+  geometry: THREE.BufferGeometry;
+  position: [number, number, number];
+  colour: string;
 }
 
 export type Scene3DProps = {
-    polyhedra: PolyhedronData[];
-}
+  polyhedra: PolyhedronData[];
+};
 
 export type Polyhedron3DAction =
   | { type: "ADD_CUBE"; payload: PolyhedronData }
   | { type: "ADD_RANDOM_POLYHEDRON"; payload: PolyhedronData }
   | { type: "CLEAR_POLYHEDRA" };
+

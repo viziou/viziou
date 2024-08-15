@@ -44,6 +44,14 @@ function PolygonReducer(state: PolygonContextInterface, action: Polygon2DAction)
                 polygons: [],
             };
 
+        case "UPDATE_POSITION":
+            const updatedPolygons = [...state.polygons];
+            updatedPolygons[action.index].position = action.position;
+            return {
+                ...state,
+                polygons: updatedPolygons
+            }
+
         default:
             return state;
     }

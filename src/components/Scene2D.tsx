@@ -9,13 +9,14 @@ const Scene2D = ({ polygons }: Scene2DProps) => {
         <Canvas style={{ height: "80vh", background: "#cccccc" }} >
 
             {polygons.map((polygon, index) => (
-                <Polygon key={index} position={polygon.position} geometry={polygon.geometry} colour={polygon.colour} />
+                <Polygon key={index} index={index} position={polygon.position} geometry={polygon.geometry} colour={polygon.colour} />
             ))}
       
             <OrbitControls
                 enableRotate={false} 
                 enablePan={true}
                 enableZoom={true} 
+                enableDamping={false}
                 mouseButtons={{
                   LEFT: THREE.MOUSE.PAN
                 }}
