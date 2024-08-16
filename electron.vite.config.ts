@@ -4,9 +4,23 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   main: {
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve(__dirname, 'src/main/index.mts')
+        }
+      }
+    },
     plugins: [externalizeDepsPlugin()]
   },
   preload: {
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve(__dirname, 'src/preload/index.mts')
+        }
+      }
+    },
     plugins: [externalizeDepsPlugin()]
   },
   renderer: {

@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "descripton": "Visualiation of IOU for convex 2D and 3D polyhedra",
-  "main": "./out/main/index.js",
+  "main": "./out/main/index.mjs",
   "author": "Daniel, KC, Mub, Satya",
   "homepage": "https://viziou.com",
   "type": "module",
