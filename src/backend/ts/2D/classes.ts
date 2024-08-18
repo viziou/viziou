@@ -30,8 +30,17 @@ class Point2D {
     return {x: this.x, y: this.y};
   }
 
-  public translate(x: number, y: number) {
-    this._x += x; this._y += y; return this;
+  public translate(x: number, y: number): this;
+  public translate(p: Point2D): this;
+
+  public translate(x: unknown, y: unknown = null): this {
+    if (typeof x === 'number' && typeof y === 'number') {
+      this._x += x; this._y += y;
+    } else if (x instanceof Point2D) {
+      this._x += x.x; this._y += x.y;
+    }
+    // should probably throw exception if both failed
+    return this;
   }
 
     public toList(): number[] {
