@@ -115,4 +115,10 @@ describe("Fuzzing Tests", () => {
     })
   })
 
+  describe("Centroid Invariance", () => {
+    it("should always be inside a convex polygon", () => {
+
+    })
+  })
+
 })
