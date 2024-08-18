@@ -115,22 +115,39 @@ class Polygon2D {
 		return [...this._vertices];
 	}
 
-    public get numVertices(): number {
-        return this._vertices.length;
+  public get numVertices(): number {
+      return this._vertices.length;
+  }
+
+  public getCentroid() {
+      var x: number = 0;
+      var y: number = 0;
+      var numVertices: number = this.numVertices;
+
+      // Add up all coordinates and divide by number of vertices to get centre spot
+      for (var point of this._vertices) {
+          x += point.x;
+          y += point.y;
+      }
+      return new Point2D(x/numVertices, y/numVertices);
+  }
+
+  public translate(x: number, y: number): this;
+  public translate(p: Point2D): this;
+
+  public translate(x: number | Point2D, y?: number): this {
+    if (!(x instanceof Point2D) && (y)) {
+      x = new Point2D(x, y);
+    }
+    // this is necessary to keep TypeScript happy since we're doing funky things with types
+    if (typeof x !== 'number') {
+      this._vertices.map((point: Point2D) => {
+        return point.translate(x);
+      })
     }
 
-    public getCentroid() {
-        var x: number = 0;
-        var y: number = 0;
-        var numVertices: number = this.numVertices;
-
-        // Add up all coordinates and divide by number of vertices to get centre spot
-        for (var point of this._vertices) {
-            x += point.x;
-            y += point.y;
-        }
-        return new Point2D(x/numVertices, y/numVertices);
-    }
+    return this;
+  }
 
     private _sortCCW() {
         // Obtain centre point to reference from
