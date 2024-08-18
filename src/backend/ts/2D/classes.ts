@@ -26,6 +26,14 @@ class Point2D {
 		return this._y;
 	}
 
+  public get xy(): { x: number; y: number } {
+    return {x: this.x, y: this.y};
+  }
+
+  public translate(x: number, y: number) {
+    this._x += x; this._y += y; return this;
+  }
+
     public toList(): number[] {
         return [this._x, this._y];
     }
@@ -49,7 +57,7 @@ class Point2D {
     public leq(point: Point2D): boolean {
         return this._x <= point.x && this._y <= point.y;
     }
-    
+
     private _withinEdgeSegment(edge: Edge): boolean {
         return ((this._x >= edge.p.x && this._x <= edge.q.x) || (this._x >= edge.q.x && this._x <= edge.p.x)) &&
                ((this._y >= edge.p.y && this._y <= edge.q.y) || (this._y >= edge.q.y && this._y <= edge.p.y));
@@ -121,7 +129,7 @@ class Polygon2D {
 
         // Get angle from positive x-axis of each point
         var angles: number[] = this._vertices.map((point) => {
-            // Get angle point makes with reference to shifted polygon to origin 
+            // Get angle point makes with reference to shifted polygon to origin
             var angle = Math.atan2(point.y - meanVertex.y, point.x - meanVertex.x);
 
             // Convert domain from (-pi, pi] to [0, 2*pi)
