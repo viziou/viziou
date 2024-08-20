@@ -1,8 +1,8 @@
 // TODO cite this: http://floating-point-gui.de/errors/comparison/
 export function nearlyEqual(a: number, b: number, epsilon: number = 1e-10): boolean {
-    var absA: number = Math.abs(a);
-	var absB: number = Math.abs(b);
-	var diff: number = Math.abs(a - b);
+    const absA: number = Math.abs(a);
+	const absB: number = Math.abs(b);
+	const diff: number = Math.abs(a - b);
 
     if (a == b) {
         return true;

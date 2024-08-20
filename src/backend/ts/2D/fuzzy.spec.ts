@@ -1,10 +1,10 @@
 import { describe, it} from "mocha";
 import { should as setupShould } from "chai";
-import { Edge, Point2D, Polygon2D } from "./classes.ts";
-import { getIntersectionPolygon, IoU } from "./iou.ts";
-import { abs, sqrt } from 'mathjs'
-import { nearlyEqual } from './utils.ts'
-const should = setupShould();
+import { Point2D, Polygon2D } from "./classes.ts";
+// import { getIntersectionPolygon, IoU } from "./iou.ts";
+// import { abs, sqrt } from 'mathjs'
+// import { nearlyEqual } from './utils.ts'
+setupShould();
 
 // Fuzzy
 describe("Fuzzing Tests", () => {
