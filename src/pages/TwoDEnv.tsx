@@ -7,13 +7,15 @@ import { PolygonData } from '../utils/types';
 import { PolygonContext } from '../contexts/PolygonContext';
 import '../styles/TwoDEnv.css';
 
+import { Storage } from '../backend/Interface';
+
 const getSquare = (): THREE.PlaneGeometry => {
-    return new THREE.PlaneGeometry(1, 1); 
+    return new THREE.PlaneGeometry(1, 1);
 };
 
 const getRandomGeometry = (): ConvexGeometry => {
     // random number of vertices between 5 and 12
-    const numVertices = Math.floor(Math.random() * 8) + 5; 
+    const numVertices = Math.floor(Math.random() * 8) + 5;
     const points = [];
 
     for (let i = 0; i < numVertices; i++) {
@@ -41,7 +43,7 @@ const TwoDEnv = () => {
     if (!context?.dispatch) {
         throw new Error("TwoDEnv must be used within a PolygonProvider");
     }
-  
+
     const { polygons, dispatch } = context;
 
     const addSquare = () => {
@@ -77,6 +79,11 @@ const TwoDEnv = () => {
         dispatch({ type: "CLEAR_POLYGONS" });
     };
 
+    const savePolygons = () => {
+      console.log("Saving canvas...");
+      Storage.save(polygons, 'export');
+    }
+
     const [overflowVisible, setOverflowVisible] = useState(false);
 
     const toggleOverflowMenu = () => {
@@ -103,7 +110,7 @@ const TwoDEnv = () => {
                 <button className="overflow-button" onClick={toggleOverflowMenu}>⋮</button>
                 <div className={`overflow-menu ${overflowVisible ? 'show' : ''}`}>
                     <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Add Custom Shape</button>
-                    <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Export Scene</button>
+                    <button className="twod-button" onClick={() => { closeOverflowMenu(); savePolygons() }}>Export Scene</button>
                     <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Import Shape</button>
                 </div>
 

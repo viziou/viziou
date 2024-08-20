@@ -1,5 +1,7 @@
 import { PolygonData } from '../../../utils/types.tsx'
-import { createHmac } from 'crypto';
+//import { createHmac } from 'crypto';
+//const subtle = window.crypto.subtle;
+//import { str2ab } from '../../../utils/strings.ts'
 
 interface PolygonFile {
 
@@ -32,10 +34,11 @@ class v1 implements PolygonFile {
     this.payload = o.polygons;
   }
 
-  public canUpgrade() {return true}
+  public canUpgrade() {return false}
 
   public upgrade() {
-    return new v2(this.payload).upgrade(); // trigger a recursive upgrade
+    return this;
+    //return new v2(this.payload).upgrade(); // trigger a recursive upgrade
   }
 
   public getPolygons() {
@@ -47,36 +50,37 @@ class v1 implements PolygonFile {
   }
 }
 
-class v2 extends v1 {
+// class v2 extends v1 {
+//
+//   private notReallySecret = subtle.importKey('raw', str2ab('FIT3162'), 'hmac', false, ['sign', 'verify'])
+//   public hmac;
+//
+//   constructor(polygons: PolygonData[]) {
+//     super(polygons);
+//     this.version = 2;
+//     this.hmac = subtle.sign('hmac', this.notReallySecret, JSON.stringify(this.payload))
+//     //this.hmac = createHmac('sha256', this.notReallySecret).update(JSON.stringify(this.payload)).digest('hex');
+//   }
+//
+//   public integrityCheck() {
+//     // Compute the HMAC, make sure it hasn't changed
+//     return createHmac('sha256', this.notReallySecret).update(JSON.stringify(this.payload)).digest('hex') === this.hmac;
+//   }
+//
+//   public canUpgrade() {
+//     return false;
+//   }
+//
+//   public upgrade() {
+//     return this;
+//   }
+//
+// }
 
-  private notReallySecret = 'FIT3162'; // our 'key'
-  public hmac;
-
-  constructor(polygons: PolygonData[]) {
-    super(polygons);
-    this.version = 2;
-    this.hmac = createHmac('sha256', this.notReallySecret).update(JSON.stringify(this.payload)).digest('hex');
-  }
-
-  public integrityCheck() {
-    // Compute the HMAC, make sure it hasn't changed
-    return createHmac('sha256', this.notReallySecret).update(JSON.stringify(this.payload)).digest('hex') === this.hmac;
-  }
-
-  public canUpgrade() {
-    return false;
-  }
-
-  public upgrade() {
-    return this;
-  }
-
-}
-
-class vLatest extends v2 {}
+class vLatest extends v1 {}
 
 class Handler {
-  private static readonly versions = [vLatest, v1, v2];
+  private static readonly versions = [vLatest, v1];//, v2];
 
   public static getConstructor(version: number) {
     return this.versions[version]
