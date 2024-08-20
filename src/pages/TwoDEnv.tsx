@@ -7,13 +7,15 @@ import { PolygonData } from '../utils/types';
 import { PolygonContext } from '../contexts/PolygonContext';
 import '../styles/TwoDEnv.css';
 
+import { Backend2D } from '../backend/Interface';
+
 const getSquare = (): THREE.PlaneGeometry => {
-    return new THREE.PlaneGeometry(1, 1); 
+    return new THREE.PlaneGeometry(1, 1);
 };
 
 const getRandomGeometry = (): ConvexGeometry => {
     // random number of vertices between 5 and 12
-    const numVertices = Math.floor(Math.random() * 8) + 5; 
+    const numVertices = Math.floor(Math.random() * 8) + 5;
     const points = [];
 
     for (let i = 0; i < numVertices; i++) {
@@ -41,7 +43,7 @@ const TwoDEnv = () => {
     if (!context?.dispatch) {
         throw new Error("TwoDEnv must be used within a PolygonProvider");
     }
-  
+
     const { polygons, dispatch } = context;
 
     const addSquare = () => {
@@ -70,6 +72,20 @@ const TwoDEnv = () => {
 
         console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
         dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
+        console.time('Calculating Area of Polygon')
+        console.log("Area of new random polygon: ", Backend2D.area(newPolygon));
+        console.timeEnd('Calculating Area of Polygon');
+        console.time('Calculating Centroid');
+        const {x, y} = Backend2D.centreOfMass(newPolygon);
+        console.log('Centroid: (', x, ', ', y, ')');
+        console.time('Calculating Centroid')
+        const newPoint: PolygonData = {
+          geometry: new THREE.CircleGeometry(0.05, 50),
+          position: [x, y],
+          colour: '#C81400'
+        }
+        console.log("Dispatching ADD_POINT:")
+        dispatch( { type: "ADD_POINT", payload: newPoint });
     };
 
     const clearPolygons = () => {
