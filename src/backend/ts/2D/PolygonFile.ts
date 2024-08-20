@@ -25,13 +25,16 @@ class v1 implements PolygonFile {
   payload: PolygonData[];
 
   constructor(polygons: string | PolygonData[]) {
+    console.log("polygons: ", polygons)
     if (polygons instanceof Array ) {
       this.payload = polygons;
     }
     // otherwise we have a string
     // TODO: this is not type-safe since this has `any`, see https://stackoverflow.com/questions/38688822/how-to-parse-json-string-in-typescript
-    const o = JSON.parse(JSON.stringify(polygons));
-    this.payload = o.polygons;
+    else {
+      const o = JSON.parse(JSON.stringify(polygons));
+      this.payload = o.polygons;
+    }
   }
 
   public canUpgrade() {return false}
