@@ -24,16 +24,19 @@ class v1 implements PolygonFile {
   dimension = 2;
   payload: PolygonData[];
 
+  // TODO: can you overload a constructor?
   constructor(polygons: string | PolygonData[]) {
     console.log("polygons: ", polygons)
     if (polygons instanceof Array ) {
+      console.log('found an array')
       this.payload = polygons;
     }
     // otherwise we have a string
     // TODO: this is not type-safe since this has `any`, see https://stackoverflow.com/questions/38688822/how-to-parse-json-string-in-typescript
     else {
-      const o = JSON.parse(JSON.stringify(polygons));
-      this.payload = o.polygons;
+      console.log('found a string')
+      const o = JSON.parse(polygons);
+      this.payload = o.payload;
     }
   }
 
@@ -98,9 +101,14 @@ class Handler {
   }
 
   public static prepareLoad(content: string) {
+    console.log('prepareLoad content: ', content);
     const o = JSON.parse(content);
+    console.log('prepareLoad object: ', o);
     const c = this.getConstructor(o.version) // get the constructor for this version
-    return new c(content).getPolygons()
+    console.log('prepareLoad constructor: ', c);
+    const p = new c(content)
+    console.log('polygonFile object: ', p)
+    return p.getPolygons()
   }
 }
 
