@@ -36,6 +36,7 @@ class v1 implements PolygonFile {
     else {
       console.log('found a string')
       const o = JSON.parse(polygons);
+      // TODO: investigate whether it is necessary to recreate the BufferGeometry
       this.payload = o.payload;
     }
   }
@@ -52,6 +53,7 @@ class v1 implements PolygonFile {
   }
 
   public toSave() {
+    // TODO: use a replacer to force strictly only elements from PolygonData in the file
     return JSON.stringify(this);
   }
 }
