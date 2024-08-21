@@ -85,21 +85,7 @@ const TwoDEnv = () => {
     }
     const loadPolygons = async () => {
         console.log("Opening file dialog...");
-        // const options = {
-        //     types: [
-        //         {
-        //             description: "Viziou Canvas",
-        //             accept: {
-        //                 "text/plain": [".viz"]
-        //             }
-        //         }
-        //     ],
-        //     multiple: false, // TODO: can we accept multiple .viz canvas files and combine them?
-        //     startIn: "downloads",
-        // };
-        // const [handle] = await window.showOpenFilePicker(options);
         await Storage.load()
-
     }
 
     const [overflowVisible, setOverflowVisible] = useState(false);
