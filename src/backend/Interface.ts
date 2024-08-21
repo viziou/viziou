@@ -4,7 +4,8 @@ import { Handler, vLatest } from './ts/2D/PolygonFile.ts';
 class Storage {
 
   public static save(polygons: PolygonData[], name: string) {
-    const fileData = [Handler.prepareSave(new vLatest(polygons))]
+    // TODO: should probably not create the vLatest object here, should be prepareSave's responsibility
+    const fileData = [Handler.prepareSave(new vLatest(polygons))] // this has to be an array of files
 
     // this might be different on browser vs. electron
     const file = new File(fileData, name, { type: "text/plain", });
@@ -22,7 +23,7 @@ class Storage {
     const u = document.createElement('input');
     u.type = 'file';
     u.style.display = 'none';
-    u.accept = '.viz'
+    u.accept = '.viz';
     u.multiple = false; // TODO feat: merge multiple .viz files?
 
     // add event listeners
@@ -46,7 +47,12 @@ class Storage {
     if (u.files && u.files.length === 1) {
       console.log('User requested file upload ', u.files[0]);
       document.body.removeChild(u); // cleanup
-      return u.files[0];
+      const handle = u.files[0]; // 'u' is no longer part of the DOM but it's still in memory
+      const content = await handle.text(); // get the text representation (UTF-8 only)
+      console.log('Text representation: ', content)
+      const pl = Handler.prepareLoad(content); // the PolygonData array in this file
+      console.log('Object representation: ', pl)
+      return pl
     }
 
     // TODO: two removeChild calls is dirty

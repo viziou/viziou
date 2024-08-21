@@ -85,7 +85,8 @@ const TwoDEnv = () => {
     }
     const loadPolygons = async () => {
         console.log("Opening file dialog...");
-        await Storage.load()
+        const polygonData = await Storage.load()
+        console.log(polygonData)
     }
 
     const [overflowVisible, setOverflowVisible] = useState(false);
