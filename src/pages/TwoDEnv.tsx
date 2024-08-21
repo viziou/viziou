@@ -83,6 +83,24 @@ const TwoDEnv = () => {
       console.log("Saving canvas...");
       Storage.save(polygons, 'export');
     }
+    const loadPolygons = async () => {
+        console.log("Opening file dialog...");
+        // const options = {
+        //     types: [
+        //         {
+        //             description: "Viziou Canvas",
+        //             accept: {
+        //                 "text/plain": [".viz"]
+        //             }
+        //         }
+        //     ],
+        //     multiple: false, // TODO: can we accept multiple .viz canvas files and combine them?
+        //     startIn: "downloads",
+        // };
+        // const [handle] = await window.showOpenFilePicker(options);
+        await Storage.load()
+
+    }
 
     const [overflowVisible, setOverflowVisible] = useState(false);
 
@@ -111,7 +129,7 @@ const TwoDEnv = () => {
                 <div className={`overflow-menu ${overflowVisible ? 'show' : ''}`}>
                     <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Add Custom Shape</button>
                     <button className="twod-button" onClick={() => { closeOverflowMenu(); savePolygons() }}>Export Scene</button>
-                    <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Import Shape</button>
+                    <button className="twod-button" onClick={() => { closeOverflowMenu(); loadPolygons() }}>Import Shape</button>
                 </div>
 
             </div>
