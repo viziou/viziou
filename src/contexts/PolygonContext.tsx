@@ -26,6 +26,12 @@ function PolygonReducer(state: PolygonContextInterface, action: Polygon2DAction)
                 polygons: [...state.polygons, action.payload],
             };
 
+        case "SET_POLYGONS":
+            return {
+                ...state,
+                polygons: [...action.payload],
+            };
+
         case "CLEAR_POLYGONS":
             return {
                 ...state,

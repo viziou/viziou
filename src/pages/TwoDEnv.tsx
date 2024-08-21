@@ -87,6 +87,10 @@ const TwoDEnv = () => {
         console.log("Opening file dialog...");
         const polygonData = await Storage.load()
         console.log(polygonData)
+        if (polygonData) {
+            console.log("Dispatching SET_POLYGONS");
+            dispatch({ type: "SET_POLYGONS", payload: polygonData });
+        }
     }
 
     const [overflowVisible, setOverflowVisible] = useState(false);
