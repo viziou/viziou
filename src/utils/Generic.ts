@@ -10,3 +10,5 @@ function* generatePairs<T>(array: T[]): Generator<[T, T]> {
 // for (const [one, two] of generatePairs([1,2,3,4,5,'a','b','c','d'])) {
 //   console.log(one + ', ' + two);
 // }
+
+export {generatePairs};

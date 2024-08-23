@@ -9,6 +9,8 @@ import '../styles/TwoDEnv.css';
 
 import { Backend2D, Storage } from '../backend/Interface';
 
+import { generatePairs } from '../utils/Generic';
+
 const getSquare = (): THREE.PlaneGeometry => {
     return new THREE.PlaneGeometry(1, 1);
 };
@@ -93,6 +95,27 @@ const TwoDEnv = () => {
         dispatch({ type: "CLEAR_POLYGONS" });
     };
 
+    const showIoUs = () => {
+        const IoUs: PolygonData[] = [];
+        for (const [a, b] of generatePairs(polygons)) {
+          const {area, shape} = Backend2D.IoU(a, b);
+          console.log("IoU between " + a.geometry.id + " and " + b.geometry.id + ": " + area);
+          if (area > 0) {
+            const IoUPolygon: PolygonData = {
+              geometry: shape,
+              position: [0, 0],
+              colour: '#ce206b'
+            }
+            IoUs.push(IoUPolygon);
+          }
+        }
+        for (const polygon of IoUs) {
+          console.log("Dispatching IoU Polygon via ADD_RANDOM_POLYGON...");
+          dispatch({type: 'ADD_RANDOM_POLYGON', payload: polygon});
+        }
+
+    }
+
     const savePolygons = () => {
       console.log("Saving canvas...");
       Storage.save2D(polygons, 'export');
@@ -129,6 +152,7 @@ const TwoDEnv = () => {
                 <button className="twod-button" onClick={addRandomPolygon}>Add Random Polygon</button>
                 <button className="twod-button" onClick={addSquare}>Add Square</button>
                 <button className="twod-button" onClick={clearPolygons}>Clear Shapes</button>
+                <button className="twod-button" onClick={showIoUs}>Show IoUs</button>
 
                 <button className="overflow-button" onClick={toggleOverflowMenu}>⋮</button>
                 <div className={`overflow-menu ${overflowVisible ? 'show' : ''}`}>
