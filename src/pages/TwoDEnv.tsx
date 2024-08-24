@@ -88,8 +88,8 @@ const TwoDEnv = () => {
         const polygonData = await Storage.load()
         console.log(polygonData)
         if (polygonData) {
-            //console.log("Dispatching SET_POLYGONS");
-            //dispatch({ type: "SET_POLYGONS", payload: polygonData });
+            console.log("Dispatching SET_POLYGONS");
+            dispatch({ type: "SET_POLYGONS", payload: polygonData });
         }
     }
 

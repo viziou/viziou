@@ -1,4 +1,5 @@
 import { PolygonData } from '../../../utils/types.tsx'
+import { BufferGeometryLoader } from 'three'
 //import { createHmac } from 'crypto';
 //const subtle = window.crypto.subtle;
 //import { str2ab } from '../../../utils/strings.ts'
@@ -36,7 +37,14 @@ class v1 implements PolygonFile {
     else {
       console.log('found a string')
       const o = JSON.parse(polygons);
-      // TODO: investigate whether it is necessary to recreate the BufferGeometry
+      // we're restoring a save, and so need to recreate BufferGeometry instances
+      console.log('before:', o);
+       const geometryLoader = new BufferGeometryLoader();
+       o.payload.map((polygon: PolygonData) => {
+         polygon.geometry = geometryLoader.parse(polygon.geometry)
+       })
+      console.log('after: ', o);
+      // geometry has now been parsed
       this.payload = o.payload;
     }
   }
