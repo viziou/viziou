@@ -14,6 +14,7 @@ export type Polygon2DAction =
   | { type: "ADD_SQUARE"; payload: PolygonData }
   | { type: "ADD_RANDOM_POLYGON"; payload: PolygonData }
   | { type: "ADD_POINT", payload: PolygonData }
+  | { type: "SET_POLYGONS"; payload: PolygonData[] }
   | { type: "CLEAR_POLYGONS" };
 
 export interface PolyhedronData {

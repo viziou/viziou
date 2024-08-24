@@ -7,7 +7,7 @@ import { PolygonData } from '../utils/types';
 import { PolygonContext } from '../contexts/PolygonContext';
 import '../styles/TwoDEnv.css';
 
-import { Backend2D } from '../backend/Interface';
+import { Backend2D, Storage } from '../backend/Interface';
 
 const getSquare = (): THREE.PlaneGeometry => {
     return new THREE.PlaneGeometry(1, 1);
@@ -93,6 +93,20 @@ const TwoDEnv = () => {
         dispatch({ type: "CLEAR_POLYGONS" });
     };
 
+    const savePolygons = () => {
+      console.log("Saving canvas...");
+      Storage.save(polygons, 'export');
+    }
+    const loadPolygons = async () => {
+        console.log("Opening file dialog...");
+        const polygonData = await Storage.load()
+        console.log(polygonData)
+        if (polygonData) {
+            console.log("Dispatching SET_POLYGONS");
+            dispatch({ type: "SET_POLYGONS", payload: polygonData });
+        }
+    }
+
     const [overflowVisible, setOverflowVisible] = useState(false);
 
     const toggleOverflowMenu = () => {
@@ -119,8 +133,8 @@ const TwoDEnv = () => {
                 <button className="overflow-button" onClick={toggleOverflowMenu}>⋮</button>
                 <div className={`overflow-menu ${overflowVisible ? 'show' : ''}`}>
                     <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Add Custom Shape</button>
-                    <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Export Scene</button>
-                    <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Import Shape</button>
+                    <button className="twod-button" onClick={() => { closeOverflowMenu(); savePolygons() }}>Export Scene</button>
+                    <button className="twod-button" onClick={() => { closeOverflowMenu(); loadPolygons() }}>Import Scene</button>
                 </div>
 
             </div>
