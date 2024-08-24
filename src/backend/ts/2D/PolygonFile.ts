@@ -1,5 +1,5 @@
 import { PolygonData } from '../../../utils/types.tsx'
-import { BufferGeometryLoader, PlaneGeometry } from 'three'
+import { BufferGeometryLoader, CircleGeometry, PlaneGeometry } from 'three'
 //import { createHmac } from 'crypto';
 //const subtle = window.crypto.subtle;
 //import { str2ab } from '../../../utils/strings.ts'
@@ -52,6 +52,11 @@ class v1 implements PolygonFile {
            // so yeah, this is a dangerous, gross and ugly hack which should *not* make it to production
            const g = polygon.geometry as unknown as {width: number, height: number};
            polygon.geometry = new PlaneGeometry(g.width, g.height);
+         }
+         else if (polygon.geometry.type === 'CircleGeometry') {
+           console.log('circle geometry found', polygon.geometry);
+           const g = polygon.geometry as unknown as {radius: number, segments: number};
+           polygon.geometry = new CircleGeometry(g.radius, g.segments);
          }
          else {
            polygon.geometry = geometryLoader.parse(polygon.geometry)

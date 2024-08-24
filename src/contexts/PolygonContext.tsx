@@ -26,6 +26,12 @@ function PolygonReducer(state: PolygonContextInterface, action: Polygon2DAction)
                 polygons: [...state.polygons, action.payload],
             };
 
+      case "ADD_POINT":
+            return {
+                ...state,
+                polygons: [...state.polygons, action.payload],
+            };
+
         case "SET_POLYGONS":
             return {
                 ...state,
