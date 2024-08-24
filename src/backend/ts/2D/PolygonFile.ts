@@ -49,7 +49,9 @@ class v1 implements PolygonFile {
            // these parameters are added directly onto the rood object (i.e. saved as .width instead of
            // .parameters.width), which is why typescript is complaining here. shouldn't be too big of an issue since
            // we will scrap plane geometry due to not having any vertices.
-           polygon.geometry = new PlaneGeometry(polygon.geometry.width, polygon.height);
+           // so yeah, this is a dangerous, gross and ugly hack which should *not* make it to production
+           const g = polygon.geometry as unknown as {width: number, height: number};
+           polygon.geometry = new PlaneGeometry(g.width, g.height);
          }
          else {
            polygon.geometry = geometryLoader.parse(polygon.geometry)
