@@ -24,6 +24,8 @@ const getRandomGeometry = (): ConvexGeometry => {
       points.push(new THREE.Vector3(Math.random() * 4 - 2, Math.random() * 4 - 2, 0));
     }
 
+    console.log('number of points: ' + points.length)
+
     return new ConvexGeometry(points);
 };
 
@@ -65,9 +67,9 @@ const TwoDEnv = () => {
     const addRandomPolygon = () => {
         const newPolygon: PolygonData = {
             geometry: getRandomGeometry(),
-            position: [
-                Math.random() * 4 - 2, // x coordinate
-                Math.random() * 4 - 2, // y coordinate
+            position: [0, 0
+            //    Math.random() * 4 - 2, // x coordinate
+            //    Math.random() * 4 - 2, // y coordinate
             ],
             colour: getRandomColour(),
         };
@@ -87,7 +89,7 @@ const TwoDEnv = () => {
           colour: '#C81400'
         }
         console.log("Dispatching ADD_POINT:")
-        dispatch( { type: "ADD_POINT", payload: newPoint });
+        //dispatch( { type: "ADD_POINT", payload: newPoint });
     };
 
     const clearPolygons = () => {
@@ -100,7 +102,7 @@ const TwoDEnv = () => {
         for (const [a, b] of generatePairs(polygons)) {
           const {area, shape} = Backend2D.IoU(a, b);
           console.log("IoU between " + a.geometry.id + " and " + b.geometry.id + ": " + area);
-          if (area > 0) {
+          if (1 == 1) {
             const IoUPolygon: PolygonData = {
               geometry: shape,
               position: [0, 0],
@@ -109,8 +111,10 @@ const TwoDEnv = () => {
             IoUs.push(IoUPolygon);
           }
         }
+        console.log("Clearing canvas...");
+        dispatch({type: "CLEAR_POLYGONS"});
         for (const polygon of IoUs) {
-          console.log("Dispatching IoU Polygon via ADD_RANDOM_POLYGON...");
+          console.log("Dispatching IoU Polygon via ADD_RANDOM_POLYGON...", polygon);
           dispatch({type: 'ADD_RANDOM_POLYGON', payload: polygon});
         }
 
