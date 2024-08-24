@@ -120,7 +120,7 @@ const TwoDEnv = () => {
                 <div className={`overflow-menu ${overflowVisible ? 'show' : ''}`}>
                     <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Add Custom Shape</button>
                     <button className="twod-button" onClick={() => { closeOverflowMenu(); savePolygons() }}>Export Scene</button>
-                    <button className="twod-button" onClick={() => { closeOverflowMenu(); loadPolygons() }}>Import Shape</button>
+                    <button className="twod-button" onClick={() => { closeOverflowMenu(); loadPolygons() }}>Import Scene</button>
                 </div>
 
             </div>

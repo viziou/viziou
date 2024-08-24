@@ -46,8 +46,8 @@ const ThreeDEnv = () => {
         const newPolyhedron: PolyhedronData = {
             geometry: getCube(),
             position: [
-                Math.random() * 4 - 2, 
-                Math.random() * 4 - 2, 
+                Math.random() * 4 - 2,
+                Math.random() * 4 - 2,
                 Math.random() * 4 - 2
             ],
             colour: getRandomColour(),
@@ -61,8 +61,8 @@ const ThreeDEnv = () => {
         const newPolyhedron: PolyhedronData = {
             geometry: getRandomGeometry(),
             position: [
-                Math.random() * 4 - 2, 
-                Math.random() * 4 - 2, 
+                Math.random() * 4 - 2,
+                Math.random() * 4 - 2,
                 Math.random() * 4 - 2
             ],
             colour: getRandomColour(),
@@ -99,12 +99,12 @@ const ThreeDEnv = () => {
                 <button className="threed-button" onClick={addRandomPolyhedron}>Add Random Polyhedron</button>
                 <button className="threed-button" onClick={addCube}>Add Cube</button>
                 <button className="threed-button" onClick={clearPolyhedra}>Clear Shapes</button>
-                
+
                 <button className="overflow-button" onClick={toggleOverflowMenu}>⋮</button>
                 <div className={`overflow-menu ${overflowVisible ? 'show' : ''}`}>
                     <button className="threed-button" onClick={() => { closeOverflowMenu(); }}>Add Custom Shape</button>
                     <button className="threed-button" onClick={() => { closeOverflowMenu(); }}>Export Scene</button>
-                    <button className="threed-button" onClick={() => { closeOverflowMenu(); }}>Import Shape</button>
+                    <button className="threed-button" onClick={() => { closeOverflowMenu(); }}>Import Scene</button>
                 </div>
 
             </div>
