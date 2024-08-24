@@ -1,5 +1,5 @@
 import { PolygonData } from '../../../utils/types.tsx'
-import { BufferGeometryLoader } from 'three'
+import { BufferGeometryLoader, PlaneGeometry } from 'three'
 //import { createHmac } from 'crypto';
 //const subtle = window.crypto.subtle;
 //import { str2ab } from '../../../utils/strings.ts'
@@ -41,7 +41,19 @@ class v1 implements PolygonFile {
       console.log('before:', o);
        const geometryLoader = new BufferGeometryLoader();
        o.payload.map((polygon: PolygonData) => {
-         polygon.geometry = geometryLoader.parse(polygon.geometry)
+         if (polygon.geometry.type === 'PlaneGeometry') {
+           // have to recast since plane geometry is special
+           console.log('plane geometry found', polygon.geometry)
+           // parity miss between .toJSON() and object representation. when PlaneGeometry is instantiated,
+           // the .parameters attribute is set as the parameters used in the constructor. however, when saving,
+           // these parameters are added directly onto the rood object (i.e. saved as .width instead of
+           // .parameters.width), which is why typescript is complaining here. shouldn't be too big of an issue since
+           // we will scrap plane geometry due to not having any vertices.
+           polygon.geometry = new PlaneGeometry(polygon.geometry.width, polygon.height);
+         }
+         else {
+           polygon.geometry = geometryLoader.parse(polygon.geometry)
+         }
        })
       console.log('after: ', o);
       // geometry has now been parsed
