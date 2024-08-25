@@ -6,6 +6,8 @@ import { DragControls } from "@react-three/drei";
 
 type PolygonProps = PolygonData & { index: number };
 
+// TODO: Make information on top of the polygon as a child instead?
+
 const Polygon = ({ position, geometry, colour, index }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
   const { dispatch } = useContext(PolygonContext)!;
