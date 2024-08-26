@@ -95,11 +95,11 @@ const TwoDEnv = () => {
 
     const savePolygons = () => {
       console.log("Saving canvas...");
-      Storage.save(polygons, 'export');
+      Storage.save2D(polygons, 'export');
     }
     const loadPolygons = async () => {
         console.log("Opening file dialog...");
-        const polygonData = await Storage.load()
+        const polygonData = await Storage.load2D()
         console.log(polygonData)
         if (polygonData) {
             console.log("Dispatching SET_POLYGONS");

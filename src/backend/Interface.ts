@@ -1,10 +1,11 @@
 /* API that is exposed to the front-end. */
-import { PolygonData } from '../utils/types';
+import { PolygonData, PolyhedronData } from '../utils/types';
 import { Point2D, Polygon2D } from './ts/2D/classes';
 import { IoU, getIntersectionPolygon } from './ts/2D/iou';
 import { BufferGeometry, Vector3 } from 'three';
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
-import { Handler, vLatest } from './ts/2D/PolygonFile.ts';
+import { Handler as Handler2D, vLatest as vLatest2D } from './ts/2D/PolygonFile.ts';
+import { Handler as Handler3D, vLatest as vLatest3D } from './ts/3D/PolyhedronFile.ts';
 
 class Backend2D {
 
@@ -54,9 +55,9 @@ class Backend2D {
 
 class Storage {
 
-  public static save(polygons: PolygonData[], name: string) {
+  public static save2D(polygons: PolygonData[], name: string) {
     // TODO: should probably not create the vLatest object here, should be prepareSave's responsibility
-    const fileData = [Handler.prepareSave(new vLatest(polygons))] // this has to be an array of files
+    const fileData = [Handler2D.prepareSave(new vLatest2D(polygons))] // this has to be an array of files
 
     // this might be different on browser vs. electron
     const file = new File(fileData, name, { type: "text/plain", });
@@ -70,7 +71,24 @@ class Storage {
     document.body.removeChild(a); // let's not overflow the page
   }
 
-  public static async load() {
+  public static save3D(polyhedra: PolyhedronData[], name: string) {
+    // TODO: should probably not create the vLatest object here, should be prepareSave's responsibility
+    const fileData = [Handler3D.prepareSave(new vLatest3D(polyhedra))] // this has to be an array of files
+
+    // this might be different on browser vs. electron
+    // TODO: this is a completely duplicated code fragment from here on
+    const file = new File(fileData, name, { type: "text/plain", });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(file);
+    a.download = name + '.viz'
+
+    // simulate a click
+    document.body.appendChild(a); // necessary for firefox?
+    a.click();
+    document.body.removeChild(a); // let's not overflow the page
+  }
+
+  public static async load2D() {
     const u = document.createElement('input');
     u.type = 'file';
     u.style.display = 'none';
@@ -101,7 +119,50 @@ class Storage {
       const handle = u.files[0]; // 'u' is no longer part of the DOM but it's still in memory
       const content = await handle.text(); // get the text representation (UTF-8 only)
       console.log('Text representation: ', content)
-      const pl = Handler.prepareLoad(content); // the PolygonData array in this file
+      const pl = Handler2D.prepareLoad(content); // the PolygonData array in this file
+      console.log('Object representation: ', pl)
+      return pl
+    }
+
+    // TODO: two removeChild calls is dirty
+
+    console.log("User cancelled file upload.")
+    document.body.removeChild(u); // cleanup
+    return null;
+  }
+
+  public static async load3D() {
+    const u = document.createElement('input');
+    u.type = 'file';
+    u.style.display = 'none';
+    u.accept = '.viz';
+    u.multiple = false; // TODO feat: merge multiple .viz files?
+
+    // add event listeners
+    const cl = new Promise((resolve) => {
+      u.addEventListener('cancel', resolve, false);
+    })
+
+    const ch = new Promise((resolve) => {
+      u.addEventListener('change', resolve, false);
+    })
+
+    // simulate a click
+    document.body.appendChild(u);
+    u.click();
+
+    // block until one of these resolves
+    await Promise.any([cl, ch]);
+
+    // if the user sent a file then it's inside the 'u' HTML element
+    // TODO feat: handle merging multiple .viz files!
+    if (u.files && u.files.length === 1) {
+      console.log('User requested file upload ', u.files[0]);
+      document.body.removeChild(u); // cleanup
+      const handle = u.files[0]; // 'u' is no longer part of the DOM but it's still in memory
+      const content = await handle.text(); // get the text representation (UTF-8 only)
+      console.log('Text representation: ', content)
+      const pl = Handler3D.prepareLoad(content); // the PolygonData array in this file
       console.log('Object representation: ', pl)
       return pl
     }
