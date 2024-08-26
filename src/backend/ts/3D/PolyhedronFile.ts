@@ -1,5 +1,5 @@
 import { PolyhedronData } from '../../../utils/types.tsx'
-import { BufferGeometryLoader } from 'three'
+import { BoxGeometry, BufferGeometryLoader } from 'three'
 //import { createHmac } from 'crypto';
 //const subtle = window.crypto.subtle;
 //import { str2ab } from '../../../utils/strings.ts'
@@ -41,8 +41,15 @@ class v1 implements PolyhedronFile {
       console.log('before:', o);
        const geometryLoader = new BufferGeometryLoader();
        o.payload.map((polyhedra: PolyhedronData) => {
+         if (polyhedra.geometry.type === 'BoxGeometry') {
+           // have to recast since box geometry is special
+           console.log('box geometry found', polyhedra.geometry)
+           const g = polyhedra.geometry as unknown as {width: number, height: number, depth: number};
+           polyhedra.geometry = new BoxGeometry(g.width, g.height, g.depth);
+         }
+         else {
            polyhedra.geometry = geometryLoader.parse(polyhedra.geometry);
-
+         }
        })
       console.log('after: ', o);
       // geometry has now been parsed
