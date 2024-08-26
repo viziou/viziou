@@ -31,5 +31,6 @@ export type Scene3DProps = {
 export type Polyhedron3DAction =
   | { type: "ADD_CUBE"; payload: PolyhedronData }
   | { type: "ADD_RANDOM_POLYHEDRON"; payload: PolyhedronData }
+  | { type: "SET_POLYHEDRONS"; payload: PolyhedronData[] }
   | { type: "CLEAR_POLYHEDRA" };
 

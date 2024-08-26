@@ -26,6 +26,12 @@ function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron
                 polyhedra: [...state.polyhedra, action.payload],
             };
 
+        case "SET_POLYHEDRONS":
+            return {
+              ...state,
+              polyhedra: [...action.payload]
+            }
+
         case "CLEAR_POLYHEDRA":
             return {
                 ...state,
