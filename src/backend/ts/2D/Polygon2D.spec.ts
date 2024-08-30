@@ -1,7 +1,7 @@
 import { describe, it} from "mocha";
 import { should as setupShould } from "chai";
 import { Point2D, Polygon2D } from "./classes.ts";
-import { nearlyEqual } from "./utils.ts";
+import { nearlyEqual } from "../utils.ts";
 const should = setupShould();
 
 
