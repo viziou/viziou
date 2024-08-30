@@ -2,13 +2,15 @@ import { nearlyEqual } from "../utils.ts";
 type Pair<A, B> = [A, B];
 
 
-class Point2D {
+class Point3D {
     private _x: number;
     private _y: number;
+    private _z: number;
 
-	constructor(x: number, y: number) {
+	constructor(x: number, y: number, z: number) {
 		this._x = x;
 		this._y = y;
+        this._z = z;
 	}
 
     /**
@@ -27,82 +29,106 @@ class Point2D {
 		return this._y;
 	}
 
-    public get xy(): { x: number; y: number } {
-        return {x: this.x, y: this.y};
-    }
+    /**
+     * Getter z
+     * @return {number}
+     */
+	public get z(): number {
+		return this._z;
+	}
 
-    public translate(x: number, y: number): this;
-    public translate(p: Point2D): this;
-    public translate(x: unknown, y: unknown = null): this {
-        if (typeof x === 'number' && typeof y === 'number') {
-            this._x += x; this._y += y;
-        } else if (x instanceof Point2D) {
-            this._x += x.x; this._y += x.y;
+    public translate(x: number, y: number, z: number): this;
+    public translate(p: Point3D): this;
+    public translate(x: unknown, y: unknown = null, z: unknown = null): this {
+        if (typeof x === 'number' && typeof y === 'number' && typeof z === 'number') {
+            this._x += x; this._y += y; this._z += z;
+        } else if (x instanceof Point3D) {
+            this._x += x.x; this._y += x.y; this._z += x.z;
         }
             // should probably throw exception if both failed
             return this;
     }
 
+    public add(p: Point3D): Point3D {
+        return new Point3D(this.x + p.x, this.y + p.y, this.z + p.z);
+    }
+
+    public subtract(p: Point3D): Point3D {
+        return new Point3D(this.x - p.x, this.y - p.y, this.z - p.z);
+    }
+
+    public magnitude(): number {
+        return Math.sqrt(this.x**2 + this.y**2 + this.z**2);
+    }
+
+    public normalise(): Point3D {
+        const mag = this.magnitude();
+        return new Point3D(this.x/mag, this.y/mag, this.z/mag);
+    }
+
     public toList(): number[] {
-        return [this._x, this._y];
+        return [this._x, this._y, this._z];
     }
 
-    public equals(point: Point2D): boolean {
-        return nearlyEqual(this._x, point.x) && nearlyEqual(this._y, point.y);
+    public equals(point: Point3D): boolean {
+        return nearlyEqual(this._x, point.x) && nearlyEqual(this._y, point.y) && nearlyEqual(this._z, point.z);
     }
 
-    public gre(point: Point2D): boolean {
-        return this._x >= point.x && this._y >= point.y && !this.equals(point);
-    }
-
-    public less(point: Point2D): boolean {
-        return this._x <= point.x && this._y <= point.y && !this.equals(point);
-    }
-
-    public geq(point: Point2D): boolean {
-        return this._x >= point.x && this._y >= point.y;
-    }
-
-    public leq(point: Point2D): boolean {
-        return this._x <= point.x && this._y <= point.y;
-    }
-
-    private _withinEdgeSegment(edge: Edge): boolean {
+    private _withinEdgeSegment(edge: Edge3D): boolean {
         return ((this._x >= edge.p.x && this._x <= edge.q.x) || (this._x >= edge.q.x && this._x <= edge.p.x)) &&
-               ((this._y >= edge.p.y && this._y <= edge.q.y) || (this._y >= edge.q.y && this._y <= edge.p.y));
+               ((this._y >= edge.p.y && this._y <= edge.q.y) || (this._y >= edge.q.y && this._y <= edge.p.y)) &&
+               ((this._z >= edge.p.z && this._z <= edge.q.z) || (this._z >= edge.q.z && this._z <= edge.p.z));
     }
 
-    public onEdgeSegment(edge: Edge): boolean {
+    public onEdgeSegment(edge: Edge3D): boolean {
         // Determine if on the line defined by edge and within bounds
         const p = edge.p;
         const q = edge.q;
 
-        // Get coefficients of line in form of Ax + By + C = 0
-        const A = p.y - q.y;
-        const B = q.x - p.x;
-        const C = -(A*p.x + B*p.y);
+        // Solve for the scalar t for each coordinate
+        const tx = (this.x - p.x)/(p.x - q.x);
+        const ty = (this.y - p.y)/(p.y - q.y);
+        const tz = (this.z - p.z)/(p.z - q.z);
 
-        // Point is on the segment if within bounds and lies on line equation
-        return this._withinEdgeSegment(edge) && nearlyEqual(A*this._x + B*this._y + C, 0);
+        // Point is on the segment if within bounds and all scalar t are same
+        return this._withinEdgeSegment(edge) && nearlyEqual(tx, ty) && nearlyEqual(ty, tz) && nearlyEqual(tz, tx);
     }
 
     public toString(): string {
-        return `(${this._x},${this._y})`;
+        return `(${this._x},${this._y},${this._z})`;
     }
 }
 
 
-interface Edge {
-    p: Point2D;
-    q: Point2D;
+interface Edge3D {
+    p: Point3D;
+    q: Point3D;
 }
 
 
-class Polygon2D {
-    private _vertices: Point2D[];
+function cross(p: Point3D, q: Point3D): Point3D {
+    return new Point3D(p.y*q.z - p.z*q.y, p.z*q.x - p.x*q.z, p.x*q.y - p.y*q.x);
+}
 
-    constructor(vertices: Point2D[], requiresSort?: boolean) {
+function dot(p: Point3D, q: Point3D): number {
+    return p.x*q.x + p.y*q.y + p.z*q.z;
+}
+
+
+class Face3D {
+    private _vertices: Point3D[];
+
+    constructor(vertices: Point3D[], requiresValidation?: boolean, requiresSort?: boolean) {
         this._vertices = [...vertices];
+
+        // Validate if required
+        if (requiresValidation) {
+            if (!this._validateVertices()) {
+                this._vertices = []     // TODO: Should throw some exception
+            }
+        }
+
+        // Sort CCW order if required
         if (requiresSort) {
             this._vertices = this._sortCCW();
         }
@@ -110,9 +136,9 @@ class Polygon2D {
 
     /**
      * Getter vertices
-     * @return {Point2D[]}
+     * @return {Point3D[]}
      */
-	public get vertices(): Point2D[] {
+	public get vertices(): Point3D[] {
 		return [...this._vertices];
 	}
 
@@ -120,29 +146,83 @@ class Polygon2D {
         return this._vertices.length;
     }
 
-    public getCentroid() {
+    public normal(): Point3D {
+        // Establish points to use
+        const Point1 = this._vertices[0];
+        const Point2 = this._vertices[1];
+        const Point3 = this._vertices[2];
+
+        // Get parallel plane vectors
+        const vec12 = Point2.subtract(Point1);
+        const vec13 = Point3.subtract(Point1);
+
+        // Get normal vector to plane
+        const n = cross(vec12, vec13);
+
+        return n;
+    }
+
+    public planeCoefficients(): number[] {
+        // Get normal vector to plane
+        const n = this.normal()
+
+        // Create coefficients
+        const A = n.x;
+        const B = n.y;
+        const C = n.z;
+        const D = -1 * dot(n, this._vertices[0]);
+
+        return [A, B, C, D];
+    }
+
+    private _validateVertices(): boolean {
+        // All vertices must lie on the same plane, with a minimum of 3 vertices
+        if (this._vertices.length < 3) {
+            return false;
+        }
+
+        // Get plane equation based on first 3 vertices
+        const coeffs = this.planeCoefficients()
+        const A = coeffs[0];
+        const B = coeffs[1];
+        const C = coeffs[2];
+        const D = coeffs[3];
+
+        // Iterate over each vertex and verify it belongs on plane
+        for (let i = 0; i < this.numVertices; i++) {
+            if (!nearlyEqual(A*this._vertices[i].x + B*this._vertices[i].y + C*this._vertices[i].z + D, 0)) {
+                // Vertex does not meet plane equation, therefore vertices are not valid
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public getCentroid(): Point3D {
         let x: number = 0;
         let y: number = 0;
+        let z: number = 0;
         const numVertices: number = this.numVertices;
 
         // Add up all coordinates and divide by number of vertices to get centre spot
         for (let point of this._vertices) {
             x += point.x;
             y += point.y;
+            z += point.z
         }
-        return new Point2D(x/numVertices, y/numVertices);
+        return new Point3D(x/numVertices, y/numVertices, z/numVertices);
     }
 
-    public translate(x: number, y: number): this;
-    public translate(p: Point2D): this;
-    public translate(x: number | Point2D, y?: number): this {
-        if (!(x instanceof Point2D) && (y)) {
-            x = new Point2D(x, y);
+    public translate(x: number, y: number, z: number): this;
+    public translate(p: Point3D): this;
+    public translate(x: number | Point3D, y?: number, z?: number): this {
+        if (!(x instanceof Point3D) && (y) && (z)) {
+            x = new Point3D(x, y, z);
         }
 
         // this is necessary to keep TypeScript happy since we're doing funky things with types
         if (typeof x !== 'number') {
-            this._vertices.map((point: Point2D) => {
+            this._vertices.map((point: Point3D) => {
             return point.translate(x);
             })
         }
@@ -151,12 +231,24 @@ class Polygon2D {
 
     private _sortCCW() {
         // Obtain centre point to reference from
-        const meanVertex: Point2D = this.getCentroid();
+        const meanVertex: Point3D = this.getCentroid();
 
-        // Get angle from positive x-axis of each point
-        const angles: number[] = this._vertices.map((point) => {
-            // Get angle point makes with reference to shifted polygon to origin
-            let angle = Math.atan2(point.y - meanVertex.y, point.x - meanVertex.x);
+        // Redefine coordinate system to put face on 2D x-y plane
+        const coordinates: Pair<number, number>[] = [[1, 0]];
+        const a = this._vertices[0].subtract(meanVertex);
+        const a_mag = a.magnitude()
+        for (let i = 1; i < this.numVertices; i++) {
+            let b = this._vertices[i].subtract(meanVertex);
+            let b_hat = b.normalise();
+            let u_mag = dot(a, b_hat);
+            let w_mag = Math.sqrt(a_mag**2 - u_mag**2);
+            coordinates.push([u_mag, w_mag]);
+        }
+
+        // Get angle from positive x-axis of each point based on redefined coordinates
+        const angles: number[] = coordinates.map((coordinate) => {
+            // Get angle point makes with reference new horizontal
+            let angle = Math.atan2(coordinate[1], coordinate[0]);
 
             // Convert domain from (-pi, pi] to [0, 2*pi)
             if (angle < 0) {
@@ -164,9 +256,10 @@ class Polygon2D {
             }
             return angle;
         })
+        
 
         // Zip the points with key value of angle
-        const collection: Pair<Point2D, number>[] = [];
+        const collection: Pair<Point3D, number>[] = [];
         for (let i = 0; i < this._vertices.length; i++) {
             collection.push([this._vertices[i], angles[i]]);
         }
@@ -190,79 +283,29 @@ class Polygon2D {
 
     public calculateArea(): number {
         let sum: number = 0;
-        let p: Point2D;
-        let q: Point2D;
-        let edge: Edge;
+        let p: Point3D;
+        let q: Point3D;
+        let edge: Edge3D;
 
         // Loop over every edge counterclockwise
         for (var i = 0; i < this._vertices.length; i++) {
             edge = this.getEdge(i)
             p = edge.p;
             q = edge.q;
-            sum += (p.x*q.y - p.y*q.x);
+            sum += cross(p, q).magnitude();
         }
         return sum/2;
     }
 
-    public contains(testPoint: Point2D): boolean {
-        for (let point of this._vertices) {
-            if (testPoint.equals(point)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public includes(testPoint: Point2D): boolean {
-        // Iterate over every edge of the polygon in ccw order
-        for (let i = 0; i < this._vertices.length; i++) {
-            // Get edge
-            let edge = this.getEdge(i)
-            let p = edge.p;
-            let q = edge.q;
-
-            // Obtain line equation coefficients of edge
-            let A = p.y - q.y;
-            let B = q.x - p.x;
-            let C = -(A*p.x + B*p.y);
-
-            // Ensure y-coefficient is positive and if zero, x-coefficient is positive
-            if (B < 0 || (B == 0 && A < 0)) {
-                A *= -1;
-                B *= -1;
-                C *= -1;
-            }
-
-            // Get vector direction
-            let dx = q.x - p.x;
-            let dy = q.y - p.y;
-            let angle = Math.atan2(dy, dx);
-
-            // Perform inequality test and return early if point fails
-            if (-Math.PI/2 <= angle && angle < Math.PI/2) {
-                if (!(A*testPoint.x + B*testPoint.y + C >= 0)) {
-                    return false;
-                }
-            } else {
-                if (!(A*testPoint.x + B*testPoint.y + C <= 0)) {
-                    return false;
-                }
-            }
-        }
-
-        // Return true if passes all inequalities
-        return true;
-    }
-
-    public getEdge(idx: number): Edge {
+    public getEdge(idx: number): Edge3D {
         return {
             p: this._vertices[idx],
             q: this._vertices[(idx + 1) % this._vertices.length]
         };
     }
 
-    public map(callbackfn: (point: Point2D) => Point2D): Polygon2D {
-        return new Polygon2D(this._vertices.map(callbackfn));
+    public map(callbackfn: (point: Point3D) => Point3D): Face3D {
+        return new Face3D(this._vertices.map(callbackfn), true);
     }
 
     public toString(): string {
@@ -280,5 +323,61 @@ class Polygon2D {
 }
 
 
-export { Point2D, Polygon2D };
-export type { Edge };
+class Polyhedra3D {
+    private _faces: Face3D[];
+
+    constructor(faces: Face3D[]) {
+        this._faces = [...faces];
+    }
+
+    /**
+     * Getter faces
+     * @return {Face3D[]}
+     */
+	public get faces(): Face3D[] {
+		return [...this._faces];
+	}
+
+    public get numFaces(): number {
+        return this.faces.length;
+    }
+
+    public get numVertices(): number {
+        return 1;   // TODO FIGURE THIS OUT
+    }
+
+    public centroid(): Point3D {
+        let sumPoint = new Point3D(0, 0, 0);
+        for (let i = 0; i < this.numFaces; i++) {
+            sumPoint = sumPoint.add(this.faces[i].getCentroid());
+        }
+        return new Point3D(sumPoint.x/this.numFaces, sumPoint.y/this.numFaces, sumPoint.z/this.numFaces);
+    }
+
+    public volume(): number {
+        // Iterate over every face and create a pyramid with it, with apex of centroid,
+        // and calculate its volume and add to a running total
+        let sum = 0;
+        let meanVertex = this.centroid();
+        for (let i = 0; i < this.numFaces; i++) {
+            let face = this.faces[i];
+
+            // Get base area
+            let baseArea = face.calculateArea();
+
+            // Get perpendicular height to apex by getting normal vector of face and 
+            // doing scalar resolute with any slant vector
+            let n = face.normal();
+            let slantVector = meanVertex.subtract(face.vertices[0]);
+            let height = dot(slantVector, n.normalise());
+
+            // Add volume to total
+            sum = 1/3 * baseArea * height;
+        }
+
+        return sum;
+    }
+}
+
+export { Point3D, Face3D, Polyhedra3D };
+export type { Edge3D };
