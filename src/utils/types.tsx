@@ -13,10 +13,13 @@ export type Scene2DProps = {
 export type Polygon2DAction =
   | { type: "ADD_SQUARE"; payload: PolygonData }
   | { type: "ADD_RANDOM_POLYGON"; payload: PolygonData }
-  | { type: "ADD_POINT", payload: PolygonData }
+  | { type: "ADD_POINT"; payload: PolygonData }
   | { type: "SET_POLYGONS"; payload: PolygonData[] }
   | { type: "CLEAR_POLYGONS" }
-  | { type: "UPDATE_POSITION"; index: number; position: [number, number] };
+  | { type: "UPDATE_POSITION"; index: number; position: [number, number] }
+  | { type: "SELECT_POLYGON"; index: number | null }
+  | { type: "ADD_MOUSED_OVER_POLYGON"; index: number }
+  | { type: "REMOVE_MOUSED_OVER_POLYGON"; index: number };
 
 export interface PolyhedronData {
   geometry: THREE.BufferGeometry;
@@ -32,4 +35,3 @@ export type Polyhedron3DAction =
   | { type: "ADD_CUBE"; payload: PolyhedronData }
   | { type: "ADD_RANDOM_POLYHEDRON"; payload: PolyhedronData }
   | { type: "CLEAR_POLYHEDRA" };
-

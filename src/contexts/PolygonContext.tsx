@@ -3,11 +3,15 @@ import { PolygonData, Polygon2DAction } from '../utils/types';
 
 const initialState: PolygonContextInterface = {
     polygons: [],
+    selectedPolygonIndex: null,
+    currentlyMousedOverPolygons: []
 };
 
 interface PolygonContextInterface {
     polygons: PolygonData[];
     dispatch?: React.Dispatch<Polygon2DAction>;
+    selectedPolygonIndex: number | null;
+    currentlyMousedOverPolygons: number[];
 }
 
 export const PolygonContext = createContext<PolygonContextInterface | undefined>(undefined);
@@ -50,6 +54,35 @@ function PolygonReducer(state: PolygonContextInterface, action: Polygon2DAction)
             return {
                 ...state,
                 polygons: updatedPolygons
+            };
+        
+        case "SELECT_POLYGON":
+            return {
+                ...state,
+                selectedPolygonIndex: action.index
+            };
+
+        case "ADD_MOUSED_OVER_POLYGON":
+            const mousedOver = state.currentlyMousedOverPolygons.slice();
+            if (!mousedOver.includes(action.index)) {
+                mousedOver.push(action.index)
+            }
+            return {
+                ...state,
+                currentlyMousedOverPolygons: mousedOver.slice()
+            }
+
+        case "REMOVE_MOUSED_OVER_POLYGON":
+            const mousedOverArr = state.currentlyMousedOverPolygons.slice();
+            if (mousedOverArr.includes(action.index)) {
+                const index = mousedOverArr.indexOf(action.index);
+                if (index > -1) {
+                    mousedOverArr.splice(index, 1);
+                }
+            }
+            return {
+                ...state,
+                currentlyMousedOverPolygons: mousedOverArr.slice()
             }
 
         default:
@@ -65,7 +98,7 @@ export function PolygonProvider(props: PolygonProviderProps) {
     const [state, dispatch] = useReducer(PolygonReducer, initialState);
 
     return (
-        <PolygonContext.Provider value={{ polygons: state.polygons, dispatch }}>
+        <PolygonContext.Provider value={{ polygons: state.polygons, dispatch, selectedPolygonIndex: state.selectedPolygonIndex, currentlyMousedOverPolygons: state.currentlyMousedOverPolygons}}>
             {props.children}
         </PolygonContext.Provider>
     );
