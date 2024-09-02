@@ -1,4 +1,4 @@
-import { Point2D, Edge, Polygon2D } from './classes.ts';
+import { Point2D, Edge2D, Polygon2D } from './classes.ts';
 import { intersect } from 'mathjs';
 
 
@@ -36,7 +36,7 @@ function getIntersectionPolygon(polygon1: Polygon2D, polygon2: Polygon2D): Polyg
 }
 
 
-function findIntersectionPoint(edge1: Edge, edge2: Edge): Point2D | null {
+function findIntersectionPoint(edge1: Edge2D, edge2: Edge2D): Point2D | null {
     // Get intersection point
     const intersectionPoint = intersect(edge1.p.toList(), edge1.q.toList(), edge2.p.toList(), edge2.q.toList());
     
