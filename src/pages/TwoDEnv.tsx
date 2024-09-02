@@ -83,13 +83,17 @@ const TwoDEnv = () => {
         const {x, y} = Backend2D.centreOfMass(newPolygon);
         console.log('Centroid: (', x, ', ', y, ')');
         console.time('Calculating Centroid')
-        const newPoint: PolygonData = {
-          geometry: new THREE.CircleGeometry(0.05, 50),
-          position: [x, y],
-          colour: '#C81400'
+        const geometryPosition = newPolygon.geometry.getAttribute('position');
+        for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
+          const newPoint: PolygonData = {
+            geometry: new THREE.CircleGeometry(0.02, 50),
+            position: [geometryPosition.array[i], geometryPosition.array[i+1]],
+            colour: '#C81400'
         }
         console.log("Dispatching ADD_POINT:")
-        //dispatch( { type: "ADD_POINT", payload: newPoint });
+        dispatch( { type: "ADD_POINT", payload: newPoint });
+      }
+
     };
 
     const clearPolygons = () => {

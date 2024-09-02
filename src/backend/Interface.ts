@@ -38,9 +38,18 @@ class Backend2D {
   private static _threeGeometryToPolygon2D( geometry: BufferGeometry ): Polygon2D {
     const geometryPosition = geometry.getAttribute('position');
     const vertices: Point2D[] = [];
+    const vertexSet: Set<{x: number, y: number}> = new Set();
     for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
-      vertices.push(new Point2D(geometryPosition.array[i], geometryPosition.array[i + 1]));
+      //vertices.push(new Point2D(geometryPosition.array[i], geometryPosition.array[i + 1]));
+      vertexSet.add({x: geometryPosition.array[i], y: geometryPosition.array[i + 1]});  // sets do not allow duplicates
     }
+    vertexSet.forEach(({x, y}) => {
+      vertices.push(new Point2D(x, y))
+    })
+    console.log('vertexSet: ', vertexSet);
+    console.log('vertices: ', vertices)
+    console.log('number of vertices parsed: ', geometryPosition.count / 3);
+    console.log('number of vertices included: ', vertices.length)
     return new Polygon2D(vertices, true);
   }
 
