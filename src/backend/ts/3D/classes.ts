@@ -396,6 +396,18 @@ class Polyhedra3D {
 
         return sum;
     }
+
+    public toString(): string {
+        if (this._faces.length == 0) {
+            return "[]";
+        }
+        let str = "[\n";
+        this._faces.forEach((face) => {
+            str += `\t${face.toString()}\n`;
+        });
+        str += "]";
+        return str;
+    }
 }
 
 export { Point3D, Face3D, Polyhedra3D };
