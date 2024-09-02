@@ -1,4 +1,5 @@
 import { nearlyEqual } from "./utils.ts";
+import { Points } from 'three'
 type Pair<A, B> = [A, B];
 
 
@@ -65,6 +66,15 @@ class Point2D {
 
     public leq(point: Point2D): boolean {
         return this._x <= point.x && this._y <= point.y;
+    }
+
+    public sub(point: Point2D): Point2D {
+      return new Point2D(this.x - point.x, this.y - point.y);
+    }
+
+    public distanceToOrigin(): number {
+      // if you're using this as a vector then this is equal to the vector length
+      return Math.sqrt(this.x ** 2 + this.y ** 2);
     }
 
     private _withinEdgeSegment(edge: Edge): boolean {

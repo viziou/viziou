@@ -60,6 +60,26 @@ class Backend2D {
     });
     return new ConvexGeometry(vertices);
   }
+
+  private static _reducePointsToConvexHull(points: Point2D[]) {
+    if (points.length <= 3) return points; // you have a triangle or less, already convex
+    const reducedVertices: Point2D[] = [];
+    // step 1: find an extremal starting point (e.g. lowest y value)
+    let extremalPoint1Index = 0;
+    for (const [index, point] of points.entries()) {
+        if (point.y < points[extremalPoint1Index].y) extremalPoint1Index = index;
+    }
+    reducedVertices.push(points.splice(extremalPoint1Index, extremalPoint1Index)[0]) // popping specific index
+    // step 2: find the smallest angle to any other vertex to the *right* of our point
+    const onRight = points.filter(({x}) => {
+      return (x >= reducedVertices[0].x);
+    });
+    const angles = onRight.map((point) => {
+      const vector = point.sub(reducedVertices[0]); // vector from extreme to this point
+      return (Math.acos(vector.x / vector.distanceToOrigin()));
+    })
+    //const minAngle = angles.reduce(())
+  }
 }
 
 class Storage {

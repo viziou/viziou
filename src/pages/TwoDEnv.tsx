@@ -115,8 +115,8 @@ const TwoDEnv = () => {
             IoUs.push(IoUPolygon);
           }
         }
-        console.log("Clearing canvas...");
-        dispatch({type: "CLEAR_POLYGONS"});
+        //console.log("Clearing canvas...");
+        //dispatch({type: "CLEAR_POLYGONS"});
         for (const polygon of IoUs) {
           console.log("Dispatching IoU Polygon via ADD_RANDOM_POLYGON...", polygon);
           dispatch({type: 'ADD_RANDOM_POLYGON', payload: polygon});
@@ -134,6 +134,8 @@ const TwoDEnv = () => {
         console.log(polygonData)
         if (polygonData) {
             console.log("Dispatching SET_POLYGONS");
+            console.log('testing count: ', polygonData[0].geometry.getAttribute('position').count)
+            console.log('triangulation count: ', polygonData[0].geometry.attributes.position.array.length)
             dispatch({ type: "SET_POLYGONS", payload: polygonData });
         }
     }
