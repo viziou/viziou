@@ -129,7 +129,7 @@ class Face3D {
         }
 
         // Sort CCW order if required
-        if (requiresSort) {
+        if (requiresSort && this._vertices.length > 0) {
             this._vertices = this._sortCCW();
         }
     }
@@ -235,14 +235,23 @@ class Face3D {
 
         // Redefine coordinate system to put face on 2D x-y plane
         const coordinates: Pair<number, number>[] = [[1, 0]];
-        const a = this._vertices[0].subtract(meanVertex);
-        const a_mag = a.magnitude()
+
+        // Set new x-direction component vector
+        const x = this._vertices[0].subtract(meanVertex);
+        const x_mag = x.magnitude();
+        const x_hat = x.normalise();
+
+        // Set new y-direction component vector by taking cross product of x and face normal
+        const y = cross(x, this.normal());
+        const y_mag = y.magnitude();
+        const y_hat = y.normalise();
+
+        // Redefine all centroid vectors in terms of x and y via scalar resolute
         for (let i = 1; i < this.numVertices; i++) {
-            let b = this._vertices[i].subtract(meanVertex);
-            let b_hat = b.normalise();
-            let u_mag = dot(a, b_hat);
-            let w_mag = Math.sqrt(a_mag**2 - u_mag**2);
-            coordinates.push([u_mag, w_mag]);
+            let a = this._vertices[i].subtract(meanVertex);
+            let u_mag = dot(a, x_hat);
+            let w_mag = dot(a, y_hat);
+            coordinates.push([u_mag/x_mag, w_mag/y_mag]);
         }
 
         // Get angle from positive x-axis of each point based on redefined coordinates
@@ -286,15 +295,25 @@ class Face3D {
         let p: Point3D;
         let q: Point3D;
         let edge: Edge3D;
+        let side1: Point3D;
+        let side2: Point3D;
+        let meanVertex = this.getCentroid();
 
         // Loop over every edge counterclockwise
         for (var i = 0; i < this._vertices.length; i++) {
+            // Get position vector of the endpoint of the edge
             edge = this.getEdge(i)
             p = edge.p;
             q = edge.q;
-            sum += cross(p, q).magnitude();
+
+            // Get side vectors of the triangle created with the centroid
+            side1 = p.subtract(meanVertex);
+            side2 = q.subtract(meanVertex);
+
+            // Get area of triangle of the two vectors
+            sum += cross(side1, side2).magnitude()/2;
         }
-        return sum/2;
+        return sum;
     }
 
     public getEdge(idx: number): Edge3D {
