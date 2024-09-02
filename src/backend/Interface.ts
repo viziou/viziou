@@ -37,7 +37,7 @@ class Backend2D {
 
   private static _threeGeometryToPolygon2D( geometry: BufferGeometry ): Polygon2D {
     const geometryPosition = geometry.getAttribute('position');
-    const vertices: Point2D[] = [];
+    let vertices: Point2D[] = [];
     const vertexSet: Set<{x: number, y: number}> = new Set();
     for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
       //vertices.push(new Point2D(geometryPosition.array[i], geometryPosition.array[i + 1]));
@@ -50,6 +50,9 @@ class Backend2D {
     console.log('vertices: ', vertices)
     console.log('number of vertices parsed: ', geometryPosition.count / 3);
     console.log('number of vertices included: ', vertices.length)
+    vertices = this._reducePointsToConvexHull(vertices);
+    console.log('vertices after convex hull reduction: ', vertices);
+    console.log('number of vertices on hull: ', vertices.length)
     return new Polygon2D(vertices, true);
   }
 
@@ -61,24 +64,101 @@ class Backend2D {
     return new ConvexGeometry(vertices);
   }
 
+  // private static _reducePointsToConvexHull(points: Point2D[]) {
+  //   if (points.length <= 3) return points; // you have a triangle or less, already convex
+  //   const reducedVertices: Point2D[] = [];
+  //   // step 1: find an extremal starting point (e.g. lowest y value)
+  //   let extremalPoint1Index = 0;
+  //   for (const [index, point] of points.entries()) {
+  //     if (point.y < points[extremalPoint1Index].y) extremalPoint1Index = index;
+  //   }
+  //   reducedVertices.push(points.splice(extremalPoint1Index, extremalPoint1Index)[0]) // popping specific index
+  //   // step 2: find the smallest angle to any other vertex to the *right* of our point
+  //   const onRight = points.filter(({x}) => {
+  //     return (x >= reducedVertices[0].x);
+  //   });
+  //   // TODO: if there's nothing on the right, then we'll need to do minimum angle to y-axis
+  //   const angles = onRight.map((point) => {
+  //     const vector = point.sub(reducedVertices[0]); // vector from extreme to this point
+  //     return (Math.acos(vector.x / vector.distanceToOrigin()));
+  //   })
+  //   //const minAngle = angles.reduce(())
+  //
+  //   // keep determining angles and looping around until you reach the initial point
+  // }
+
   private static _reducePointsToConvexHull(points: Point2D[]) {
+    console.log('initial points: ', points);
     if (points.length <= 3) return points; // you have a triangle or less, already convex
     const reducedVertices: Point2D[] = [];
     // step 1: find an extremal starting point (e.g. lowest y value)
-    let extremalPoint1Index = 0;
-    for (const [index, point] of points.entries()) {
-        if (point.y < points[extremalPoint1Index].y) extremalPoint1Index = index;
+    let extremalPointStart = points[0];
+    let extramalPointIndex = 0
+    for (const [index, point] of points.slice(1).entries()) {
+      if (point.y < extremalPointStart.y) {
+        extremalPointStart = point;
+        extramalPointIndex = index
+      }
     }
-    reducedVertices.push(points.splice(extremalPoint1Index, extremalPoint1Index)[0]) // popping specific index
+    console.log('extremal point: ', extremalPointStart);
+    reducedVertices.push(extremalPointStart)
     // step 2: find the smallest angle to any other vertex to the *right* of our point
-    const onRight = points.filter(({x}) => {
-      return (x >= reducedVertices[0].x);
+    // don't include our own point
+    const onRight = points.flatMap((point, idx) => {
+      if (point.x >= reducedVertices[0].x && point.y !== reducedVertices[0].y) {
+        return [{point: point, orig_idx: idx}];
+      }
+      else {
+        return [];
+      }
     });
-    const angles = onRight.map((point) => {
+    console.log('points to the right: ', onRight);
+    // TODO: if there's nothing on the right, then we'll need to do minimum angle to y-axis
+    const angles = onRight.map(({point, orig_idx}) => {
       const vector = point.sub(reducedVertices[0]); // vector from extreme to this point
-      return (Math.acos(vector.x / vector.distanceToOrigin()));
+      return {angle: (Math.acos(vector.x / vector.distanceToOrigin())), orig_idx: orig_idx};
     })
-    //const minAngle = angles.reduce(())
+    console.log('angles on the right: ', angles);
+    let min_angle = 360;
+    let min_angle_index = 0
+    for (const {angle, orig_idx} of angles) {
+      // search for minimum angle
+      if (angle < min_angle) {
+        min_angle = angle;
+        min_angle_index = orig_idx;
+      }
+    }
+    reducedVertices.push(points.splice(min_angle_index, 1)[0]);
+
+    let finished = false;
+    while (!finished) {
+      const angles = points.map((point) => {
+        const vector_behind = reducedVertices[reducedVertices.length - 1].sub(reducedVertices[reducedVertices.length - 2]) // recover previous vector
+        const vector = point.sub(reducedVertices[reducedVertices.length - 1]) // calculate this vector
+        return (Math.acos(vector_behind.dot(vector) / (vector_behind.distanceToOrigin() * vector.distanceToOrigin())))
+      });
+      console.log('current wrap: ', reducedVertices);
+      console.log('next angles: ', angles);
+      // TODO: Need to manage original indexes, gross
+      let max_angle = 0;
+      let max_angle_index = 0
+      for (const [index, angle] of angles.entries()) {
+        // search for maximum angle
+        if (angle > max_angle) {
+          max_angle = angle;
+          max_angle_index = index;
+
+        }
+      // if we come back to the start then that's a wrap (literally)
+      if (max_angle_index === extramalPointIndex) {
+        console.log('final max angle: ', max_angle, ' occurred at: ', max_angle_index);
+        finished = true;
+      } else {
+        reducedVertices.push(points[max_angle_index]);
+        }
+      }
+    }
+    return reducedVertices;
   }
 }
 

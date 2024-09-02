@@ -72,6 +72,10 @@ class Point2D {
       return new Point2D(this.x - point.x, this.y - point.y);
     }
 
+    public dot(point: Point2D): number {
+      return this.x * point.x + this.y * point.y; // dot product
+    }
+
     public distanceToOrigin(): number {
       // if you're using this as a vector then this is equal to the vector length
       return Math.sqrt(this.x ** 2 + this.y ** 2);
