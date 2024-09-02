@@ -83,13 +83,17 @@ const TwoDEnv = () => {
         const {x, y} = Backend2D.centreOfMass(newPolygon);
         console.log('Centroid: (', x, ', ', y, ')');
         console.time('Calculating Centroid')
-        const newPoint: PolygonData = {
-          geometry: new THREE.CircleGeometry(0.05, 50),
-          position: [x, y],
-          colour: '#C81400'
+        const geometryPosition = newPolygon.geometry.getAttribute('position');
+        for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
+          const newPoint: PolygonData = {
+            geometry: new THREE.CircleGeometry(0.02, 50),
+            position: [geometryPosition.array[i], geometryPosition.array[i+1]],
+            colour: '#C81400'
         }
         console.log("Dispatching ADD_POINT:")
-        //dispatch( { type: "ADD_POINT", payload: newPoint });
+        dispatch( { type: "ADD_POINT", payload: newPoint });
+      }
+
     };
 
     const clearPolygons = () => {
@@ -111,8 +115,8 @@ const TwoDEnv = () => {
             IoUs.push(IoUPolygon);
           }
         }
-        console.log("Clearing canvas...");
-        dispatch({type: "CLEAR_POLYGONS"});
+        //console.log("Clearing canvas...");
+        //dispatch({type: "CLEAR_POLYGONS"});
         for (const polygon of IoUs) {
           console.log("Dispatching IoU Polygon via ADD_RANDOM_POLYGON...", polygon);
           dispatch({type: 'ADD_RANDOM_POLYGON', payload: polygon});
@@ -130,6 +134,8 @@ const TwoDEnv = () => {
         console.log(polygonData)
         if (polygonData) {
             console.log("Dispatching SET_POLYGONS");
+            console.log('testing count: ', polygonData[0].geometry.getAttribute('position').count)
+            console.log('triangulation count: ', polygonData[0].geometry.attributes.position.array.length)
             dispatch({ type: "SET_POLYGONS", payload: polygonData });
         }
     }
