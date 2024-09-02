@@ -388,10 +388,10 @@ class Polyhedra3D {
             // doing scalar resolute with any slant vector
             let n = face.normal();
             let slantVector = meanVertex.subtract(face.vertices[0]);
-            let height = dot(slantVector, n.normalise());
+            let height = Math.abs(dot(slantVector, n.normalise()));
 
             // Add volume to total
-            sum = 1/3 * baseArea * height;
+            sum += 1/3 * baseArea * height;
         }
 
         return sum;
