@@ -397,6 +397,10 @@ class Polyhedra3D {
         return sum;
     }
 
+    public map(callbackfn: (point: Point3D) => Point3D): Polyhedra3D {
+        return new Polyhedra3D(this._faces.map((face) => face.map(callbackfn)));
+    }
+
     public toString(): string {
         if (this._faces.length == 0) {
             return "[]";
