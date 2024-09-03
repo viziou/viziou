@@ -17,7 +17,7 @@ const Polygon = ({ position, geometry, colour, index }: PolygonProps) => {
 
   const selectPolygon = () => {
     if (
-      (selectedPolygonIndex === null || selectedPolygonIndex < index) &&
+      (selectedPolygonIndex === null || Math.max(...currentlyMousedOverPolygons) === index) &&
       dispatch
     ) {
       // only select the largest polygon index
