@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useRef } from "react";
 import * as THREE from "three";
 import { PolygonData } from "../utils/types";
 import { PolygonContext } from "../contexts/PolygonContext";
@@ -29,9 +29,10 @@ const Polygon = ({ position, geometry, colour, index }: PolygonProps) => {
     return selectedPolygonIndex === index;
   };
 
-  const deselectPolygon = () => {
-    if (dispatch) dispatch({ type: "SELECT_POLYGON", index: null });
-  };
+  // uncomment this if it becomes useful
+  // const deselectPolygon = () => {
+  //   if (dispatch) dispatch({ type: "SELECT_POLYGON", index: null });
+  // };
 
   const handleDragEnd = () => {
     /* Could trigger updates to IoU or something here maybe */
