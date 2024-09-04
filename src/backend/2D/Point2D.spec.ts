@@ -1,6 +1,6 @@
 import { describe, it} from "mocha";
 import { should as setupShould } from "chai";
-import { Edge, Point2D } from "./classes.ts";
+import { Edge2D, Point2D } from "./classes.ts";
 const should = setupShould();
 
 
@@ -99,7 +99,7 @@ describe("Testing Class: Point2D", () => {
     describe("Point2D.onEdgeSegment()", () => {
         it("Not on Edge #1 - Obvious", () => {
             const point = new Point2D(-1, 8);
-            const edge: Edge = {
+            const edge: Edge2D = {
                 p: new Point2D(2, 3),
                 q: new Point2D(7, 1)
             };
@@ -109,7 +109,7 @@ describe("Testing Class: Point2D", () => {
 
         it("Not on Edge #2 - Within Bounds", () => {
             const point = new Point2D(5, 2);
-            const edge: Edge = {
+            const edge: Edge2D = {
                 p: new Point2D(2, 3),
                 q: new Point2D(7, 1)
             };
@@ -119,7 +119,7 @@ describe("Testing Class: Point2D", () => {
 
         it("Not on Edge #3 - Fractions", () => {
             const point = new Point2D(-3/7, 447/99);
-            const edge: Edge = {
+            const edge: Edge2D = {
                 p: new Point2D(-5, 15/2),
                 q: new Point2D(2, 3)
             };
@@ -129,11 +129,11 @@ describe("Testing Class: Point2D", () => {
 
         it("On Edge #1 - Obvious", () => {
             const point = new Point2D(3, 4);
-            const edge1: Edge = {
+            const edge1: Edge2D = {
                 p: new Point2D(2, 3),
                 q: new Point2D(4, 5)
             };
-            const edge2: Edge = {
+            const edge2: Edge2D = {
                 p: new Point2D(4, 5),
                 q: new Point2D(2, 3)
             };
@@ -146,7 +146,7 @@ describe("Testing Class: Point2D", () => {
         it("On Edge #2 - Endpoint", () => {
             const point1 = new Point2D(-2, 3);
             const point2 = new Point2D(4, -5);
-            const edge: Edge = {
+            const edge: Edge2D = {
                 p: new Point2D(-2, 3),
                 q: new Point2D(4, -5)
             };
@@ -158,7 +158,7 @@ describe("Testing Class: Point2D", () => {
 
         it("On Edge #3 - Fractions", () => {
             const point = new Point2D(-3/7, 447/98);
-            const edge: Edge = {
+            const edge: Edge2D = {
                 p: new Point2D(-5, 15/2),
                 q: new Point2D(2, 3)
             };

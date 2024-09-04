@@ -1,10 +1,10 @@
-import { PolygonData } from '../../../utils/types.tsx'
-import { BufferGeometryLoader, CircleGeometry, PlaneGeometry } from 'three'
+import { PolyhedronData } from '../../utils/types.tsx'
+import { BoxGeometry, BufferGeometryLoader } from 'three'
 //import { createHmac } from 'crypto';
 //const subtle = window.crypto.subtle;
 //import { str2ab } from '../../../utils/strings.ts'
 
-interface PolygonFile {
+interface PolyhedronFile {
 
   readonly version: number;
   readonly dimension: number;
@@ -13,53 +13,42 @@ interface PolygonFile {
   // whether the file is upgradable. can include contextual information through context
   canUpgrade(context?: object): boolean;
   // upgrade to the next version. can again provide contextual information through an argument
-  upgrade(context?: object): PolygonFile;
+  upgrade(context?: object): PolyhedronFile;
 
-  getPolygons(): PolygonData[];
+  getPolyhedra(): PolyhedronData[];
 
   toSave(): string;
 }
 
-class v1 implements PolygonFile {
+class v1 implements PolyhedronFile {
   version = 1;
-  dimension = 2;
-  payload: PolygonData[];
+  dimension = 3;
+  payload: PolyhedronData[];
 
   // TODO: can you overload a constructor?
-  constructor(polygons: string | PolygonData[]) {
-    console.log("polygons: ", polygons)
-    if (polygons instanceof Array ) {
+  constructor(polyhedra: string | PolyhedronData[]) {
+    console.log("polyhedra: ", polyhedra)
+    if (polyhedra instanceof Array ) {
       console.log('found an array')
-      this.payload = polygons;
+      this.payload = polyhedra;
     }
     // otherwise we have a string
     // TODO: this is not type-safe since this has `any`, see https://stackoverflow.com/questions/38688822/how-to-parse-json-string-in-typescript
     else {
-      console.log('found a string')
-      const o = JSON.parse(polygons);
+      console.log('found a string');
+      const o = JSON.parse(polyhedra);
       // we're restoring a save, and so need to recreate BufferGeometry instances
       console.log('before:', o);
        const geometryLoader = new BufferGeometryLoader();
-       o.payload.map((polygon: PolygonData) => {
-         if (polygon.geometry.type === 'PlaneGeometry') {
-           // have to recast since plane geometry is special
-           console.log('plane geometry found', polygon.geometry)
-           // parity miss between .toJSON() and object representation. when PlaneGeometry is instantiated,
-           // the .parameters attribute is set as the parameters used in the constructor. however, when saving,
-           // these parameters are added directly onto the rood object (i.e. saved as .width instead of
-           // .parameters.width), which is why typescript is complaining here. shouldn't be too big of an issue since
-           // we will scrap plane geometry due to not having any vertices.
-           // so yeah, this is a dangerous, gross and ugly hack which should *not* make it to production
-           const g = polygon.geometry as unknown as {width: number, height: number};
-           polygon.geometry = new PlaneGeometry(g.width, g.height);
-         }
-         else if (polygon.geometry.type === 'CircleGeometry') {
-           console.log('circle geometry found', polygon.geometry);
-           const g = polygon.geometry as unknown as {radius: number, segments: number};
-           polygon.geometry = new CircleGeometry(g.radius, g.segments);
+       o.payload.map((polyhedra: PolyhedronData) => {
+         if (polyhedra.geometry.type === 'BoxGeometry') {
+           // have to recast since box geometry is special
+           console.log('box geometry found', polyhedra.geometry)
+           const g = polyhedra.geometry as unknown as {width: number, height: number, depth: number};
+           polyhedra.geometry = new BoxGeometry(g.width, g.height, g.depth);
          }
          else {
-           polygon.geometry = geometryLoader.parse(polygon.geometry)
+           polyhedra.geometry = geometryLoader.parse(polyhedra.geometry);
          }
        })
       console.log('after: ', o);
@@ -75,7 +64,7 @@ class v1 implements PolygonFile {
     //return new v2(this.payload).upgrade(); // trigger a recursive upgrade
   }
 
-  public getPolygons() {
+  public getPolyhedra() {
     return this.payload;
   }
 
@@ -121,7 +110,7 @@ class Handler {
     return this.versions[version]
   }
 
-  public static prepareSave(pf: PolygonFile, shouldUpgrade: boolean = true) {
+  public static prepareSave(pf: PolyhedronFile, shouldUpgrade: boolean = true) {
     if (shouldUpgrade) {
       pf = pf.upgrade();
     }
@@ -136,8 +125,8 @@ class Handler {
     const c = this.getConstructor(o.version) // get the constructor for this version
     console.log('prepareLoad constructor: ', c);
     const p = new c(content)
-    console.log('polygonFile object: ', p)
-    return p.getPolygons()
+    console.log('polyhedronFile object: ', p)
+    return p.getPolyhedra()
   }
 }
 

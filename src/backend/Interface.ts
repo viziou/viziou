@@ -1,11 +1,11 @@
 /* API that is exposed to the front-end. */
-import { PolygonData, PolyhedronData } from '../utils/types';
-import { Point2D, Polygon2D } from './ts/2D/classes';
-import { IoU, getIntersectionPolygon } from './ts/2D/iou';
+import { PolygonData, PolyhedronData } from '../utils/types.tsx';
+import { Point2D, Polygon2D } from './2D/classes.ts';
+import { IoU, getIntersectionPolygon } from './2D/iou.ts';
 import { BufferGeometry, Vector3 } from 'three';
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
-import { Handler as Handler2D, vLatest as vLatest2D } from './ts/2D/PolygonFile.ts';
-import { Handler as Handler3D, vLatest as vLatest3D } from './ts/3D/PolyhedronFile.ts';
+import { Handler as Handler2D, vLatest as vLatest2D } from './2D/PolygonFile.ts';
+import { Handler as Handler3D, vLatest as vLatest3D } from './3D/PolyhedronFile.ts';
 
 class Backend2D {
 
