@@ -381,6 +381,9 @@ class Polyhedra3D {
     public volume(): number {
         // Iterate over every face and create a pyramid with it, with apex of centroid,
         // and calculate its volume and add to a running total
+        if (this.numFaces < 4) {
+            return 0;
+        }
         let sum = 0;
         let meanVertex = this.centroid();
         for (let i = 0; i < this.numFaces; i++) {
