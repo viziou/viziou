@@ -1,5 +1,5 @@
 /* API that is exposed to the front-end. */
-import { PolygonData, PolyhedronData } from '../../utils/types.tsx';
+import { PolygonData, PolyhedronData } from '../utils/types.tsx';
 import { Point2D, Polygon2D } from './2D/classes.ts';
 import { IoU, getIntersectionPolygon } from './2D/iou.ts';
 import { BufferGeometry, Vector3 } from 'three';
