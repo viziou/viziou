@@ -129,7 +129,7 @@ class Face3D {
         }
 
         // Sort CCW order if required
-        if (requiresSort && this._vertices.length > 0) {
+        if (requiresSort) {
             this._vertices = this._sortCCW();
         }
     }
@@ -230,6 +230,11 @@ class Face3D {
     }
 
     private _sortCCW() {
+        // Sorting is meaningless
+        if (this._vertices.length < 3) {
+            return this._vertices;
+        }
+
         // Obtain centre point to reference from
         const meanVertex: Point3D = this.getCentroid();
 
