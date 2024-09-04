@@ -27,13 +27,13 @@ describe("Testing Class: Face3D", () => {
             points[0] = newPoint;
             result = face.vertices[0].equals(new Point3D(0, 0, 0));
             result.should.equal(true);
-            result.should.not.equal(newPoint);
+            face.vertices[0].should.not.equal(newPoint);
 
             // Directly changing the return of face.vertices should also not change the internal
             face.vertices[0] = newPoint;
             result = face.vertices[0].equals(new Point3D(0, 0, 0));
             result.should.equal(true);
-            result.should.not.equal(newPoint);
+            face.vertices[0].should.not.equal(newPoint);
         });
 
         it("Should sort when asked", () => {
@@ -171,12 +171,12 @@ describe("Testing Class: Face3D", () => {
             const points = [new Point3D(0, 0, 0), new Point3D(5, 0, 1), new Point3D(1, 3, -2)];
             const face = new Face3D(points, true, true);
             const scaleFactor = 2;
-            const faceTranslated = face.map((point) => {
+            const faceScaled = face.map((point) => {
                 return new Point3D(point.x*scaleFactor, point.y*scaleFactor, point.z*scaleFactor);
             })
             let pointMappedCorrectly: boolean;
             for (let i = 0; i < face.numVertices; i++) {
-                pointMappedCorrectly = faceTranslated.vertices[i].equals(new Point3D(face.vertices[i].x*scaleFactor, face.vertices[i].y*scaleFactor, face.vertices[i].z*scaleFactor));
+                pointMappedCorrectly = faceScaled.vertices[i].equals(new Point3D(face.vertices[i].x*scaleFactor, face.vertices[i].y*scaleFactor, face.vertices[i].z*scaleFactor));
                 pointMappedCorrectly.should.equal(true);
             }
         });
