@@ -6,7 +6,7 @@ import Scene3D from '../components/Scene3D';
 import { PolyhedronData } from '../utils/types';
 import { PolyhedronContext } from '../contexts/PolyhedronContext';
 import '../styles/ThreeDEnv.css';
-import { Storage } from '../backend/ts/Interface.ts'
+import { Storage } from '../backend/Interface.ts'
 
 const getCube = (): THREE.BoxGeometry => {
     return new THREE.BoxGeometry(1, 1, 1);

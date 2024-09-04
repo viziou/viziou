@@ -7,7 +7,7 @@ import { PolygonData } from '../utils/types';
 import { PolygonContext } from '../contexts/PolygonContext';
 import '../styles/TwoDEnv.css';
 
-import { Backend2D, Storage } from '../backend/ts/Interface';
+import { Backend2D, Storage } from '../backend/Interface';
 
 const getSquare = (): THREE.PlaneGeometry => {
     return new THREE.PlaneGeometry(1, 1);
