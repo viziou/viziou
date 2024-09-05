@@ -6,6 +6,7 @@ import { BufferGeometry, Vector3 } from 'three';
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
 import { Handler as Handler2D, vLatest as vLatest2D } from './ts/2D/PolygonFile.ts';
 import { Handler as Handler3D, vLatest as vLatest3D } from './ts/3D/PolyhedronFile.ts';
+import { or } from 'mathjs'
 
 class Backend2D {
 
@@ -50,9 +51,9 @@ class Backend2D {
     console.log('vertices: ', vertices)
     console.log('number of vertices parsed: ', geometryPosition.count / 3);
     console.log('number of vertices included: ', vertices.length)
-    vertices = this._reducePointsToConvexHull(vertices);
-    console.log('vertices after convex hull reduction: ', vertices);
-    console.log('number of vertices on hull: ', vertices.length)
+    //vertices = this._reducePointsToConvexHull(vertices);
+    // console.log('vertices after convex hull reduction: ', vertices);
+    // console.log('number of vertices on hull: ', vertices.length)
     return new Polygon2D(vertices, true);
   }
 
@@ -87,6 +88,27 @@ class Backend2D {
   //   // keep determining angles and looping around until you reach the initial point
   // }
 
+  public static reduceThreeGeometry(polygon: PolygonData) {
+    const geometryPosition = polygon.geometry.getAttribute('position');
+    let vertices: Point2D[] = [];
+    const vertexSet: Set<{x: number, y: number}> = new Set();
+    for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
+      //vertices.push(new Point2D(geometryPosition.array[i], geometryPosition.array[i + 1]));
+      vertexSet.add({x: geometryPosition.array[i], y: geometryPosition.array[i + 1]});  // sets do not allow duplicates
+    }
+    vertexSet.forEach(({x, y}) => {
+      vertices.push(new Point2D(x, y))
+    })
+    // console.log('vertexSet: ', vertexSet);
+    // console.log('vertices: ', vertices)
+    // console.log('number of vertices parsed: ', geometryPosition.count / 3);
+    // console.log('number of vertices included: ', vertices.length)
+    vertices = this._reducePointsToConvexHull(vertices);
+     console.log('vertices after convex hull reduction: ', vertices);
+     console.log('number of vertices on hull: ', vertices.length)
+    return new Polygon2D(vertices, true);
+  }
+
   private static _reducePointsToConvexHull(points: Point2D[]) {
     console.log('initial points: ', points);
     if (points.length <= 3) return points; // you have a triangle or less, already convex
@@ -97,7 +119,7 @@ class Backend2D {
     for (const [index, point] of points.slice(1).entries()) {
       if (point.y < extremalPointStart.y) {
         extremalPointStart = point;
-        extramalPointIndex = index
+        extramalPointIndex = index + 1; // IMPORTANT: the indexes have changed AAAAAAA
       }
     }
     console.log('extremal point: ', extremalPointStart);
@@ -113,12 +135,29 @@ class Backend2D {
       }
     });
     console.log('points to the right: ', onRight);
-    // TODO: if there's nothing on the right, then we'll need to do minimum angle to y-axis
-    const angles = onRight.map(({point, orig_idx}) => {
-      const vector = point.sub(reducedVertices[0]); // vector from extreme to this point
-      //console.log(vector.x / vector.distanceToOrigin())
-      return {angle: (Math.acos(vector.x / vector.distanceToOrigin())), orig_idx: orig_idx};
-    })
+    // if there's nothing on the right, then we'll need to do minimum angle to y-axis
+    const above = points.flatMap((point, idx) => {
+      if (point.x !== reducedVertices[0].x && point.y >= reducedVertices[0].y) {
+        return [{point: point, orig_idx: idx}];
+      }
+      else {
+        return [];
+      }
+    });
+    let angles: {angle: number, orig_idx: number}[];
+    if (onRight.length === 0) {
+      angles = above.map(({point, orig_idx}) => {
+        const vector = point.sub(reducedVertices[0])
+        return { angle: (Math.acos(vector.y / vector.distanceToOrigin())), orig_idx: orig_idx };
+      })
+    }
+    else {
+      angles = onRight.map(({ point, orig_idx }) => {
+        const vector = point.sub(reducedVertices[0]); // vector from extreme to this point
+        //console.log(vector.x / vector.distanceToOrigin())
+        return { angle: (Math.acos(vector.x / vector.distanceToOrigin())), orig_idx: orig_idx };
+      })
+    }
     console.log('angles on the right: ', angles);
     let min_angle = 360;
     let min_angle_index = 0
@@ -130,6 +169,7 @@ class Backend2D {
       }
     }
     reducedVertices.push(points[min_angle_index]);
+    console.log('current wrap (after initial point): ', reducedVertices);
 
     let finished = false;
     while (!finished) {
@@ -137,7 +177,7 @@ class Backend2D {
         const vector_behind = reducedVertices[reducedVertices.length - 1].sub(reducedVertices[reducedVertices.length - 2]) // recover previous vector
         const vector = reducedVertices[reducedVertices.length - 1].sub(point) // calculate this vector
         console.log('inside next angle: ', vector.x / vector.distanceToOrigin());
-        return {angle: Math.PI - Math.acos(vector_behind.dot(vector) / (vector_behind.distanceToOrigin() * vector.distanceToOrigin())), orig_idx: index}
+        return {angle: Math.acos(vector_behind.dot(vector) / (vector_behind.distanceToOrigin() * vector.distanceToOrigin())), orig_idx: index}
       });
       console.log('current wrap: ', reducedVertices);
       console.log('next angles: ', angles);
