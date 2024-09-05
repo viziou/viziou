@@ -20,12 +20,6 @@ const getRandomGeometry = (): ConvexGeometry => {
     const numVertices = Math.floor(Math.random() * 8) + 5;
     const points = [];
 
-    // force vertices
-    //points.push(new THREE.Vector3(-1.4525399208068848, -0.178605854511261, 0));
-    //points.push(new THREE.Vector3(0.701518177986145, -0.9902114272117615, 0));
-    //points.push(new THREE.Vector3(1.6133530139923096, 1.6097732782363892, 0));
-    //points.push(new THREE.Vector3(0.4548308253288269, -0.7087771892547607, 0));
-
     for (let i = 0; i < numVertices; i++) {
       points.push(new THREE.Vector3(Math.random() * 4 - 2, Math.random() * 4 - 2, 0));
     }
@@ -91,7 +85,7 @@ const TwoDEnv = () => {
             colour: '#C81400'
           }
           console.log("Dispatching ADD_POINT:")
-          dispatch({ type: "ADD_POINT", payload: newPoint });
+          //dispatch({ type: "ADD_POINT", payload: newPoint });
         }
         console.time('Calculating Area of Polygon')
         console.log("Area of new random polygon: ", Backend2D.area(newPolygon));
@@ -109,7 +103,7 @@ const TwoDEnv = () => {
             position: [vertex.x, vertex.y],
             colour: '#0dc800'
           }
-          dispatch({ type: "ADD_POINT", payload: newPoint })
+          //dispatch({ type: "ADD_POINT", payload: newPoint })
         }
     };
 
