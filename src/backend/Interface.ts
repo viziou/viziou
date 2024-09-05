@@ -63,19 +63,29 @@ class Backend2D {
     const polyVerts = polygon.vertices;
 
     const vertices: Vector3[] = [];
+    const verticesOld: Vector3[] = [];
     const baseVertex = polyVerts[0];
 
+    // This variant does not work as intended.
+    for (const polygon of polyVerts) {
+      verticesOld.push(new Vector3(polygon.x, polygon.y, 0));
+    }
+
     // Naive triangulation method, our vertices are already sorted so these should be CCW mini-triangles already.
-    for (let i = 1; i < polygon.vertices.length - 1; i++) {
-      for (let j = 2; j < polygon.vertices.length; j++) {
-        vertices.push(new Vector3(baseVertex.x, baseVertex.y, 0));
-        vertices.push(new Vector3(polyVerts[i].x, polyVerts[i].y, 0));
-        vertices.push(new Vector3(polyVerts[j].x, polyVerts[j].y, 0));
-      }
+    for (let i = 1, j = 2; j < polygon.vertices.length; i++, j++) {
+      vertices.push(new Vector3(baseVertex.x, baseVertex.y, 0));
+      vertices.push(new Vector3(polyVerts[i].x, polyVerts[i].y, 0));
+      vertices.push(new Vector3(polyVerts[j].x, polyVerts[j].y, 0));
     }
 
     const convexGeom = new BufferGeometry();
     convexGeom.setFromPoints(vertices);
+    const oldGeom = new BufferGeometry();
+    oldGeom.setFromPoints(verticesOld);
+    console.log('old length: ', verticesOld.length);
+    console.log('new length: ', vertices.length);
+    console.log('oldGeometry: ', oldGeom);
+    console.log('convexGeom: ', convexGeom);
     //const convexGeom = new ConvexGeometry(vertices);
     const pointsGeom = convexGeom.getAttribute('position').count / 3
     console.log('Points in ConvexGeometry: ', pointsGeom);
