@@ -2,8 +2,7 @@
 import { PolygonData, PolyhedronData } from '../utils/types';
 import { Point2D, Polygon2D } from './ts/2D/classes';
 import { IoU, getIntersectionPolygon } from './ts/2D/iou';
-import { BufferGeometry, Vector3, ShapeGeometry } from 'three';
-import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
+import { BufferGeometry, Vector3 } from 'three';
 import { Handler as Handler2D, vLatest as vLatest2D } from './ts/2D/PolygonFile.ts';
 import { Handler as Handler3D, vLatest as vLatest3D } from './ts/3D/PolyhedronFile.ts';
 

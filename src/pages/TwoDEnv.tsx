@@ -77,16 +77,16 @@ const TwoDEnv = () => {
 
         console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
         dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
-        const geometryPosition = newPolygon.geometry.getAttribute('position');
-        for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
-          const newPoint: PolygonData = {
-            geometry: new THREE.CircleGeometry(0.02, 50),
-            position: [geometryPosition.array[i], geometryPosition.array[i + 1]],
-            colour: '#C81400'
-          }
-          console.log("Dispatching ADD_POINT:")
-          //dispatch({ type: "ADD_POINT", payload: newPoint });
-        }
+        // const geometryPosition = newPolygon.geometry.getAttribute('position');
+        // for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
+        //   const newPoint: PolygonData = {
+        //     geometry: new THREE.CircleGeometry(0.02, 50),
+        //     position: [geometryPosition.array[i], geometryPosition.array[i + 1]],
+        //     colour: '#C81400'
+        //   }
+        //   console.log("Dispatching ADD_POINT:")
+        //   //dispatch({ type: "ADD_POINT", payload: newPoint });
+        // }
         console.time('Calculating Area of Polygon')
         console.log("Area of new random polygon: ", Backend2D.area(newPolygon));
         console.timeEnd('Calculating Area of Polygon');
@@ -97,14 +97,14 @@ const TwoDEnv = () => {
         console.log('Reducing polygon...');
         const result = Backend2D.reduceThreeGeometry(newPolygon);
         console.log('reduced polygon: ', result);
-        for (const vertex of result.vertices) {
-          const newPoint: PolygonData = {
-            geometry: new THREE.CircleGeometry(0.02, 50),
-            position: [vertex.x, vertex.y],
-            colour: '#0dc800'
-          }
-          //dispatch({ type: "ADD_POINT", payload: newPoint })
-        }
+        // for (const vertex of result.vertices) {
+        //   const newPoint: PolygonData = {
+        //     geometry: new THREE.CircleGeometry(0.02, 50),
+        //     position: [vertex.x, vertex.y],
+        //     colour: '#0dc800'
+        //   }
+        //   //dispatch({ type: "ADD_POINT", payload: newPoint })
+        // }
     };
 
     const clearPolygons = () => {
