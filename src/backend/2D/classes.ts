@@ -1,4 +1,4 @@
-import { nearlyEqual } from "./utils.ts";
+import { nearlyEqual } from "../utils.ts";
 type Pair<A, B> = [A, B];
 
 
@@ -80,12 +80,12 @@ class Point2D {
       return Math.sqrt(this.x ** 2 + this.y ** 2);
     }
 
-    private _withinEdgeSegment(edge: Edge): boolean {
+    private _withinEdgeSegment(edge: Edge2D): boolean {
         return ((this._x >= edge.p.x && this._x <= edge.q.x) || (this._x >= edge.q.x && this._x <= edge.p.x)) &&
                ((this._y >= edge.p.y && this._y <= edge.q.y) || (this._y >= edge.q.y && this._y <= edge.p.y));
     }
 
-    public onEdgeSegment(edge: Edge): boolean {
+    public onEdgeSegment(edge: Edge2D): boolean {
         // Determine if on the line defined by edge and within bounds
         const p = edge.p;
         const q = edge.q;
@@ -105,7 +105,7 @@ class Point2D {
 }
 
 
-interface Edge {
+interface Edge2D {
     p: Point2D;
     q: Point2D;
 }
@@ -205,7 +205,7 @@ class Polygon2D {
         let sum: number = 0;
         let p: Point2D;
         let q: Point2D;
-        let edge: Edge;
+        let edge: Edge2D;
 
         // Loop over every edge counterclockwise
         for (var i = 0; i < this._vertices.length; i++) {
@@ -267,7 +267,7 @@ class Polygon2D {
         return true;
     }
 
-    public getEdge(idx: number): Edge {
+    public getEdge(idx: number): Edge2D {
         return {
             p: this._vertices[idx],
             q: this._vertices[(idx + 1) % this._vertices.length]
@@ -294,4 +294,4 @@ class Polygon2D {
 
 
 export { Point2D, Polygon2D };
-export type { Edge };
+export type { Edge2D };

@@ -21,7 +21,7 @@ export type Polygon2DAction =
 export interface PolyhedronData {
   geometry: THREE.BufferGeometry;
   position: [number, number, number];
-  colour: string;
+  colour: string;  
 }
 
 export type Scene3DProps = {
@@ -32,5 +32,6 @@ export type Polyhedron3DAction =
   | { type: "ADD_CUBE"; payload: PolyhedronData }
   | { type: "ADD_RANDOM_POLYHEDRON"; payload: PolyhedronData }
   | { type: "SET_POLYHEDRONS"; payload: PolyhedronData[] }
-  | { type: "CLEAR_POLYHEDRA" };
+  | { type: "CLEAR_POLYHEDRA" }
+  | { type: "UPDATE_POLYHEDRON"; index: number; position: [number, number, number] };
 
