@@ -1,5 +1,4 @@
 import { nearlyEqual } from "./utils.ts";
-import { Points } from 'three'
 type Pair<A, B> = [A, B];
 
 
