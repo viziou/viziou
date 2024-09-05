@@ -10,6 +10,8 @@ import '../styles/TwoDEnv.css';
 import { Backend2D, Storage } from '../backend/Interface';
 import AddPolygonModal from '../modals/AddPolygonModal';
 
+import { generatePairs } from '../utils/Generic';
+
 const getSquare = (): THREE.PlaneGeometry => {
     return new THREE.PlaneGeometry(1, 1);
 };
@@ -22,6 +24,9 @@ const getRandomGeometry = (): ConvexGeometry => {
     for (let i = 0; i < numVertices; i++) {
       points.push(new THREE.Vector3(Math.random() * 4 - 2, Math.random() * 4 - 2, 0));
     }
+
+    //console.log('number of points: ' + points.length)
+    //console.log('added points: ', points)
 
     return new ConvexGeometry(points);
 };
@@ -74,29 +79,43 @@ const TwoDEnv = () => {
     const addRandomPolygon = () => {
         const newPolygon: PolygonData = {
             geometry: getRandomGeometry(),
-            position: [
-                Math.random() * 4 - 2, // x coordinate
-                Math.random() * 4 - 2, // y coordinate
+            position: [0, 0
+            //    Math.random() * 4 - 2, // x coordinate
+            //    Math.random() * 4 - 2, // y coordinate
             ],
             colour: getRandomColour(),
         };
 
         console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
         dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
+        // const geometryPosition = newPolygon.geometry.getAttribute('position');
+        // for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
+        //   const newPoint: PolygonData = {
+        //     geometry: new THREE.CircleGeometry(0.02, 50),
+        //     position: [geometryPosition.array[i], geometryPosition.array[i + 1]],
+        //     colour: '#C81400'
+        //   }
+        //   console.log("Dispatching ADD_POINT:")
+        //   //dispatch({ type: "ADD_POINT", payload: newPoint });
+        // }
         console.time('Calculating Area of Polygon')
         console.log("Area of new random polygon: ", Backend2D.area(newPolygon));
         console.timeEnd('Calculating Area of Polygon');
         console.time('Calculating Centroid');
         const {x, y} = Backend2D.centreOfMass(newPolygon);
         console.log('Centroid: (', x, ', ', y, ')');
-        console.time('Calculating Centroid')
-        const newPoint: PolygonData = {
-          geometry: new THREE.CircleGeometry(0.05, 50),
-          position: [x, y],
-          colour: '#C81400'
-        }
-        console.log("Dispatching ADD_POINT:")
-        dispatch( { type: "ADD_POINT", payload: newPoint });
+        console.time('Calculating Centroid');
+        console.log('Reducing polygon...');
+        const result = Backend2D.reduceThreeGeometry(newPolygon);
+        console.log('reduced polygon: ', result);
+        // for (const vertex of result.vertices) {
+        //   const newPoint: PolygonData = {
+        //     geometry: new THREE.CircleGeometry(0.02, 50),
+        //     position: [vertex.x, vertex.y],
+        //     colour: '#0dc800'
+        //   }
+        //   //dispatch({ type: "ADD_POINT", payload: newPoint })
+        // }
     };
 
     const clearPolygons = () => {
@@ -104,16 +123,49 @@ const TwoDEnv = () => {
         dispatch({ type: "CLEAR_POLYGONS" });
     };
 
+    const showIoUs = () => {
+        const IoUs: PolygonData[] = [];
+        for (const [a, b] of generatePairs(polygons)) {
+          const {area, shape} = Backend2D.IoU(a, b);
+          console.log("IoU between " + a.geometry.id + " and " + b.geometry.id + ": " + area);
+          console.log("IoU shape: ", shape)
+            const IoUPolygon: PolygonData = {
+              geometry: shape,
+              position: [0, 0],
+              colour: '#ce206b'
+            }
+            IoUs.push(IoUPolygon);
+        }
+        //console.log("Clearing canvas...");
+        //dispatch({type: "CLEAR_POLYGONS"});
+        for (const polygon of IoUs) {
+          console.log("Dispatching IoU Polygon via ADD_RANDOM_POLYGON...", polygon);
+          dispatch({ type: 'ADD_RANDOM_POLYGON', payload: polygon });
+          const geomPos = polygon.geometry.getAttribute('position')
+          for (let i = 0, l = geomPos.count; i < l; i += 3) {
+            const newPoint: PolygonData = {
+              geometry: new THREE.CircleGeometry(0.02, 50),
+              position: [geomPos.array[i], geomPos.array[i + 1]],
+              colour: '#2bc800'
+            }
+            console.log("Placing IoU vertex:")
+            dispatch({ type: "ADD_POINT", payload: newPoint });
+          }
+        }
+    }
+
     const savePolygons = () => {
       console.log("Saving canvas...");
-      Storage.save(polygons, 'export');
+      Storage.save2D(polygons, 'export');
     }
     const loadPolygons = async () => {
         console.log("Opening file dialog...");
-        const polygonData = await Storage.load()
+        const polygonData = await Storage.load2D()
         console.log(polygonData)
         if (polygonData) {
             console.log("Dispatching SET_POLYGONS");
+            console.log('testing count: ', polygonData[0].geometry.getAttribute('position').count)
+            console.log('triangulation count: ', polygonData[0].geometry.attributes.position.array.length)
             dispatch({ type: "SET_POLYGONS", payload: polygonData });
         }
     }
@@ -140,6 +192,7 @@ const TwoDEnv = () => {
                 <button className="twod-button" onClick={addRandomPolygon}>Add Random Polygon</button>
                 <button className="twod-button" onClick={addSquare}>Add Square</button>
                 <button className="twod-button" onClick={clearPolygons}>Clear Shapes</button>
+                <button className="twod-button" onClick={showIoUs}>Show IoUs</button>
 
                 <button className="overflow-button" onClick={toggleOverflowMenu}>⋮</button>
                 <div className={`overflow-menu ${overflowVisible ? 'show' : ''}`}>

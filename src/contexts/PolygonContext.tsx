@@ -55,7 +55,7 @@ function PolygonReducer(state: PolygonContextInterface, action: Polygon2DAction)
                 ...state,
                 polygons: updatedPolygons
             };
-        
+
         case "SELECT_POLYGON":
             return {
                 ...state,

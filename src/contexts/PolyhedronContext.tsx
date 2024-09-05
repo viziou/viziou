@@ -26,11 +26,25 @@ function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron
                 polyhedra: [...state.polyhedra, action.payload],
             };
 
+        case "SET_POLYHEDRONS":
+            return {
+              ...state,
+              polyhedra: [...action.payload]
+            };
+
         case "CLEAR_POLYHEDRA":
             return {
                 ...state,
                 polyhedra: [],
             };
+
+        case "UPDATE_POLYHEDRON":
+            const updatedPolyhedra = [...state.polyhedra];
+            updatedPolyhedra[action.index].position = action.position; 
+            return {
+                ...state,
+                polyhedra: updatedPolyhedra, 
+            };  
 
         default:
             return state;
