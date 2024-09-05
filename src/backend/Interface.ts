@@ -116,6 +116,7 @@ class Backend2D {
     // TODO: if there's nothing on the right, then we'll need to do minimum angle to y-axis
     const angles = onRight.map(({point, orig_idx}) => {
       const vector = point.sub(reducedVertices[0]); // vector from extreme to this point
+      //console.log(vector.x / vector.distanceToOrigin())
       return {angle: (Math.acos(vector.x / vector.distanceToOrigin())), orig_idx: orig_idx};
     })
     console.log('angles on the right: ', angles);
@@ -128,27 +129,30 @@ class Backend2D {
         min_angle_index = orig_idx;
       }
     }
-    reducedVertices.push(points.splice(min_angle_index, 1)[0]);
+    reducedVertices.push(points[min_angle_index]);
 
     let finished = false;
     while (!finished) {
-      const angles = points.map((point) => {
+      const angles = points.map((point, index) => {
         const vector_behind = reducedVertices[reducedVertices.length - 1].sub(reducedVertices[reducedVertices.length - 2]) // recover previous vector
-        const vector = point.sub(reducedVertices[reducedVertices.length - 1]) // calculate this vector
-        return (Math.acos(vector_behind.dot(vector) / (vector_behind.distanceToOrigin() * vector.distanceToOrigin())))
+        const vector = reducedVertices[reducedVertices.length - 1].sub(point) // calculate this vector
+        console.log('inside next angle: ', vector.x / vector.distanceToOrigin());
+        return {angle: Math.PI - Math.acos(vector_behind.dot(vector) / (vector_behind.distanceToOrigin() * vector.distanceToOrigin())), orig_idx: index}
       });
       console.log('current wrap: ', reducedVertices);
       console.log('next angles: ', angles);
       // TODO: Need to manage original indexes, gross
       let max_angle = 0;
       let max_angle_index = 0
-      for (const [index, angle] of angles.entries()) {
+      for (const {orig_idx, angle} of angles) {
         // search for maximum angle
         if (angle > max_angle) {
           max_angle = angle;
-          max_angle_index = index;
+          max_angle_index = orig_idx;
 
         }
+        }
+        console.log('determined that the next point is ', points[max_angle_index], ' with angle ', max_angle)
       // if we come back to the start then that's a wrap (literally)
       if (max_angle_index === extramalPointIndex) {
         console.log('final max angle: ', max_angle, ' occurred at: ', max_angle_index);
@@ -157,7 +161,6 @@ class Backend2D {
         reducedVertices.push(points[max_angle_index]);
         }
       }
-    }
     return reducedVertices;
   }
 }

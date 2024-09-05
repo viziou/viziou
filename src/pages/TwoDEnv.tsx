@@ -76,13 +76,6 @@ const TwoDEnv = () => {
 
         console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
         dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
-        console.time('Calculating Area of Polygon')
-        console.log("Area of new random polygon: ", Backend2D.area(newPolygon));
-        console.timeEnd('Calculating Area of Polygon');
-        console.time('Calculating Centroid');
-        const {x, y} = Backend2D.centreOfMass(newPolygon);
-        console.log('Centroid: (', x, ', ', y, ')');
-        console.time('Calculating Centroid')
         const geometryPosition = newPolygon.geometry.getAttribute('position');
         for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
           const newPoint: PolygonData = {
@@ -92,6 +85,13 @@ const TwoDEnv = () => {
         }
         console.log("Dispatching ADD_POINT:")
         dispatch( { type: "ADD_POINT", payload: newPoint });
+        console.time('Calculating Area of Polygon')
+        console.log("Area of new random polygon: ", Backend2D.area(newPolygon));
+        console.timeEnd('Calculating Area of Polygon');
+        console.time('Calculating Centroid');
+        const {x, y} = Backend2D.centreOfMass(newPolygon);
+        console.log('Centroid: (', x, ', ', y, ')');
+        console.time('Calculating Centroid')
       }
 
     };
