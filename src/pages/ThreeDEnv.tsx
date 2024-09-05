@@ -106,7 +106,7 @@ const ThreeDEnv = () => {
         <div className="ThreeDEnv">
             <main>
                 <div className="threed-canvas-container">
-                    <Scene3D polyhedra={polyhedra} />
+                    <Scene3D/>
                 </div>
             </main>
 
