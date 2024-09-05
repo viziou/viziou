@@ -1,8 +1,10 @@
 import { useState, useRef } from "react";
 import { Canvas, useThree, ThreeEvent } from "@react-three/fiber";
-import { Vector3, OrthographicCamera } from "three";
+import { Vector3, OrthographicCamera, BufferGeometry, NormalBufferAttributes } from "three";
 import { OrbitControls } from "@react-three/drei";
 import "../styles/Modal.css";
+import { ConvexGeometry } from "../backend/Interface";
+import Polygon from "../components/Polygon";
 
 interface AddPolygonProps {
   isOpen: boolean;
@@ -20,8 +22,23 @@ interface PolygonCreatorProps {
 
 const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
   const [points, setPoints] = useState<Point[]>([]);
+  const [geometry, setGeometry] = useState<BufferGeometry<NormalBufferAttributes> | null>(null);
   const [draggedPoint, setDraggedPoint] = useState<number | null>(null);
   const { camera, gl } = useThree();
+
+  const updatePoints = (newPoints: Point[]) => {
+    const newConvexHullPoints = ConvexGeometry.reducePointsToConvexHull(newPoints.map(p => p.position));
+
+    if (newConvexHullPoints.length === newPoints.length) {
+        // set points array in this component AND parent component
+        setPoints(newPoints);
+        setPointsArray(newPoints);
+
+        if (newPoints.length > 2) {
+            setGeometry(ConvexGeometry.fromPoints(newPoints.map(p => p.position)));
+        }
+    }
+  }
 
   // add a point at the position where the user clicked:
   const handleCanvasClick = (event: ThreeEvent<MouseEvent>) => {
@@ -29,10 +46,7 @@ const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
 
     const pos = getWorldPosition(event);
     const newPoints = [...points, { position: pos }];
-
-    // set points array in this component AND parent component
-    setPoints(newPoints);
-    setPointsArray(newPoints);
+    updatePoints(newPoints);
   };
 
   // set the index of the currently dragged shape:
@@ -56,9 +70,11 @@ const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
       i === draggedPoint ? { position: pos } : point
     );
 
-    // set points array in this component AND parent component
-    setPoints(newPoints);
-    setPointsArray(newPoints);
+    
+    updatePoints(newPoints);
+    
+    
+
   };
 
   const handleDragEnd = () => {
@@ -89,6 +105,7 @@ const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
         <planeGeometry args={[100, 100]} />
         <meshBasicMaterial visible={false} />
       </mesh>
+      {geometry ? <Polygon geometry={geometry} colour="green" position={[0,0]} index={points.length+2}></Polygon> : <></>}
       {points.map((point, index) => (
         <mesh
           key={index}
@@ -99,6 +116,7 @@ const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
           <meshBasicMaterial color="red" />
         </mesh>
       ))}
+      
     </>
   );
 };
