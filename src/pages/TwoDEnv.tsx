@@ -8,6 +8,7 @@ import { PolygonContext } from '../contexts/PolygonContext';
 import '../styles/TwoDEnv.css';
 
 import { Backend2D, Storage } from '../backend/Interface';
+import AddPolygonModal from '../modals/AddPolygonModal';
 
 const getSquare = (): THREE.PlaneGeometry => {
     return new THREE.PlaneGeometry(1, 1);
@@ -45,6 +46,16 @@ const TwoDEnv = () => {
     }
 
     const { polygons, dispatch } = context;
+
+    const [isAddShapeModalOpen, setIsAddShapeModalOpen] = useState(false);
+
+    const handleModalOpen = () => setIsAddShapeModalOpen(true);
+    const handleModalClose = () => setIsAddShapeModalOpen(false);
+
+    const handleModalSubmit = (points: [number, number][]) => {
+        console.log(points);
+        handleModalClose();
+    }
 
     const addSquare = () => {
         const newPolygon: PolygonData = {
@@ -135,10 +146,15 @@ const TwoDEnv = () => {
                     <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Add Custom Shape</button>
                     <button className="twod-button" onClick={() => { closeOverflowMenu(); savePolygons() }}>Export Scene</button>
                     <button className="twod-button" onClick={() => { closeOverflowMenu(); loadPolygons() }}>Import Scene</button>
+                    <button className="twod-button" onClick={handleModalOpen}>Add New Shape</button>
                 </div>
 
             </div>
-
+        <AddPolygonModal
+        isOpen={isAddShapeModalOpen}
+        onClose={handleModalClose}
+        onSubmit={handleModalSubmit}
+      />
         </div>
     );
 };
