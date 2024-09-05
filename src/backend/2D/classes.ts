@@ -67,6 +67,19 @@ class Point2D {
         return this._x <= point.x && this._y <= point.y;
     }
 
+    public sub(point: Point2D): Point2D {
+      return new Point2D(this.x - point.x, this.y - point.y);
+    }
+
+    public dot(point: Point2D): number {
+      return this.x * point.x + this.y * point.y; // dot product
+    }
+
+    public distanceToOrigin(): number {
+      // if you're using this as a vector then this is equal to the vector length
+      return Math.sqrt(this.x ** 2 + this.y ** 2);
+    }
+
     private _withinEdgeSegment(edge: Edge2D): boolean {
         return ((this._x >= edge.p.x && this._x <= edge.q.x) || (this._x >= edge.q.x && this._x <= edge.p.x)) &&
                ((this._y >= edge.p.y && this._y <= edge.q.y) || (this._y >= edge.q.y && this._y <= edge.p.y));
