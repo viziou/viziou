@@ -6,6 +6,50 @@ import { BufferGeometry, Vector3 } from 'three';
 import { Handler as Handler2D, vLatest as vLatest2D } from './2D/PolygonFile.ts';
 import { Handler as Handler3D, vLatest as vLatest3D } from './3D/PolyhedronFile.ts';
 
+class ConvexGeometry {
+
+  public static fromPoints(points: Vector3[]) {
+    // TODO: Allow skipping the convex hull reduction process by passing in a boolean flag.
+    // First reduce the points to a convex hull.
+    points = this.reducePointsToConvexHull(points);
+
+    // Naive triangulation method, our vertices are already sorted so these should be CCW mini-triangles already.
+    const vertices: Vector3[] = [];
+    const baseVertex = points[0];
+
+    for (let i = 1, j = 2; j < points.length; i++, j++) {
+      vertices.push(baseVertex);
+      vertices.push(points[i]);
+      vertices.push(points[j]);
+      //vertices.push(new Vector3(baseVertex.x, baseVertex.y, 0));
+      //vertices.push(new Vector3(points[i].x, points[i].y, 0));
+      //vertices.push(new Vector3(points[j].x, points[j].y, 0));
+    }
+
+    const convexGeom = new BufferGeometry();
+    convexGeom.setFromPoints(vertices);
+    return convexGeom;
+  }
+
+  public static reducePointsToConvexHull(points: Vector3[]): Vector3[] {
+    // TODO: Don't convert to Point2D, just do the convex hull directly.
+    // TODO: Make it so convex hull reduction can be done directly with Vector3
+    const pointsTemp: Point2D[] = [];
+    for (const point of points) {
+      pointsTemp.push(new Point2D(point.x, point.y));
+    }
+
+    const reduced = Backend2D._reducePointsToConvexHull(pointsTemp);
+
+    const reproduced: Vector3[] = [];
+    for (const point of reduced) {
+      reproduced.push(new Vector3(point.x, point.y, 0));
+    }
+
+    return reproduced;
+  }
+}
+
 class Backend2D {
 
   public static area( { geometry }: PolygonData ) {
@@ -111,7 +155,7 @@ class Backend2D {
     return new Polygon2D(vertices, true);
   }
 
-  private static _reducePointsToConvexHull(points: Point2D[]) {
+  public static _reducePointsToConvexHull(points: Point2D[]) {
     // This code is ugly as hell since there was so much debugging involved to get it working.
     //console.log('initial points: ', points);
     // Step 0: If you have a triangle (or less), there's nothing to do.
@@ -337,4 +381,4 @@ class Storage {
   }
 }
 
-export { Backend2D, Storage };
+export { Backend2D, ConvexGeometry, Storage };
