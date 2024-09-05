@@ -24,8 +24,8 @@ const getRandomGeometry = (): ConvexGeometry => {
       points.push(new THREE.Vector3(Math.random() * 4 - 2, Math.random() * 4 - 2, 0));
     }
 
-    console.log('number of points: ' + points.length)
-    console.log('added points: ', points)
+    //console.log('number of points: ' + points.length)
+    //console.log('added points: ', points)
 
     return new ConvexGeometry(points);
 };
@@ -117,22 +117,30 @@ const TwoDEnv = () => {
         for (const [a, b] of generatePairs(polygons)) {
           const {area, shape} = Backend2D.IoU(a, b);
           console.log("IoU between " + a.geometry.id + " and " + b.geometry.id + ": " + area);
-          if (1 == 1) {
+          console.log("IoU shape: ", shape)
             const IoUPolygon: PolygonData = {
               geometry: shape,
               position: [0, 0],
               colour: '#ce206b'
             }
             IoUs.push(IoUPolygon);
-          }
         }
         //console.log("Clearing canvas...");
         //dispatch({type: "CLEAR_POLYGONS"});
         for (const polygon of IoUs) {
           console.log("Dispatching IoU Polygon via ADD_RANDOM_POLYGON...", polygon);
-          dispatch({type: 'ADD_RANDOM_POLYGON', payload: polygon});
+          dispatch({ type: 'ADD_RANDOM_POLYGON', payload: polygon });
+          const geomPos = polygon.geometry.getAttribute('position')
+          for (let i = 0, l = geomPos.count; i < l; i += 3) {
+            const newPoint: PolygonData = {
+              geometry: new THREE.CircleGeometry(0.02, 50),
+              position: [geomPos.array[i], geomPos.array[i + 1]],
+              colour: '#2bc800'
+            }
+            console.log("Placing IoU vertex:")
+            dispatch({ type: "ADD_POINT", payload: newPoint });
+          }
         }
-
     }
 
     const savePolygons = () => {
