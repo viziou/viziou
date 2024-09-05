@@ -62,14 +62,16 @@ const TwoDEnv = () => {
 
   const handleModalSubmit = (points: [number, number][]) => {
     console.log(points);
-    const newPolygon: PolygonData = {
-      geometry: ConvexGeometry.fromPoints(
-        points.map((p) => new THREE.Vector3(p[0], p[1], 0))
-      ),
-      position: [0, 0],
-      colour: getRandomColour(),
-    };
-    dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
+    if (points.length > 2) {
+      const newPolygon: PolygonData = {
+        geometry: ConvexGeometry.fromPoints(
+          points.map((p) => new THREE.Vector3(p[0], p[1], 0))
+        ),
+        position: [0, 0],
+        colour: getRandomColour(),
+      };
+      dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
+    }
     handleModalClose();
   };
 
