@@ -128,13 +128,13 @@ describe("Testing Class: Face3D", () => {
         });
     });
 
-    describe("Face3D.getCentroid()", () => {
+    describe("Face3D.centroid()", () => {
         it("Basic #1 - Rectangle", () => {
             // Setup face
             const points = [new Point3D(0, 0, 0), new Point3D(0, 1, 0), new Point3D(4, 0, 2), new Point3D(4, 1, 2)];
             const face = new Face3D(points, true, true);
             const actualCentre = new Point3D(2, 1/2, 1);
-            const result = actualCentre.equals(face.getCentroid());
+            const result = actualCentre.equals(face.centroid());
             result.should.equal(true);
         });
 
@@ -143,7 +143,7 @@ describe("Testing Class: Face3D", () => {
             const points = [new Point3D(1, 1, 9), new Point3D(2, -2, 0), new Point3D(6, 4, 0)];
             const face = new Face3D(points, true, true);
             const actualCentre = new Point3D(3, 1, 3);
-            const result = actualCentre.equals(face.getCentroid());
+            const result = actualCentre.equals(face.centroid());
             result.should.equal(true);
         });
     });

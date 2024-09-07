@@ -1,9 +1,8 @@
 import { Point3D, Face3D, Polyhedra3D } from './classes.ts';
-import { CSG } from 'three-csg-ts';
-import { Polygon } from 'three-csg-ts/lib/esm/Polygon';
-import { Vertex } from 'three-csg-ts/lib/esm/Vertex';
-import { Vector } from 'three-csg-ts/lib/esm/Vector';
-
+import { CSG } from './csg/CSG.ts';
+import { Polygon } from './csg/Polygon.ts';
+import { Vertex } from './csg/Vertex.ts';
+import { Vector } from './csg/Vector.ts';
 
 function getIntersectionPolyhedra(polyhedra1: Polyhedra3D, polyhedra2: Polyhedra3D): Polyhedra3D {
     // Convert both input polyhedra into CSG solids
@@ -21,7 +20,7 @@ function getIntersectionPolyhedra(polyhedra1: Polyhedra3D, polyhedra2: Polyhedra
 function PolyehdraToCSG(polyehdra: Polyhedra3D): CSG {
     const polygons: Polygon[] = [];
     polyehdra.faces.forEach((face) => {
-        let normal = face.normal();
+        let normal = face.normal;
         polygons.push(new Polygon(face.vertices.map((point) => {
             return new Vertex(
                 new Vector(point.x, point.y, point.z),
