@@ -117,9 +117,11 @@ function dot(p: Point3D, q: Point3D): number {
 
 class Face3D {
     private _vertices: Point3D[];
+    private _normal: Point3D;
 
     constructor(vertices: Point3D[], requiresValidation?: boolean, requiresSort?: boolean) {
         this._vertices = [...vertices];
+        this._normal = this.calculateNormal();
 
         // Validate if required
         if (requiresValidation) {
@@ -130,7 +132,7 @@ class Face3D {
 
         // Sort CCW order if required
         if (requiresSort) {
-            this._vertices = this._sortCCW();
+            this._sortCCW();
         }
     }
 
@@ -142,11 +144,24 @@ class Face3D {
 		return [...this._vertices];
 	}
 
+    /**
+     * Getter normal
+     * @return {Point3D[]}
+     */
+	public get normal(): Point3D {
+		return new Point3D(this._normal.x, this._normal.y, this._normal.z);
+	}
+
+    public invertNormal() {
+        this._normal = new Point3D(-this.normal.x, -this.normal.y, -this.normal.z);
+        this._sortCCW();
+    }
+
     public get numVertices(): number {
         return this._vertices.length;
     }
 
-    public normal(): Point3D {
+    public calculateNormal(): Point3D {
         // Establish points to use
         const Point1 = this._vertices[0];
         const Point2 = this._vertices[1];
@@ -159,12 +174,12 @@ class Face3D {
         // Get normal vector to plane
         const n = cross(vec12, vec13);
 
-        return n;
+        return n.normalise();
     }
 
     public planeCoefficients(): number[] {
         // Get normal vector to plane
-        const n = this.normal()
+        const n = this.normal;
 
         // Create coefficients
         const A = n.x;
@@ -198,7 +213,7 @@ class Face3D {
         return true;
     }
 
-    public getCentroid(): Point3D {
+    public centroid(): Point3D {
         let x: number = 0;
         let y: number = 0;
         let z: number = 0;
@@ -213,30 +228,14 @@ class Face3D {
         return new Point3D(x/numVertices, y/numVertices, z/numVertices);
     }
 
-    public translate(x: number, y: number, z: number): this;
-    public translate(p: Point3D): this;
-    public translate(x: number | Point3D, y?: number, z?: number): this {
-        if (!(x instanceof Point3D) && (y) && (z)) {
-            x = new Point3D(x, y, z);
-        }
-
-        // this is necessary to keep TypeScript happy since we're doing funky things with types
-        if (typeof x !== 'number') {
-            this._vertices.map((point: Point3D) => {
-            return point.translate(x);
-            })
-        }
-        return this;
-    }
-
     private _sortCCW() {
-        // Sorting is meaningless
         if (this._vertices.length < 3) {
+            // Sorting is meaningless
             return this._vertices;
         }
 
         // Obtain centre point to reference from
-        const meanVertex: Point3D = this.getCentroid();
+        const meanVertex: Point3D = this.centroid();
 
         // Redefine coordinate system to put face on 2D x-y plane
         const coordinates: Pair<number, number>[] = [[1, 0]];
@@ -246,8 +245,8 @@ class Face3D {
         const x_mag = x.magnitude();
         const x_hat = x.normalise();
 
-        // Set new y-direction component vector by taking cross product of x and face normal
-        const y = cross(x, this.normal());
+        // Set new y-direction component vector by taking cross product face normal and x. This order ensures anticlockwise x and y 
+        const y = cross(this.normal, x);
         const y_mag = y.magnitude();
         const y_hat = y.normalise();
 
@@ -289,10 +288,26 @@ class Face3D {
             }
         });
 
-        // Return an array only consisting of the points
-        return sortedCollection.map((value) => {
+        // Set an array only consisting of the points
+        this._vertices = sortedCollection.map((value) => {
             return value[0];
         })
+    }
+
+    public translate(x: number, y: number, z: number): this;
+    public translate(p: Point3D): this;
+    public translate(x: number | Point3D, y?: number, z?: number): this {
+        if (!(x instanceof Point3D) && (y) && (z)) {
+            x = new Point3D(x, y, z);
+        }
+
+        // this is necessary to keep TypeScript happy since we're doing funky things with types
+        if (typeof x !== 'number') {
+            this._vertices.map((point: Point3D) => {
+            return point.translate(x);
+            })
+        }
+        return this;
     }
 
     public calculateArea(): number {
@@ -302,7 +317,7 @@ class Face3D {
         let edge: Edge3D;
         let side1: Point3D;
         let side2: Point3D;
-        let meanVertex = this.getCentroid();
+        let meanVertex = this.centroid();
 
         // Loop over every edge counterclockwise
         for (var i = 0; i < this._vertices.length; i++) {
@@ -351,7 +366,11 @@ class Polyhedra3D {
     private _faces: Face3D[];
 
     constructor(faces: Face3D[]) {
+        // Save a copy of the faces
         this._faces = [...faces];
+
+        // Renormalise faces to all have outward normals
+        this.renormalise();
     }
 
     /**
@@ -373,9 +392,28 @@ class Polyhedra3D {
     public centroid(): Point3D {
         let sumPoint = new Point3D(0, 0, 0);
         for (let i = 0; i < this.numFaces; i++) {
-            sumPoint = sumPoint.add(this.faces[i].getCentroid());
+            sumPoint = sumPoint.add(this.faces[i].centroid());
         }
         return new Point3D(sumPoint.x/this.numFaces, sumPoint.y/this.numFaces, sumPoint.z/this.numFaces);
+    }
+
+    public renormalise() {
+        // Get centroid
+        const polyhedraCentroid = this.centroid();
+
+        // Go over every face
+        this._faces.forEach((face) => {
+            // Get face centroid to polyhedra centroid vector
+            let centreVector = polyhedraCentroid.subtract(face.centroid())
+
+            // Compute scalar product of centre vector with respect to the normal
+            let scalarProduct = dot(centreVector, face.normal);
+
+            // If positive, means the normal is facing inwards
+            if (scalarProduct > 0) {
+                face.invertNormal();
+            }
+        });
     }
 
     public volume(): number {
@@ -394,9 +432,9 @@ class Polyhedra3D {
 
             // Get perpendicular height to apex by getting normal vector of face and 
             // doing scalar resolute with any slant vector
-            let n = face.normal();
+            let n = face.normal;
             let slantVector = meanVertex.subtract(face.vertices[0]);
-            let height = Math.abs(dot(slantVector, n.normalise()));
+            let height = Math.abs(dot(slantVector, n));
 
             // Add volume to total
             sum += 1/3 * baseArea * height;
