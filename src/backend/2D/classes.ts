@@ -117,7 +117,7 @@ class Polygon2D {
     constructor(vertices: Point2D[], requiresSort?: boolean) {
         this._vertices = [...vertices];
         if (requiresSort) {
-            this._vertices = this._sortCCW();
+            this._sortCCW();
         }
     }
 
@@ -133,7 +133,7 @@ class Polygon2D {
         return this._vertices.length;
     }
 
-    public getCentroid() {
+    public centroid() {
         let x: number = 0;
         let y: number = 0;
         const numVertices: number = this.numVertices;
@@ -164,7 +164,7 @@ class Polygon2D {
 
     private _sortCCW() {
         // Obtain centre point to reference from
-        const meanVertex: Point2D = this.getCentroid();
+        const meanVertex: Point2D = this.centroid();
 
         // Get angle from positive x-axis of each point
         const angles: number[] = this._vertices.map((point) => {
@@ -195,13 +195,13 @@ class Polygon2D {
             }
         });
 
-        // Return an array only consisting of the points
-        return sortedCollection.map((value) => {
+        // Set vertices as an array only consisting of the points
+        this._vertices = sortedCollection.map((value) => {
             return value[0];
         })
     }
 
-    public calculateArea(): number {
+    public area(): number {
         let sum: number = 0;
         let p: Point2D;
         let q: Point2D;

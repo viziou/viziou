@@ -9,7 +9,7 @@ import { Handler as Handler3D, vLatest as vLatest3D } from './3D/PolyhedronFile.
 class Backend2D {
 
   public static area( { geometry }: PolygonData ) {
-    return this._threeGeometryToPolygon2D(geometry).calculateArea();
+    return this._threeGeometryToPolygon2D(geometry).area();
   }
 
   public static pointInPolygon({x, y}: { x: number; y: number }, { geometry, position }: PolygonData) {
@@ -31,7 +31,7 @@ class Backend2D {
 
   public static centreOfMass({geometry, position}: PolygonData): {x: number; y: number} {
     const offset = new Point2D(position[0], position[1]);
-    return this._threeGeometryToPolygon2D(geometry).getCentroid().translate(offset).xy;
+    return this._threeGeometryToPolygon2D(geometry).centroid().translate(offset).xy;
   }
 
   private static _threeGeometryToPolygon2D( geometry: BufferGeometry ): Polygon2D {

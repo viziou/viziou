@@ -86,13 +86,13 @@ describe("Testing Class: Polygon2D", () => {
         });
     });
 
-    describe("Polygon.getCentroid()", () => {
+    describe("Polygon.centroid()", () => {
         it("Basic #1 - Rectangle", () => {
             // Setup polygon
             const points = [new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 4), new Point2D(0, 4)];
             const polygon = new Polygon2D(points);
             const actualCentre = new Point2D(1, 2);
-            const result = actualCentre.equals(polygon.getCentroid());
+            const result = actualCentre.equals(polygon.centroid());
             result.should.equal(true);
         });
 
@@ -110,7 +110,7 @@ describe("Testing Class: Polygon2D", () => {
             ];
             const polygon = new Polygon2D(points, true);
             const actualCentre = new Point2D(0, 0);
-            const result = actualCentre.equals(polygon.getCentroid());
+            const result = actualCentre.equals(polygon.centroid());
             result.should.equal(true);
         });
     });
@@ -162,12 +162,12 @@ describe("Testing Class: Polygon2D", () => {
         });
     });
 
-    describe("Polygon2D.calculateArea()", () => {
+    describe("Polygon2D.area()", () => {
         it("Basic #1 - Triangle", () => {
             // Setup polygon
             const points = [new Point2D(0, 0), new Point2D(5, 0), new Point2D(1, 3)];
             const polygon = new Polygon2D(points, true);
-            const calculatedArea = polygon.calculateArea();
+            const calculatedArea = polygon.area();
             const expectedArea = 15/2;
             calculatedArea.should.be.a('number');
             calculatedArea.should.equal(expectedArea);
@@ -177,7 +177,7 @@ describe("Testing Class: Polygon2D", () => {
             // Setup polygon
             const points = [new Point2D(0, 0), new Point2D(5, 0), new Point2D(5, 2), new Point2D(0, 2)];
             const polygon = new Polygon2D(points, true);
-            const calculatedArea = polygon.calculateArea();
+            const calculatedArea = polygon.area();
             const expectedArea = 10;
             calculatedArea.should.be.a('number');
             calculatedArea.should.equal(expectedArea);
@@ -196,7 +196,7 @@ describe("Testing Class: Polygon2D", () => {
                 new Point2D(Math.sqrt(2)/2, -Math.sqrt(2)/2)
             ];
             const polygon = new Polygon2D(points, true);
-            const calculatedArea = polygon.calculateArea();
+            const calculatedArea = polygon.area();
             calculatedArea.should.be.a('number');
 
             const expectedArea = 2*Math.sqrt(2);
@@ -208,7 +208,7 @@ describe("Testing Class: Polygon2D", () => {
             // Setup polygon
             const points = [new Point2D(0, 0), new Point2D(9, 0), new Point2D(1, 6), new Point2D(0, 3)];
             const polygon = new Polygon2D(points, true);
-            const calculatedArea = polygon.calculateArea();
+            const calculatedArea = polygon.area();
             const expectedArea = 57/2;
             calculatedArea.should.be.a('number');
             calculatedArea.should.equal(expectedArea);
@@ -217,7 +217,7 @@ describe("Testing Class: Polygon2D", () => {
         it("Complex #2", () => {
             const points = [new Point2D(1, 0), new Point2D(0, 1)];
             const polygon = new Polygon2D(points, true);
-            const calculatedArea = polygon.calculateArea();
+            const calculatedArea = polygon.area();
             const expectedArea = 0;
             should.exist(calculatedArea);
             calculatedArea.should.be.a('number');
@@ -242,7 +242,7 @@ describe("Testing Class: Polygon2D", () => {
             polygon = polygon.map((point) => {
                 return new Point2D(point.x + 1000, point.y - 5000);
             })
-            const calculatedArea = polygon.calculateArea();
+            const calculatedArea = polygon.area();
             const expectedArea = 2*Math.sqrt(2);
             const areTheyEqual = nearlyEqual(calculatedArea, expectedArea);
             areTheyEqual.should.equal(true);
@@ -266,7 +266,7 @@ describe("Testing Class: Polygon2D", () => {
             polygon = polygon.map((point) => {
                 return new Point2D(2*(point.x + 340), 2*(point.y + 17));
             })
-            const calculatedArea = polygon.calculateArea();
+            const calculatedArea = polygon.area();
             const expectedArea = 8*Math.sqrt(2);
             const areTheyEqual = nearlyEqual(calculatedArea, expectedArea);
             areTheyEqual.should.equal(true);
@@ -275,36 +275,36 @@ describe("Testing Class: Polygon2D", () => {
         describe("Null Behaviour #1 - Empty", () => {
           it("should be 0 (no sorting)", () => {
             const emptyPolygon = new Polygon2D([]);
-            emptyPolygon.calculateArea().should.equal(0);
+            emptyPolygon.area().should.equal(0);
           });
 
           it("should be 0 (sorting)", () => {
             const emptyPolygon = new Polygon2D([], true);
-            emptyPolygon.calculateArea().should.equal(0);
+            emptyPolygon.area().should.equal(0);
           })
         });
 
         describe("Null Behaviour #2 - Singular ", () => {
           it("should be 0 (no sort)", () => {
             const point = new Polygon2D([new Point2D(1, 2)]);
-            point.calculateArea().should.equal(0)
+            point.area().should.equal(0)
           });
 
           it("should be 0 (sorting)", () => {
             const point = new Polygon2D([new Point2D(1, 2)], true);
-            point.calculateArea().should.equal(0)
+            point.area().should.equal(0)
           });
         });
 
         describe("Null Behaviour #3 - Line", () => {
           it("should be 0 (no sort)", () => {
             const line = new Polygon2D([new Point2D(-1, 0), new Point2D(-1, 0)]);
-            line.calculateArea().should.equal(0);
+            line.area().should.equal(0);
           })
 
           it("should be 0 (sorting)", () => {
             const line = new Polygon2D([new Point2D(-1, 0), new Point2D(-1, 0)], true);
-            line.calculateArea().should.equal(0);
+            line.area().should.equal(0);
           })
 
         })
