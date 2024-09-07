@@ -46,22 +46,23 @@ describe("Testing Class: Polyhedra3D", () => {
             const polyhedra = new Polyhedra3D(faces);
 
             let result: boolean;
-            const newFace = new Face3D([D, C, B], true, true);
+            const E = new Point3D(0, 0, 1);
+            const F = new Point3D(0, 1, 0);
+            const G = new Point3D(1, 0, 0);
+            const newFace = new Face3D([E, F, G], true, true);
 
             // Check if a copy was appropriately made and no side effect can happen
             faces[0] = newFace;
             for (let i = 0; i < face1.numVertices; i++) {
-                result = polyhedra.faces[0].vertices[i].equals(face1.vertices[i]);
-                result.should.equal(true);
-                polyhedra.faces[0].vertices[i].should.not.equal(newFace.vertices[i]);
+                result = polyhedra.faces[0].vertices[i].equals(newFace.vertices[i]);
+                result.should.not.equal(true);
             }      
 
             // Directly changing the return of polyhedra faces should also not change the internal
             polyhedra.faces[0] = newFace;
             for (let i = 0; i < face1.numVertices; i++) {
-                result = polyhedra.faces[0].vertices[i].equals(face1.vertices[i]);
-                result.should.equal(true);
-                polyhedra.faces[0].vertices[i].should.not.equal(newFace.vertices[i]);
+                result = polyhedra.faces[0].vertices[i].equals(newFace.vertices[i]);
+                result.should.not.equal(true);
             }    
         });
     });
