@@ -174,8 +174,7 @@ describe("Testing getIntersectingPolygon()", () => {
     });
 });
 
-
-describe("Testing IoU Functionality", () => {
+describe("Testing 2D IoU Functionality", () => {
     it("Commutativity Test", () => {
         const polygon1 = new Polygon2D([new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 6), new Point2D(0, 6)], true);
         const polygon2 = new Polygon2D([new Point2D(1, 1), new Point2D(4, 1), new Point2D(4, -2), new Point2D(1, -2)], true);
@@ -205,7 +204,7 @@ describe("Testing IoU Functionality", () => {
         const polygon1 = new Polygon2D([new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 6), new Point2D(0, 6)], true);
         const polygon2 = new Polygon2D([new Point2D(0.5, 1), new Point2D(0.5, 2), new Point2D(1.5, 2), new Point2D(1.5, 1)], true);
         const iou = IoU(polygon1, polygon2);
-        iou.should.equal(polygon2.calculateArea()/polygon1.calculateArea());
+        iou.should.equal(polygon2.area()/polygon1.area());
     });
 
     it("No Intersection Test", () => {
@@ -281,17 +280,14 @@ describe("Testing IoU Functionality", () => {
         const expectedIntersectionArea = 3449877/155890;
 
         let result: boolean;
-        result = nearlyEqual(polygon1.calculateArea(), expectedPolygon1Area);
+        result = nearlyEqual(polygon1.area(), expectedPolygon1Area);
         result.should.equal(true);
-        result = nearlyEqual(polygon2.calculateArea(), expectedPolygon2Area);
+        result = nearlyEqual(polygon2.area(), expectedPolygon2Area);
         result.should.equal(true);
-        result = nearlyEqual(getIntersectionPolygon(polygon1, polygon2).calculateArea(), expectedIntersectionArea);
+        result = nearlyEqual(getIntersectionPolygon(polygon1, polygon2).area(), expectedIntersectionArea);
         result.should.equal(true);
 
         const expectedIoU = 1149959/6488651;
         iou.should.equal(expectedIoU);  // Missing nearlyEqual but will keep as is
     });
 });
-
-
-// CHANGE ALL VARS INTO CONSTS AND LETS
