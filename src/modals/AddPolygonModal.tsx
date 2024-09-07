@@ -1,6 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Canvas, useThree, ThreeEvent } from "@react-three/fiber";
-import { Vector3, OrthographicCamera, BufferGeometry, NormalBufferAttributes } from "three";
+import {
+  Vector3,
+  OrthographicCamera,
+  BufferGeometry,
+  NormalBufferAttributes,
+} from "three";
 import { OrbitControls } from "@react-three/drei";
 import "../styles/Modal.css";
 import { ConvexGeometry } from "../backend/Interface";
@@ -22,23 +27,28 @@ interface PolygonCreatorProps {
 
 const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
   const [points, setPoints] = useState<Point[]>([]);
-  const [geometry, setGeometry] = useState<BufferGeometry<NormalBufferAttributes> | null>(null);
+  const [geometry, setGeometry] =
+    useState<BufferGeometry<NormalBufferAttributes> | null>(null);
   const [draggedPoint, setDraggedPoint] = useState<number | null>(null);
   const { camera, gl } = useThree();
 
   const updatePoints = (newPoints: Point[]) => {
-    const newConvexHullPoints = ConvexGeometry.reducePointsToConvexHull(newPoints.map(p => p.position));
+    const newConvexHullPoints = ConvexGeometry.reducePointsToConvexHull(
+      newPoints.map((p) => p.position)
+    );
 
     if (newConvexHullPoints.length === newPoints.length) {
-        // set points array in this component AND parent component
-        setPoints(newPoints);
-        setPointsArray(newPoints);
+      // set points array in this component AND parent component
+      setPoints(newPoints);
+      setPointsArray(newPoints);
 
-        if (newPoints.length > 2) {
-            setGeometry(ConvexGeometry.fromPoints(newPoints.map(p => p.position)));
-        }
+      if (newPoints.length > 2) {
+        setGeometry(
+          ConvexGeometry.fromPoints(newPoints.map((p) => p.position))
+        );
+      }
     }
-  }
+  };
 
   // add a point at the position where the user clicked:
   const handleCanvasClick = (event: ThreeEvent<MouseEvent>) => {
@@ -56,6 +66,7 @@ const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
   ) => {
     event.stopPropagation();
     setDraggedPoint(index);
+    setHovered(true);
   };
 
   const handleDrag = (event: ThreeEvent<MouseEvent>) => {
@@ -70,15 +81,12 @@ const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
       i === draggedPoint ? { position: pos } : point
     );
 
-    
     updatePoints(newPoints);
-    
-    
-
   };
 
   const handleDragEnd = () => {
     setDraggedPoint(null);
+    setHovered(false);
   };
 
   // get the position of the mouse in terms of the 3JS coordinates
@@ -93,6 +101,12 @@ const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
     return pos;
   };
 
+  const [hovered, setHovered] = useState(false);
+
+  useEffect(() => {
+    document.body.style.cursor = hovered ? 'pointer' : 'auto'
+  }, [hovered]);
+
   return (
     <>
       <mesh
@@ -105,18 +119,28 @@ const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
         <planeGeometry args={[100, 100]} />
         <meshBasicMaterial visible={false} />
       </mesh>
-      {geometry ? <Polygon geometry={geometry} colour="green" position={[0,0]} index={points.length+2}></Polygon> : <></>}
+      {geometry ? (
+        <Polygon
+          geometry={geometry}
+          colour="green"
+          position={[0, 0]}
+          index={points.length + 2}
+        ></Polygon>
+      ) : (
+        <></>
+      )}
       {points.map((point, index) => (
         <mesh
           key={index}
           position={point.position}
           onPointerDown={(e) => handlePointDragStart(e, index)}
+          onPointerEnter={() => setHovered(true)}
+          onPointerLeave={() => setHovered(false)}
         >
           <sphereGeometry args={[0.1, 32, 32]} />
           <meshBasicMaterial color="red" />
         </mesh>
       ))}
-      
     </>
   );
 };
