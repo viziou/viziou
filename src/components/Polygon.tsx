@@ -25,7 +25,7 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
       const box = new THREE.Box3().setFromObject(mesh.current);
       setBoundingBox(box);
     }
-  }, [geometry, position]);
+  }, [geometry, position, rotation, scale]);
 
   const selectPolygon = () => {
     if (!selectable) return;
@@ -140,14 +140,23 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     }
 
     // todo: use this scale and the currently selected corner to transform the points in the geometry
-    
+    console.log('mouse delta', mouseDelta)
     console.log('new scale', newScale)
-    setMousePosition(newMousePosition);
+    setScale(newScale as [number, number]);
+    const geometry = mesh.current.geometry;
+    const matrix = new THREE.Matrix4().makeScale(newScale[0], newScale[1], 1);
+    geometry.applyMatrix4(matrix);
+    geometry.computeBoundingBox();
+    geometry.computeBoundingSphere();
+    
+    if (dispatch) dispatch({type: "UPDATE_GEOMETRY", geometry: geometry, index: index})
+    // setMousePosition(newMousePosition);/
   }
 
   const handleResizeEnd = (event: ThreeEvent<MouseEvent>) => {
     setResizing(false);
-    // todo:
+    setCorner(null);
+    selectPolygon();
     console.log("resize ended");
   }
 
@@ -184,6 +193,26 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
 
     return (
       <group position={center}>
+        {/* Invisible large box to allow dragging when the drag points aren't moused over: */}
+        {resizing || rotating ? <mesh key={'invisible'} visible={false}
+        onPointerMove={(e) => {
+          if (resizing) handleResizeDrag(e);
+          if (rotating) handleRotateDrag(e);
+        }}
+
+        onPointerUp={(e) => {
+          handleResizeEnd(e);
+          handleRotateEnd(e);
+        }}
+
+        onPointerLeave={(e) => {
+          if (resizing) handleResizeEnd(e);
+          if (rotating) handleRotateEnd(e);
+        }}
+        >
+        <boxGeometry args={[size.x*2, size.y*2, 0]} />
+        
+        </mesh> : null}
         {/* Red Lines to show bounding box: */}
         <line>
           <bufferGeometry>
@@ -212,10 +241,6 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
               0
             ]}
             onPointerDown={(e) => {handleResizeStart(corner, e);}}
-
-            onPointerMove={handleResizeDrag}
-
-            onPointerUp={handleResizeEnd}
           >
             <boxGeometry args={[0.2, 0.2, 0]} />
             <meshBasicMaterial color="blue" />
