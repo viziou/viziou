@@ -18,75 +18,89 @@ export const PolygonContext = createContext<PolygonContextInterface | undefined>
 
 function PolygonReducer(state: PolygonContextInterface, action: Polygon2DAction) {
     switch (action.type) {
-        case "ADD_SQUARE":
-            return {
-                ...state,
-                polygons: [...state.polygons, action.payload],
-            };
+      case "ADD_SQUARE":
+        return {
+          ...state,
+          polygons: [...state.polygons, action.payload],
+        };
 
-        case "ADD_RANDOM_POLYGON":
-            return {
-                ...state,
-                polygons: [...state.polygons, action.payload],
-            };
+      case "ADD_RANDOM_POLYGON":
+        return {
+          ...state,
+          polygons: [...state.polygons, action.payload],
+        };
 
       case "ADD_POINT":
-            return {
-                ...state,
-                polygons: [...state.polygons, action.payload],
-            };
+        return {
+          ...state,
+          polygons: [...state.polygons, action.payload],
+        };
 
-        case "SET_POLYGONS":
-            return {
-                ...state,
-                polygons: [...action.payload],
-            };
+      case "SET_POLYGONS":
+        return {
+          ...state,
+          polygons: [...action.payload],
+        };
 
-        case "CLEAR_POLYGONS":
-            return {
-                ...state,
-                polygons: [],
-            };
+      case "CLEAR_POLYGONS":
+        return {
+          ...state,
+          polygons: [],
+        };
 
-        case "UPDATE_POSITION":
-            const updatedPolygons = [...state.polygons];
-            updatedPolygons[action.index].position = action.position;
-            return {
-                ...state,
-                polygons: updatedPolygons
-            };
+      case "UPDATE_POSITION":
+        const updatedPolygons = [...state.polygons];
+        updatedPolygons[action.index].position = action.position;
+        return {
+          ...state,
+          polygons: updatedPolygons,
+        };
 
-        case "SELECT_POLYGON":
-            return {
-                ...state,
-                selectedPolygonIndex: action.index
-            };
+      case "SELECT_POLYGON":
+        return {
+          ...state,
+          selectedPolygonIndex: action.index,
+        };
 
-        case "ADD_MOUSED_OVER_POLYGON":
-            const mousedOver = state.currentlyMousedOverPolygons.slice();
-            if (!mousedOver.includes(action.index)) {
-                mousedOver.push(action.index)
-            }
-            return {
-                ...state,
-                currentlyMousedOverPolygons: mousedOver.slice()
-            }
+      case "ADD_MOUSED_OVER_POLYGON":
+        const mousedOver = state.currentlyMousedOverPolygons.slice();
+        if (!mousedOver.includes(action.index)) {
+          mousedOver.push(action.index);
+        }
+        return {
+          ...state,
+          currentlyMousedOverPolygons: mousedOver.slice(),
+        };
 
-        case "REMOVE_MOUSED_OVER_POLYGON":
-            const mousedOverArr = state.currentlyMousedOverPolygons.slice();
-            if (mousedOverArr.includes(action.index)) {
-                const index = mousedOverArr.indexOf(action.index);
-                if (index > -1) {
-                    mousedOverArr.splice(index, 1);
+      case "REMOVE_MOUSED_OVER_POLYGON":
+        const mousedOverArr = state.currentlyMousedOverPolygons.slice();
+        if (mousedOverArr.includes(action.index)) {
+          const index = mousedOverArr.indexOf(action.index);
+          if (index > -1) {
+            mousedOverArr.splice(index, 1);
+          }
+        }
+        return {
+          ...state,
+          currentlyMousedOverPolygons: mousedOverArr.slice(),
+        };
+
+      case "UPDATE_GEOMETRY":
+        return {
+          ...state,
+          polygons: state.polygons.map((polygon, i) =>
+            i === action.index
+              ? {
+                  ...polygon,
+                  geometry: action.geometry,
+                  position: action.position || polygon.position,
                 }
-            }
-            return {
-                ...state,
-                currentlyMousedOverPolygons: mousedOverArr.slice()
-            }
+              : polygon
+          ),
+        };
 
-        default:
-            return state;
+      default:
+        return state;
     }
 }
 

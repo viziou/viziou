@@ -19,7 +19,8 @@ export type Polygon2DAction =
   | { type: "UPDATE_POSITION"; index: number; position: [number, number] }
   | { type: "SELECT_POLYGON"; index: number | null }
   | { type: "ADD_MOUSED_OVER_POLYGON"; index: number }
-  | { type: "REMOVE_MOUSED_OVER_POLYGON"; index: number };
+  | { type: "REMOVE_MOUSED_OVER_POLYGON"; index: number }
+  | { type: "UPDATE_GEOMETRY"; index: number; geometry: THREE.BufferGeometry; position?: [number, number] };
 
 export interface PolyhedronData {
   geometry: THREE.BufferGeometry;
