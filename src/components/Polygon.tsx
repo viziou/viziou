@@ -17,15 +17,15 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
   const { scene, camera, gl } = useThree();
-  const [rotation, setRotation] = useState(0);
   const [scale, setScale] = useState<[number, number]>([1, 1]);
+  const [mousePosition, setMousePosition] = useState<THREE.Vector3 | null>(null);
 
   useEffect(() => {
     if (mesh.current) {
       const box = new THREE.Box3().setFromObject(mesh.current);
       setBoundingBox(box);
     }
-  }, [geometry, position, rotation, scale]);
+  }, [geometry, position, scale, mousePosition]);
 
   const selectPolygon = () => {
     if (!selectable) return;
@@ -99,92 +99,157 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
   
   //! RESIZE FUNCTIONS:
   const [resizing, setResizing] = useState(false);
-  const [corner, setCorner] = useState<string | null>(null)
-  const [mousePosition, setMousePosition] = useState<THREE.Vector3 | null>(null);
+  const [corner, setCorner] = useState<string | null>(null);
+  const [initialMousePosition, setInitialMousePosition] = useState<THREE.Vector3 | null>(null);
+  const [initialScale, setInitialScale] = useState<[number, number]>([1, 1]);
+  const [initialSize, setInitialSize] = useState<THREE.Vector3 | null>(null);
 
   const handleResizeStart = (corner: string, event: ThreeEvent<MouseEvent>) => {
     setResizing(true);
-    setMousePosition(getWorldPosition(event));
     setCorner(corner);
+    setInitialMousePosition(getWorldPosition(event));
+    setInitialScale([...scale]);
+    if (boundingBox) {
+      setInitialSize(boundingBox.getSize(new THREE.Vector3()));
+    }
   }
 
   const handleResizeDrag = (event: ThreeEvent<MouseEvent>) => {
-    if (!resizing || !boundingBox || !mousePosition || !corner) return;
-    // todo:
-    console.log("resize dragging");
+    if (!resizing || !boundingBox || !initialMousePosition || !corner || !mesh.current || !initialSize) return;
 
-    // const mouseDelta = (event as any).delta;
     const newMousePosition = getWorldPosition(event);
-    const mouseDelta = newMousePosition.sub(mousePosition);
-    const size = boundingBox.getSize(new THREE.Vector3());
-    // console.log(mouseDelta);
-    let newScale = [1, 1];
+    const mouseDelta = newMousePosition.sub(initialMousePosition);
+    
+    let newScale = [...initialScale];
+    let newPosition: [number, number] = [...position];
 
     switch (corner) {
       case 'topLeft':
-        newScale[0] -= mouseDelta.x / size.x;
-        newScale[1] += mouseDelta.y / size.y;
+        newScale[0] = initialScale[0] * (1 - mouseDelta.x / initialSize.x);
+        newScale[1] = initialScale[1] * (1 + mouseDelta.y / initialSize.y);
+        newPosition[0] += mouseDelta.x / 2;
+        newPosition[1] += mouseDelta.y / 2;
         break;
       case 'topRight':
-        newScale[0] += mouseDelta.x / size.x;
-        newScale[1] += mouseDelta.y / size.y;
+        newScale[0] = initialScale[0] * (1 + mouseDelta.x / initialSize.x);
+        newScale[1] = initialScale[1] * (1 + mouseDelta.y / initialSize.y);
+        newPosition[0] += mouseDelta.x / 2;
+        newPosition[1] += mouseDelta.y / 2;
         break;
       case 'bottomLeft':
-        newScale[0] -= mouseDelta.x / size.x;
-        newScale[1] -= mouseDelta.y / size.y;
+        newScale[0] = initialScale[0] * (1 - mouseDelta.x / initialSize.x);
+        newScale[1] = initialScale[1] * (1 - mouseDelta.y / initialSize.y);
+        newPosition[0] += mouseDelta.x / 2;
+        newPosition[1] += mouseDelta.y / 2;
         break;
       case 'bottomRight':
-        newScale[0] += mouseDelta.x / size.x;
-        newScale[1] -= mouseDelta.y / size.y;
+        newScale[0] = initialScale[0] * (1 + mouseDelta.x / initialSize.x);
+        newScale[1] = initialScale[1] * (1 - mouseDelta.y / initialSize.y);
+        newPosition[0] += mouseDelta.x / 2;
+        newPosition[1] += mouseDelta.y / 2;
         break;
     }
 
-    // use this scale and the currently selected corner to transform the points in the geometry
+    // Apply the new scale and position
+    const scaleMatrix = new THREE.Matrix4().makeScale(newScale[0], newScale[1], 1);
+    const translateMatrix = new THREE.Matrix4().makeTranslation(
+      newPosition[0] - position[0],
+      newPosition[1] - position[1],
+      0
+    );
+
+    const combinedMatrix = new THREE.Matrix4().multiply(translateMatrix).multiply(scaleMatrix);
+
+    const newGeometry = geometry.clone().applyMatrix4(combinedMatrix);
+
+    if (dispatch) {
+      dispatch({ type: "UPDATE_GEOMETRY", geometry: newGeometry, index: index });
+      dispatch({ type: "UPDATE_POSITION", index: index, position: newPosition });
+    }
+
     setScale(newScale as [number, number]);
-    const geometry = mesh.current.geometry;
-    const matrix = new THREE.Matrix4().makeScale(newScale[0], newScale[1], 1);
-    geometry.applyMatrix4(matrix);
-    geometry.computeBoundingBox();
-    geometry.computeBoundingSphere();
     
-    if (dispatch) dispatch({type: "UPDATE_GEOMETRY", geometry: geometry, index: index})
-    // setMousePosition(newMousePosition);/
+    // Update bounding box immediately
+    if (mesh.current) {
+      const newBox = new THREE.Box3().setFromObject(mesh.current);
+      setBoundingBox(newBox);
+    }
   }
 
   const handleResizeEnd = (_: ThreeEvent<MouseEvent>) => {
     setResizing(false);
     setCorner(null);
+    setInitialMousePosition(null);
+    setInitialScale([1, 1]);
+    setInitialSize(null);
     selectPolygon();
-    console.log("resize ended");
   }
 
   //! ROTATE FUNCTIONS:
   const [rotating, setRotating] = useState(false);
+  const [rotationCenter, setRotationCenter] = useState<THREE.Vector3 | null>(null);
+  const [initialRotation, setInitialRotation] = useState(0);
+  const [totalRotation, setTotalRotation] = useState(0);
 
-  const handleRotateStart = (_: ThreeEvent<MouseEvent>) => {
+  const handleRotateStart = (e: ThreeEvent<MouseEvent>) => {
     setRotating(true);
-    setRotation(0);
-    console.log("rotate start");
+    setMousePosition(getWorldPosition(e));
+    if (boundingBox) {
+      const center = boundingBox.getCenter(new THREE.Vector3());
+      setRotationCenter(center);
+      const angle = Math.atan2(e.point.y - center.y, e.point.x - center.x);
+      setInitialRotation(angle);
+    }
   }
 
   const handleRotateDrag = (event: ThreeEvent<MouseEvent>) => {
-    if (!rotating) return;
-    const newMousePosition = getWorldPosition(event);
-    const mouseDelta = newMousePosition.sub(mousePosition!);
-    const newRotation = rotation + mouseDelta.x;  // todo: this is highly flawed
-    const geometry = mesh.current.geometry;
-    const matrix = new THREE.Matrix4().makeRotationZ(newRotation);
-    geometry.applyMatrix4(matrix);
-    geometry.computeBoundingBox();
-    geometry.computeBoundingSphere();
-    if (dispatch) dispatch({type: "UPDATE_GEOMETRY", geometry: geometry, index: index})
+    if (!rotating || !mousePosition || !rotationCenter || !mesh.current) return;
 
-    console.log("rotate dragging");
+    const newMousePosition = getWorldPosition(event);
+
+    // Calculate angle difference
+    const newAngle = Math.atan2(newMousePosition.y - rotationCenter.y, newMousePosition.x - rotationCenter.x);
+    let angleDiff = newAngle - initialRotation;
+
+    // Ensure continuous rotation
+    if (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+    if (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+
+    const newTotalRotation = totalRotation + angleDiff;
+
+    // Create rotation matrix
+    const rotationMatrix = new THREE.Matrix4().makeRotationZ(newTotalRotation / 330);
+
+    // Apply rotation to geometry
+    const newGeometry = geometry.clone().applyMatrix4(rotationMatrix);
+
+    // Update position
+    const worldPosition = new THREE.Vector3();
+    mesh.current.getWorldPosition(worldPosition);
+    const localPosition = worldPosition.sub(rotationCenter);
+    localPosition.applyMatrix4(rotationMatrix);
+    const newPosition = localPosition.add(rotationCenter);
+
+    if (dispatch) {
+      dispatch({ type: "UPDATE_GEOMETRY", geometry: newGeometry, index: index });
+      dispatch({ type: "UPDATE_POSITION", index: index, position: [newPosition.x, newPosition.y] });
+    }
+
+    setTotalRotation(newTotalRotation);
+    setMousePosition(newMousePosition);
+    setInitialRotation(newAngle);
+
+    // Update bounding box immediately
+    if (mesh.current) {
+      const newBox = new THREE.Box3().setFromObject(mesh.current);
+      setBoundingBox(newBox);
+    }
   }
 
   const handleRotateEnd = (_: ThreeEvent<MouseEvent>) => {
     setRotating(false);
-    console.log("rotate ended");
+    setRotationCenter(null);
+    setInitialRotation(0);
   }
 
 
@@ -215,10 +280,11 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
           if (rotating) handleRotateEnd(e);
         }}
         >
-        <boxGeometry args={[size.x*2, size.y*2, 0]} />
+        <boxGeometry args={[size.x*10, size.y*10, 0]} />
         
         </mesh> : null}
         {/* Red Lines to show bounding box: */}
+        {!rotating && !resizing ? 
         <line>
           <bufferGeometry>
             <bufferAttribute
@@ -236,6 +302,7 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
           </bufferGeometry>
           <lineBasicMaterial color="red" />
         </line>
+        : null }
         {/* Boxes on each corner: */}
         {['topLeft', 'topRight', 'bottomLeft', 'bottomRight'].map((corner, i) => (
           <mesh
@@ -264,6 +331,7 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
           <meshBasicMaterial color="green" />
         </mesh>
         {/* Line to Rotate circle: */}
+        {!resizing && !rotating ? 
         <line>
           <bufferGeometry>
             <bufferAttribute
@@ -277,7 +345,7 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
             />
           </bufferGeometry>
           <lineBasicMaterial color="red" />
-        </line>
+        </line> : null}
       </group>
     );
   }, [boundingBox, isPolygonSelected, scene]);
@@ -290,6 +358,11 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
         onDragStart={handleDragStart}
         onDrag={(localMatrix) => {
           handleDrag(localMatrix);
+          // Update bounding box immediately during drag
+          if (mesh.current) {
+            const newBox = new THREE.Box3().setFromObject(mesh.current);
+            setBoundingBox(newBox);
+          }
         }}
         onDragEnd={handleDragEnd}
       >
