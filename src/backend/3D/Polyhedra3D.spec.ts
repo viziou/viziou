@@ -67,7 +67,7 @@ describe("Testing Class: Polyhedra3D", () => {
         });
     });
 
-    describe("Polyhedra3D.getCentroid()", () => {
+    describe("Polyhedra3D.centroid()", () => {
         it("Cube", () => {
             // Setup polyhedra
             const A = new Point3D(0, 0, 0);
@@ -323,8 +323,6 @@ describe("Testing Class: Polyhedra3D", () => {
 
         // TODO: Implement this check
         // it("Null Behaviour - Non Enclosed Faces", () => {
-        //     const line = new Face3D([new Point3D(-1, 0, 1), new Point3D(4, 0, 4)]);
-        //     line.calculateArea().should.equal(0);
         // })
     });
 });

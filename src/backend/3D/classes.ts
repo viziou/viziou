@@ -315,7 +315,7 @@ class Face3D {
         return this;
     }
 
-    public calculateArea(): number {
+    public area(): number {
         let sum: number = 0;
         let p: Point3D;
         let q: Point3D;
@@ -433,7 +433,7 @@ class Polyhedra3D {
             let face = this.faces[i];
 
             // Get base area
-            let baseArea = face.calculateArea();
+            let baseArea = face.area();
 
             // Get perpendicular height to apex by getting normal vector of face and 
             // doing scalar resolute with any slant vector

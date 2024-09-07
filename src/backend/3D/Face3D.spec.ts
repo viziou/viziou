@@ -198,12 +198,12 @@ describe("Testing Class: Face3D", () => {
         });
     });
 
-    describe("Face3D.calculateArea()", () => {
+    describe("Face3D.area()", () => {
         it("Basic #1 - Triangle", () => {
             // Setup face
             const points = [new Point3D(1, 1, 9), new Point3D(2, -2, 0), new Point3D(6, 4, 0)];
             const face = new Face3D(points, true, true);
-            const calculatedArea = face.calculateArea();
+            const calculatedArea = face.area();
             const expectedArea = 9*Math.sqrt(14);
             calculatedArea.should.be.a('number');
             calculatedArea.should.equal(expectedArea);
@@ -213,7 +213,7 @@ describe("Testing Class: Face3D", () => {
             // Setup face
             const points = [new Point3D(0, 0, 0), new Point3D(0, 1, 0), new Point3D(4, 0, 2), new Point3D(4, 1, 2)];
             const face = new Face3D(points, true, true);
-            const calculatedArea = face.calculateArea();
+            const calculatedArea = face.area();
             const expectedArea = 2*Math.sqrt(5);
             calculatedArea.should.be.a('number');
             calculatedArea.should.equal(expectedArea);
@@ -230,7 +230,7 @@ describe("Testing Class: Face3D", () => {
 
             // Setup Face
             const face = new Face3D([A, B, C, D, E, F], false, true)
-            const calculatedArea = face.calculateArea();
+            const calculatedArea = face.area();
             const expectedArea = 28.49932;
             calculatedArea.should.be.a('number');
             calculatedArea.should.closeTo(expectedArea, 1e-4);
@@ -238,37 +238,37 @@ describe("Testing Class: Face3D", () => {
 
         it("Null Behaviour - Empty #1", () => {
             const emptyPolygon = new Face3D([]);
-            emptyPolygon.calculateArea().should.equal(0);
+            emptyPolygon.area().should.equal(0);
         });
 
         it("Null Behaviour - Empty #2", () => {
             const emptyPolygon = new Face3D([], false, true);
-            emptyPolygon.calculateArea().should.equal(0);
+            emptyPolygon.area().should.equal(0);
         })
 
         it("Null Behaviour - Empty #3", () => {
             const emptyPolygon = new Face3D([new Point3D(0, 1, 1), new Point3D(0, 0, 0), new Point3D(0, 1, 0), new Point3D(1, 0, 1)], true, true);
-            emptyPolygon.calculateArea().should.equal(0);
+            emptyPolygon.area().should.equal(0);
         })
 
         it("Null Behaviour - Singular #1", () => {
             const point = new Face3D([new Point3D(1, 2, 1)]);
-            point.calculateArea().should.equal(0);
+            point.area().should.equal(0);
         });
 
         it("Null Behaviour - Singular #2", () => {
             const point = new Face3D([new Point3D(1, 2, 1)], false, true);
-            point.calculateArea().should.equal(0);
+            point.area().should.equal(0);
         });
 
         it("Null Behaviour - Line #1", () => {
             const line = new Face3D([new Point3D(-1, 0, 1), new Point3D(4, 0, 4)]);
-            line.calculateArea().should.equal(0);
+            line.area().should.equal(0);
         })
 
         it("Null Behaviour - Line #2", () => {
             const line = new Face3D([new Point3D(-1, 0, 1), new Point3D(4, 0, 4)], false, true);
-            line.calculateArea().should.equal(0);
+            line.area().should.equal(0);
         })
     });
 });
