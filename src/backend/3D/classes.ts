@@ -348,6 +348,47 @@ class Face3D {
         };
     }
 
+    public equals(face: Face3D): boolean {
+        // Handle edge cases of null faces
+        if (face.numVertices < 3 && this.numVertices < 3) {
+            return true;
+        }
+
+        // Check if same size
+        if (face.numVertices != this.numVertices) {
+            return false;
+        }
+
+        // Check if same plane and orientation
+        if (!face.normal.equals(this._normal)) {
+            return false;
+        }
+
+        // Check if first point in face exists here
+        let initial_idx = -1;
+        for (let i = 0; i < this.numVertices; i++) {
+            if (this._vertices[i].equals(face.vertices[0])) {
+                initial_idx = i;
+                break;
+            }
+        }
+        if (initial_idx == -1) {
+            // Could not find first point
+            return false;
+        }
+
+        // Since same origin, do linear scan from 0 and initial_idx mod numVertices
+        for (let i = 0, j = initial_idx; i < this.numVertices; i++) {
+            if (!face.vertices[i].equals(this._vertices[j])) {
+                return false;
+            }
+            j = (j + 1) % this.numVertices;
+        }
+
+        // Since same exact points in same orientation, must be same face
+        return true
+    }
+
     public map(callbackfn: (point: Point3D) => Point3D): Face3D {
         return new Face3D(this._vertices.map(callbackfn), true);
     }
@@ -450,6 +491,41 @@ class Polyhedra3D {
 
     public map(callbackfn: (point: Point3D) => Point3D): Polyhedra3D {
         return new Polyhedra3D(this._faces.map((face) => face.map(callbackfn)));
+    }
+
+    public equals(polyhedra: Polyhedra3D): boolean {
+        // Handle edge cases of null polyhedra
+        if (this.numFaces < 4 && polyhedra.numFaces < 4) {
+            return true;
+        }
+
+        // Check if number of faces matches
+        if (this.numFaces != polyhedra.numFaces) {
+            return false;
+        }
+
+        // Check if number of vertices matches
+        if (this.numVertices != polyhedra.numVertices) {
+            return false;
+        }
+
+        // Check if each face on given polyhedra exists here
+        for (let face1 of polyhedra.faces) {
+            let match = false;
+            for (let face2 of this.faces) {
+                if (face1.equals(face2)) {
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) {
+                // No matching face found
+                return false;
+            }
+        }
+
+        // All faces matches, hence must be same
+        return true;
     }
 
     public toString(): string {
