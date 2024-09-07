@@ -162,6 +162,11 @@ class Face3D {
     }
 
     public calculateNormal(): Point3D {
+        // Edge case of less than 3 vertex Face
+        if (this.numVertices < 3) {
+            return new Point3D(0, 0, 0);
+        }
+        
         // Establish points to use
         const Point1 = this._vertices[0];
         const Point2 = this._vertices[1];

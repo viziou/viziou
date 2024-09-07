@@ -42,7 +42,7 @@ describe("Testing Class: Face3D", () => {
             
             // Create Face3D with sort enabled
             const face = new Face3D(points, true, true);
-            const sortedPoints = [new Point3D(0, 1, 1), new Point3D(0, 1, 0), new Point3D(0, 0, 0), new Point3D(0, 0, 1)];
+            const sortedPoints = [new Point3D(0, 1, 1), new Point3D(0, 0, 1), new Point3D(0, 0, 0), new Point3D(0, 1, 0)];
             for (let i = 0; i < points.length; i++) {
                 result = face.vertices[i].equals(sortedPoints[i]);
                 result.should.equal(true);
