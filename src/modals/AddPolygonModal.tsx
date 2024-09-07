@@ -42,10 +42,12 @@ const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
       setPoints(newPoints);
       setPointsArray(newPoints);
 
-      if (newPoints.length > 2) {
+      if (newPoints.length >= 3) {
         setGeometry(
           ConvexGeometry.fromPoints(newPoints.map((p) => p.position))
         );
+      } else {
+        setGeometry(null);
       }
     }
   };
@@ -125,6 +127,7 @@ const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
           colour="green"
           position={[0, 0]}
           index={points.length + 2}
+          selectable={false}
         ></Polygon>
       ) : (
         <></>

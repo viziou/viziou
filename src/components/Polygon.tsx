@@ -4,11 +4,11 @@ import { PolygonData } from "../utils/types";
 import { PolygonContext } from "../contexts/PolygonContext";
 import { DragControls } from "@react-three/drei";
 
-type PolygonProps = PolygonData & { index: number };
+type PolygonProps = PolygonData & { index: number; selectable: boolean };
 
 // TODO: Make information on top of the polygon as a child instead?
 
-const Polygon = ({ position, geometry, colour, index }: PolygonProps) => {
+const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
   const { dispatch, selectedPolygonIndex, currentlyMousedOverPolygons } =
     useContext(PolygonContext)!;
@@ -16,6 +16,7 @@ const Polygon = ({ position, geometry, colour, index }: PolygonProps) => {
   const matrix = new THREE.Matrix4();
 
   const selectPolygon = () => {
+    if (!selectable) return;
     if (
       (selectedPolygonIndex === null || Math.max(...currentlyMousedOverPolygons) === index) &&
       dispatch

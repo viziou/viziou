@@ -29,6 +29,7 @@ const Scene2D = ({ polygons }: Scene2DProps) => {
           position={polygon.position}
           geometry={polygon.geometry}
           colour={polygon.colour}
+          selectable={true}
         />
       ))}
 
