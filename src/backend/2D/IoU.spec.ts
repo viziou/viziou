@@ -174,7 +174,7 @@ describe("Testing getIntersectingPolygon()", () => {
     });
 });
 
-describe("Testing IoU Functionality", () => {
+describe("Testing 2D IoU Functionality", () => {
     it("Commutativity Test", () => {
         const polygon1 = new Polygon2D([new Point2D(0, 0), new Point2D(2, 0), new Point2D(2, 6), new Point2D(0, 6)], true);
         const polygon2 = new Polygon2D([new Point2D(1, 1), new Point2D(4, 1), new Point2D(4, -2), new Point2D(1, -2)], true);

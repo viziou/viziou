@@ -5,9 +5,15 @@ import { Vertex } from './csg/Vertex.ts';
 import { Vector } from './csg/Vector.ts';
 
 function getIntersectionPolyhedra(polyhedra1: Polyhedra3D, polyhedra2: Polyhedra3D): Polyhedra3D {
+    // Handle edge case of null polyhedra
+    const nullPolyhedra = new Polyhedra3D([]);
+    if (polyhedra1.equals(nullPolyhedra) || polyhedra2.equals(nullPolyhedra)) {
+        return nullPolyhedra;
+    }
+
     // Convert both input polyhedra into CSG solids
-    const csg1 = PolyehdraToCSG(polyhedra1);
-    const csg2 = PolyehdraToCSG(polyhedra2);
+    const csg1 = PolyhedraToCSG(polyhedra1);
+    const csg2 = PolyhedraToCSG(polyhedra2);
 
     // Get intersection solid
     const intersectCSG = csg1.intersect(csg2);
@@ -17,9 +23,9 @@ function getIntersectionPolyhedra(polyhedra1: Polyhedra3D, polyhedra2: Polyhedra
 }
 
 
-function PolyehdraToCSG(polyehdra: Polyhedra3D): CSG {
+function PolyhedraToCSG(polyhedra: Polyhedra3D): CSG {
     const polygons: Polygon[] = [];
-    polyehdra.faces.forEach((face) => {
+    polyhedra.faces.forEach((face) => {
         let normal = face.normal;
         polygons.push(new Polygon(face.vertices.map((point) => {
             return new Vertex(
