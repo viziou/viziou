@@ -16,7 +16,9 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
   const originalPosition = useRef<[number, number]>([0, 0]);
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
-  const { scene } = useThree();
+  const { scene, camera, gl } = useThree();
+  const [rotation, setRotation] = useState(0);
+  const [scale, setScale] = useState<[number, number]>([1, 1]);
 
   useEffect(() => {
     if (mesh.current) {
@@ -79,20 +81,68 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     // console.log('mouse over', currentlyMousedOverPolygons)
   };
 
+
+  
+
+  // get the position of the mouse in terms of the 3JS coordinates
+  const getWorldPosition = (event: ThreeEvent<MouseEvent>) => {
+    const { clientX, clientY } = event;
+    const { left, top, width, height } = gl.domElement.getBoundingClientRect();
+    const x = ((clientX - left) / width) * 2 - 1;
+    const y = -((clientY - top) / height) * 2 + 1;
+
+    const pos = new THREE.Vector3(x, y, 0);
+    pos.unproject(camera as THREE.OrthographicCamera);
+    return pos;
+  };
+
   
   //! RESIZE FUNCTIONS:
   const [resizing, setResizing] = useState(false);
+  const [corner, setCorner] = useState<string | null>(null)
+  const [mousePosition, setMousePosition] = useState<THREE.Vector3 | null>(null);
 
   const handleResizeStart = (corner: string, event: ThreeEvent<MouseEvent>) => {
     setResizing(true);
-    // todo:
-    console.log("resize start");
+    setMousePosition(getWorldPosition(event));
+    setCorner(corner);
   }
 
   const handleResizeDrag = (event: ThreeEvent<MouseEvent>) => {
-    if (!resizing) return;
+    if (!resizing || !boundingBox || !mousePosition || !corner) return;
     // todo:
     console.log("resize dragging");
+
+    // const mouseDelta = (event as any).delta;
+    const newMousePosition = getWorldPosition(event);
+    const mouseDelta = newMousePosition.sub(mousePosition);
+    const size = boundingBox.getSize(new THREE.Vector3());
+    // console.log(mouseDelta);
+    let newScale = [1, 1];
+
+    switch (corner) {
+      case 'topLeft':
+        newScale[0] -= mouseDelta.x / size.x;
+        newScale[1] += mouseDelta.y / size.y;
+        break;
+      case 'topRight':
+        newScale[0] += mouseDelta.x / size.x;
+        newScale[1] += mouseDelta.y / size.y;
+        break;
+      case 'bottomLeft':
+        newScale[0] -= mouseDelta.x / size.x;
+        newScale[1] -= mouseDelta.y / size.y;
+        break;
+      case 'bottomRight':
+        newScale[0] += mouseDelta.x / size.x;
+        newScale[1] -= mouseDelta.y / size.y;
+        break;
+    }
+
+    // todo: use this scale and the currently selected corner to transform the points in the geometry
+    
+    console.log('new scale', newScale)
+    setMousePosition(newMousePosition);
   }
 
   const handleResizeEnd = (event: ThreeEvent<MouseEvent>) => {
@@ -108,6 +158,7 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     setRotating(true);
     // todo:
     console.log("rotate start");
+
   }
 
   const handleRotateDrag = (event: ThreeEvent<MouseEvent>) => {
