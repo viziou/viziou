@@ -139,9 +139,7 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
         break;
     }
 
-    // todo: use this scale and the currently selected corner to transform the points in the geometry
-    console.log('mouse delta', mouseDelta)
-    console.log('new scale', newScale)
+    // use this scale and the currently selected corner to transform the points in the geometry
     setScale(newScale as [number, number]);
     const geometry = mesh.current.geometry;
     const matrix = new THREE.Matrix4().makeScale(newScale[0], newScale[1], 1);
@@ -153,7 +151,7 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     // setMousePosition(newMousePosition);/
   }
 
-  const handleResizeEnd = (event: ThreeEvent<MouseEvent>) => {
+  const handleResizeEnd = (_: ThreeEvent<MouseEvent>) => {
     setResizing(false);
     setCorner(null);
     selectPolygon();
@@ -163,22 +161,29 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
   //! ROTATE FUNCTIONS:
   const [rotating, setRotating] = useState(false);
 
-  const handleRotateStart = (event: ThreeEvent<MouseEvent>) => {
+  const handleRotateStart = (_: ThreeEvent<MouseEvent>) => {
     setRotating(true);
-    // todo:
+    setRotation(0);
     console.log("rotate start");
-
   }
 
   const handleRotateDrag = (event: ThreeEvent<MouseEvent>) => {
     if (!rotating) return;
-    // todo:
+    const newMousePosition = getWorldPosition(event);
+    const mouseDelta = newMousePosition.sub(mousePosition!);
+    const newRotation = rotation + mouseDelta.x;  // todo: this is highly flawed
+    const geometry = mesh.current.geometry;
+    const matrix = new THREE.Matrix4().makeRotationZ(newRotation);
+    geometry.applyMatrix4(matrix);
+    geometry.computeBoundingBox();
+    geometry.computeBoundingSphere();
+    if (dispatch) dispatch({type: "UPDATE_GEOMETRY", geometry: geometry, index: index})
+
     console.log("rotate dragging");
   }
 
-  const handleRotateEnd = (event: ThreeEvent<MouseEvent>) => {
+  const handleRotateEnd = (_: ThreeEvent<MouseEvent>) => {
     setRotating(false);
-    // todo:
     console.log("rotate ended");
   }
 
