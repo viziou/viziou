@@ -18,6 +18,13 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
   const { scene } = useThree();
 
+  useEffect(() => {
+    if (mesh.current) {
+      const box = new THREE.Box3().setFromObject(mesh.current);
+      setBoundingBox(box);
+    }
+  }, [geometry, position]);
+
   const selectPolygon = () => {
     if (!selectable) return;
     if (
