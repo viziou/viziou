@@ -3,6 +3,8 @@ import * as THREE from "three";
 import { PolygonData } from "../utils/types";
 import { PolygonContext } from "../contexts/PolygonContext";
 import { DragControls } from "@react-three/drei";
+import { CircleGeometry } from 'three'
+import { i } from 'mathjs'
 
 type PolygonProps = PolygonData & { index: number };
 
@@ -47,6 +49,33 @@ const Polygon = ({ position, geometry, colour, index }: PolygonProps) => {
     }
   };
 
+  const renderPoint = ({x, y}: {x: number, y: number}, size = 0.03, smoothness = 50) => {
+    return (
+      <mesh
+        position={[x, y, 0]}
+        geometry={new THREE.CircleGeometry(size, smoothness)}
+      >
+        <meshStandardMaterial color={'#000000'} />
+      </mesh>);
+  }
+
+  const renderVertices = (geometry: THREE.BufferGeometry) => {
+    /* Dynamically generate the vertices of a polygon. */
+    const pos = geometry.getAttribute('position')
+    const idx: {x: number, y: number, z:number}[] = [];
+    for (let i = 0; i < pos.count; i += 3) {
+      idx.push({x: pos.array[i], y: pos.array[i+1], z: pos.array[i+2]});
+    }
+
+    return (
+      <>
+        {idx.map((args) => {
+          return renderPoint(args)
+        })}
+    </>
+    )
+  }
+
   return (
     <>
       <DragControls
@@ -56,13 +85,16 @@ const Polygon = ({ position, geometry, colour, index }: PolygonProps) => {
         onDrag={(localMatrix) => {handleDrag(localMatrix)}}
         onDragEnd={handleDragEnd}
       >
-        <mesh
-          position={[position[0], position[1], 0]}
-          geometry={geometry}
-          ref={mesh}
-        >
-          <meshBasicMaterial color={colour} />
-        </mesh>
+        <group>
+          <mesh
+            position={[position[0], position[1], 0]}
+            geometry={geometry}
+            ref={mesh}
+          >
+            <meshBasicMaterial color={colour} />
+          </mesh>
+          {renderVertices(geometry)}
+        </group>
       </DragControls>
     </>
   );
