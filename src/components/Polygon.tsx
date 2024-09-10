@@ -210,6 +210,7 @@ const Polygon = ({
     setInitialMousePosition(null);
     setInitialScale([1, 1]);
     setInitialSize(null);
+    setResizePointer(null);
     selectPolygon();
   };
 
@@ -309,7 +310,7 @@ const Polygon = ({
     setRotatingPointer(false);
   };
 
-  const [rotatingPointer, setRotatingPointer] = useState(true);
+  const [rotatingPointer, setRotatingPointer] = useState(false);
   useEffect(() => {
     document.body.style.cursor = rotatingPointer ? `move` : "auto";
   }, [rotatingPointer]);
@@ -397,7 +398,7 @@ const Polygon = ({
                 );
               }}
               onPointerLeave={() => {
-                setResizePointer(null);
+                if (!resizing)setResizePointer(null);
               }}
             >
               <boxGeometry args={[0.2, 0.2, 0]} />
