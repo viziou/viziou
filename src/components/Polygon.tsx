@@ -200,6 +200,7 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
       const angle = Math.atan2(e.point.y - center.y, e.point.x - center.x);
       setInitialRotation(angle);
     }
+    setRotatingPointer(true);
   }
 
   const handleRotateDrag = (event: ThreeEvent<MouseEvent>) => {
@@ -238,6 +239,7 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     setTotalRotation(newTotalRotation);
     setMousePosition(newMousePosition);
     setInitialRotation(newAngle);
+    setRotatingPointer(true);
 
     // Update bounding box immediately
     if (mesh.current) {
@@ -250,7 +252,13 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     setRotating(false);
     setRotationCenter(null);
     setInitialRotation(0);
+    setRotatingPointer(false);
   }
+
+  const [rotatingPointer, setRotatingPointer] = useState(true);
+  useEffect(() => {
+    document.body.style.cursor = rotatingPointer ? `move` : 'auto';
+  }, [rotatingPointer]);
 
 
 
@@ -322,9 +330,9 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
         <mesh
           position={[0, size.y / 2 + 0.5, 0]}
           onPointerDown={handleRotateStart}
-
+          onPointerEnter={() => setRotatingPointer(true)}
+          onPointerLeave={() => setRotatingPointer(false)}
           onPointerMove={handleRotateDrag}
-
           onPointerUp={handleRotateEnd}
         >
           <sphereGeometry args={[0.1, 16, 16]} />
