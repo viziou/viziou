@@ -160,7 +160,7 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
       p.position.y,
     ]);
 
-    onSubmit(pts);
+    onSubmit(pts, displayColour);
   };
 
   const [displayColour, setDisplayColour] = useState<string>("green");

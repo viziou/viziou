@@ -60,7 +60,7 @@ const TwoDEnv = () => {
   const handleModalOpen = () => setIsAddShapeModalOpen(true);
   const handleModalClose = () => setIsAddShapeModalOpen(false);
 
-  const handleModalSubmit = (points: [number, number][]) => {
+  const handleModalSubmit = (points: [number, number][], colour: string) => {
     console.log(points);
     if (points.length > 2) {
       const newPolygon: PolygonData = {
@@ -68,7 +68,7 @@ const TwoDEnv = () => {
           points.map((p) => new THREE.Vector3(p[0], p[1], 0))
         ),
         position: [0, 0],
-        colour: getRandomColour(),
+        colour: colour,
       };
       dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
     }
