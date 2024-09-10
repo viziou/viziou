@@ -50,11 +50,11 @@
     margin-top: 20px;
   }
   
-  .color-picker-container {
+  .colour-picker-container {
     position: relative;
   }
   
-  .color-picker-popup {
+  .colour-picker-popup {
     position: absolute;
     top: calc(100% - 270px);
     right: 0;

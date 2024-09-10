@@ -27,7 +27,10 @@ interface PolygonCreatorProps {
   displayColour: string;
 }
 
-const PointsCreator = ({ setPointsArray, displayColour }: PolygonCreatorProps) => {
+const PointsCreator = ({
+  setPointsArray,
+  displayColour,
+}: PolygonCreatorProps) => {
   const [points, setPoints] = useState<Point[]>([]);
   const [geometry, setGeometry] =
     useState<BufferGeometry<NormalBufferAttributes> | null>(null);
@@ -108,7 +111,7 @@ const PointsCreator = ({ setPointsArray, displayColour }: PolygonCreatorProps) =
   const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
-    document.body.style.cursor = hovered ? 'pointer' : 'auto'
+    document.body.style.cursor = hovered ? "pointer" : "auto";
   }, [hovered]);
 
   return (
@@ -153,11 +156,11 @@ const PointsCreator = ({ setPointsArray, displayColour }: PolygonCreatorProps) =
 const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [points, setPoints] = useState<Point[]>([]);
-  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showColourPicker, setShowColourPicker] = useState(false);
   const [displayColour, setDisplayColour] = useState<string>("green");
-  
-  const toggleColorPicker = () => {
-    setShowColorPicker(!showColorPicker);
+
+  const toggleColourPicker = () => {
+    setShowColourPicker(!showColourPicker);
   };
 
   const handleSubmit = (_: any) => {
@@ -184,7 +187,10 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
             camera={{ zoom: 50, position: [0, 0, 100] }}
           >
             <OrbitControls enableRotate={false} />
-            <PointsCreator setPointsArray={setPoints} displayColour={displayColour}/>
+            <PointsCreator
+              setPointsArray={setPoints}
+              displayColour={displayColour}
+            />
           </Canvas>
         </div>
         <div className="modal-actions">
@@ -194,13 +200,16 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
           <button className="modal-button" onClick={onClose}>
             Close
           </button>
-          <div className="color-picker-container">
-            <button className="modal-button" onClick={toggleColorPicker}>
-              {showColorPicker ? "Hide Color Picker" : "Show Color Picker"}
+          <div className="colour-picker-container">
+            <button className="modal-button" onClick={toggleColourPicker}>
+              {showColourPicker ? "Hide Colour Picker" : "Show Colour Picker"}
             </button>
-            {showColorPicker && (
-              <div className="color-picker-popup">
-                <HexColorPicker color={displayColour} onChange={setDisplayColour} />
+            {showColourPicker && (
+              <div className="colour-picker-popup">
+                <HexColorPicker
+                  color={displayColour}
+                  onChange={setDisplayColour}
+                />
               </div>
             )}
           </div>
