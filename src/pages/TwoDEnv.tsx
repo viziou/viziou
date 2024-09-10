@@ -232,6 +232,7 @@ const TwoDEnv = () => {
             className="twod-button"
             onClick={() => {
               closeOverflowMenu();
+              handleModalOpen();
             }}
           >
             Add Custom Shape
@@ -253,9 +254,6 @@ const TwoDEnv = () => {
             }}
           >
             Import Scene
-          </button>
-          <button className="twod-button" onClick={handleModalOpen}>
-            Add New Shape
           </button>
         </div>
       </div>

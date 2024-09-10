@@ -218,7 +218,7 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     const newTotalRotation = totalRotation + angleDiff;
 
     // Create rotation matrix
-    const rotationMatrix = new THREE.Matrix4().makeRotationZ(newTotalRotation / 330);
+    const rotationMatrix = new THREE.Matrix4().makeRotationZ(newTotalRotation / 270);  // this 270 is magic number that seems to work well
 
     // Apply rotation to geometry
     const newGeometry = geometry.clone().applyMatrix4(rotationMatrix);
