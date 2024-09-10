@@ -10,6 +10,7 @@ import { OrbitControls } from "@react-three/drei";
 import "../styles/Modal.css";
 import { ConvexGeometry } from "../backend/Interface";
 import Polygon from "../components/Polygon";
+import { HexColorPicker } from "react-colorful";
 
 interface AddPolygonProps {
   isOpen: boolean;
@@ -23,9 +24,10 @@ interface Point {
 
 interface PolygonCreatorProps {
   setPointsArray: (p: Point[]) => void;
+  displayColour: string;
 }
 
-const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
+const PointsCreator = ({ setPointsArray, displayColour }: PolygonCreatorProps) => {
   const [points, setPoints] = useState<Point[]>([]);
   const [geometry, setGeometry] =
     useState<BufferGeometry<NormalBufferAttributes> | null>(null);
@@ -124,7 +126,7 @@ const PointsCreator = ({ setPointsArray }: PolygonCreatorProps) => {
       {geometry ? (
         <Polygon
           geometry={geometry}
-          colour="green"
+          colour={displayColour}
           position={[0, 0]}
           index={points.length + 2}
           selectable={false}
@@ -161,6 +163,7 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
     onSubmit(pts);
   };
 
+  const [displayColour, setDisplayColour] = useState<string>("green");
   // if modal is not open, just don't display anything
   if (!isOpen) return null;
 
@@ -176,7 +179,7 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
             camera={{ zoom: 50, position: [0, 0, 100] }}
           >
             <OrbitControls enableRotate={false} />
-            <PointsCreator setPointsArray={setPoints} />
+            <PointsCreator setPointsArray={setPoints} displayColour={displayColour}/>
           </Canvas>
         </div>
         <div className="modal-actions">
@@ -186,6 +189,7 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
           <button className="modal-button" onClick={onClose}>
             Close
           </button>
+          <HexColorPicker color={displayColour} onChange={setDisplayColour} />
         </div>
       </div>
     </div>
