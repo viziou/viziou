@@ -45,3 +45,22 @@
   .modal-button:hover {
     background-color: #0056b3;
   }
+  .modal-actions {
+    display: flex;
+    margin-top: 20px;
+  }
+  
+  .color-picker-container {
+    position: relative;
+  }
+  
+  .color-picker-popup {
+    position: absolute;
+    top: calc(100% - 270px);
+    right: 0;
+    z-index: 1000;
+    background-color: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }

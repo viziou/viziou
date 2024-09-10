@@ -15,7 +15,7 @@ import { HexColorPicker } from "react-colorful";
 interface AddPolygonProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (points: [number, number][]) => void;
+  onSubmit: (points: [number, number][], colour: string) => void;
 }
 
 interface Point {
@@ -153,6 +153,12 @@ const PointsCreator = ({ setPointsArray, displayColour }: PolygonCreatorProps) =
 const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [points, setPoints] = useState<Point[]>([]);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [displayColour, setDisplayColour] = useState<string>("green");
+  
+  const toggleColorPicker = () => {
+    setShowColorPicker(!showColorPicker);
+  };
 
   const handleSubmit = (_: any) => {
     const pts: [number, number][] = points.map((p) => [
@@ -163,7 +169,6 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
     onSubmit(pts, displayColour);
   };
 
-  const [displayColour, setDisplayColour] = useState<string>("green");
   // if modal is not open, just don't display anything
   if (!isOpen) return null;
 
@@ -189,7 +194,16 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
           <button className="modal-button" onClick={onClose}>
             Close
           </button>
-          <HexColorPicker color={displayColour} onChange={setDisplayColour} />
+          <div className="color-picker-container">
+            <button className="modal-button" onClick={toggleColorPicker}>
+              {showColorPicker ? "Hide Color Picker" : "Show Color Picker"}
+            </button>
+            {showColorPicker && (
+              <div className="color-picker-popup">
+                <HexColorPicker color={displayColour} onChange={setDisplayColour} />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
