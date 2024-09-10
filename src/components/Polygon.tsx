@@ -9,7 +9,13 @@ type PolygonProps = PolygonData & { index: number; selectable: boolean };
 
 // TODO: Make information on top of the polygon as a child instead?
 
-const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps) => {
+const Polygon = ({
+  position,
+  geometry,
+  colour,
+  index,
+  selectable,
+}: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
   const { dispatch, selectedPolygonIndex, currentlyMousedOverPolygons } =
     useContext(PolygonContext)!;
@@ -18,7 +24,9 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
   const { scene, camera, gl } = useThree();
   const [scale, setScale] = useState<[number, number]>([1, 1]);
-  const [mousePosition, setMousePosition] = useState<THREE.Vector3 | null>(null);
+  const [mousePosition, setMousePosition] = useState<THREE.Vector3 | null>(
+    null
+  );
 
   useEffect(() => {
     if (mesh.current) {
@@ -30,7 +38,8 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
   const selectPolygon = () => {
     if (!selectable) return;
     if (
-      (selectedPolygonIndex === null || Math.max(...currentlyMousedOverPolygons) === index) &&
+      (selectedPolygonIndex === null ||
+        Math.max(...currentlyMousedOverPolygons) === index) &&
       dispatch
     ) {
       // only select the largest polygon index
@@ -81,9 +90,6 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     // console.log('mouse over', currentlyMousedOverPolygons)
   };
 
-
-  
-
   // get the position of the mouse in terms of the 3JS coordinates
   const getWorldPosition = (event: ThreeEvent<MouseEvent>) => {
     const { clientX, clientY } = event;
@@ -96,11 +102,11 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     return pos;
   };
 
-  
   //! RESIZE FUNCTIONS:
   const [resizing, setResizing] = useState(false);
   const [corner, setCorner] = useState<string | null>(null);
-  const [initialMousePosition, setInitialMousePosition] = useState<THREE.Vector3 | null>(null);
+  const [initialMousePosition, setInitialMousePosition] =
+    useState<THREE.Vector3 | null>(null);
   const [initialScale, setInitialScale] = useState<[number, number]>([1, 1]);
   const [initialSize, setInitialSize] = useState<THREE.Vector3 | null>(null);
 
@@ -112,37 +118,45 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     if (boundingBox) {
       setInitialSize(boundingBox.getSize(new THREE.Vector3()));
     }
-  }
+  };
 
   const handleResizeDrag = (event: ThreeEvent<MouseEvent>) => {
-    if (!resizing || !boundingBox || !initialMousePosition || !corner || !mesh.current || !initialSize) return;
+    if (
+      !resizing ||
+      !boundingBox ||
+      !initialMousePosition ||
+      !corner ||
+      !mesh.current ||
+      !initialSize
+    )
+      return;
 
     const newMousePosition = getWorldPosition(event);
     const mouseDelta = newMousePosition.sub(initialMousePosition);
-    
+
     let newScale = [...initialScale];
     let newPosition: [number, number] = [...position];
 
     switch (corner) {
-      case 'topLeft':
+      case "topLeft":
         newScale[0] = initialScale[0] * (1 - mouseDelta.x / initialSize.x);
         newScale[1] = initialScale[1] * (1 + mouseDelta.y / initialSize.y);
         newPosition[0] += mouseDelta.x / 2;
         newPosition[1] += mouseDelta.y / 2;
         break;
-      case 'topRight':
+      case "topRight":
         newScale[0] = initialScale[0] * (1 + mouseDelta.x / initialSize.x);
         newScale[1] = initialScale[1] * (1 + mouseDelta.y / initialSize.y);
         newPosition[0] += mouseDelta.x / 2;
         newPosition[1] += mouseDelta.y / 2;
         break;
-      case 'bottomLeft':
+      case "bottomLeft":
         newScale[0] = initialScale[0] * (1 - mouseDelta.x / initialSize.x);
         newScale[1] = initialScale[1] * (1 - mouseDelta.y / initialSize.y);
         newPosition[0] += mouseDelta.x / 2;
         newPosition[1] += mouseDelta.y / 2;
         break;
-      case 'bottomRight':
+      case "bottomRight":
         newScale[0] = initialScale[0] * (1 + mouseDelta.x / initialSize.x);
         newScale[1] = initialScale[1] * (1 - mouseDelta.y / initialSize.y);
         newPosition[0] += mouseDelta.x / 2;
@@ -151,30 +165,44 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     }
 
     // Apply the new scale and position
-    const scaleMatrix = new THREE.Matrix4().makeScale(newScale[0], newScale[1], 1);
+    const scaleMatrix = new THREE.Matrix4().makeScale(
+      newScale[0],
+      newScale[1],
+      1
+    );
     const translateMatrix = new THREE.Matrix4().makeTranslation(
       newPosition[0] - position[0],
       newPosition[1] - position[1],
       0
     );
 
-    const combinedMatrix = new THREE.Matrix4().multiply(translateMatrix).multiply(scaleMatrix);
+    const combinedMatrix = new THREE.Matrix4()
+      .multiply(translateMatrix)
+      .multiply(scaleMatrix);
 
     const newGeometry = geometry.clone().applyMatrix4(combinedMatrix);
 
     if (dispatch) {
-      dispatch({ type: "UPDATE_GEOMETRY", geometry: newGeometry, index: index });
-      dispatch({ type: "UPDATE_POSITION", index: index, position: newPosition });
+      dispatch({
+        type: "UPDATE_GEOMETRY",
+        geometry: newGeometry,
+        index: index,
+      });
+      dispatch({
+        type: "UPDATE_POSITION",
+        index: index,
+        position: newPosition,
+      });
     }
 
     setScale(newScale as [number, number]);
-    
+
     // Update bounding box immediately
     if (mesh.current) {
       const newBox = new THREE.Box3().setFromObject(mesh.current);
       setBoundingBox(newBox);
     }
-  }
+  };
 
   const handleResizeEnd = (_: ThreeEvent<MouseEvent>) => {
     setResizing(false);
@@ -183,11 +211,24 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     setInitialScale([1, 1]);
     setInitialSize(null);
     selectPolygon();
-  }
+  };
+
+  const [resizePointer, setResizePointer] = useState<string | null>(null);
+
+  useEffect(() => {
+    document.body.style.cursor =
+      resizePointer === "nesw"
+        ? `nesw-resize`
+        : resizePointer === "nwse"
+        ? "nwse-resize"
+        : "auto";
+  }, [resizePointer]);
 
   //! ROTATE FUNCTIONS:
   const [rotating, setRotating] = useState(false);
-  const [rotationCenter, setRotationCenter] = useState<THREE.Vector3 | null>(null);
+  const [rotationCenter, setRotationCenter] = useState<THREE.Vector3 | null>(
+    null
+  );
   const [initialRotation, setInitialRotation] = useState(0);
   const [totalRotation, setTotalRotation] = useState(0);
 
@@ -201,7 +242,7 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
       setInitialRotation(angle);
     }
     setRotatingPointer(true);
-  }
+  };
 
   const handleRotateDrag = (event: ThreeEvent<MouseEvent>) => {
     if (!rotating || !mousePosition || !rotationCenter || !mesh.current) return;
@@ -209,7 +250,10 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     const newMousePosition = getWorldPosition(event);
 
     // Calculate angle difference
-    const newAngle = Math.atan2(newMousePosition.y - rotationCenter.y, newMousePosition.x - rotationCenter.x);
+    const newAngle = Math.atan2(
+      newMousePosition.y - rotationCenter.y,
+      newMousePosition.x - rotationCenter.x
+    );
     let angleDiff = newAngle - initialRotation;
 
     // Ensure continuous rotation
@@ -219,7 +263,9 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     const newTotalRotation = totalRotation + angleDiff;
 
     // Create rotation matrix
-    const rotationMatrix = new THREE.Matrix4().makeRotationZ(newTotalRotation / 270);  // this 270 is magic number that seems to work well
+    const rotationMatrix = new THREE.Matrix4().makeRotationZ(
+      newTotalRotation / 270
+    ); // this 270 is magic number that seems to work well
 
     // Apply rotation to geometry
     const newGeometry = geometry.clone().applyMatrix4(rotationMatrix);
@@ -232,8 +278,16 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     const newPosition = localPosition.add(rotationCenter);
 
     if (dispatch) {
-      dispatch({ type: "UPDATE_GEOMETRY", geometry: newGeometry, index: index });
-      dispatch({ type: "UPDATE_POSITION", index: index, position: [newPosition.x, newPosition.y] });
+      dispatch({
+        type: "UPDATE_GEOMETRY",
+        geometry: newGeometry,
+        index: index,
+      });
+      dispatch({
+        type: "UPDATE_POSITION",
+        index: index,
+        position: [newPosition.x, newPosition.y],
+      });
     }
 
     setTotalRotation(newTotalRotation);
@@ -246,21 +300,19 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
       const newBox = new THREE.Box3().setFromObject(mesh.current);
       setBoundingBox(newBox);
     }
-  }
+  };
 
   const handleRotateEnd = (_: ThreeEvent<MouseEvent>) => {
     setRotating(false);
     setRotationCenter(null);
     setInitialRotation(0);
     setRotatingPointer(false);
-  }
+  };
 
   const [rotatingPointer, setRotatingPointer] = useState(true);
   useEffect(() => {
-    document.body.style.cursor = rotatingPointer ? `move` : 'auto';
+    document.body.style.cursor = rotatingPointer ? `move` : "auto";
   }, [rotatingPointer]);
-
-
 
   // bounding box component:
   const BoundingBox = useMemo(() => {
@@ -272,60 +324,87 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
     return (
       <group position={center}>
         {/* Invisible large box to allow dragging when the drag points aren't moused over: */}
-        {resizing || rotating ? <mesh key={'invisible'} visible={false}
-        onPointerMove={(e) => {
-          if (resizing) handleResizeDrag(e);
-          if (rotating) handleRotateDrag(e);
-        }}
-
-        onPointerUp={(e) => {
-          handleResizeEnd(e);
-          handleRotateEnd(e);
-        }}
-
-        onPointerLeave={(e) => {
-          if (resizing) handleResizeEnd(e);
-          if (rotating) handleRotateEnd(e);
-        }}
-        >
-        <boxGeometry args={[size.x*10, size.y*10, 0]} />
-        
-        </mesh> : null}
-        {/* Red Lines to show bounding box: */}
-        {!rotating && !resizing ? 
-        <line>
-          <bufferGeometry>
-            <bufferAttribute
-              attach="attributes-position"
-              count={5}
-              array={new Float32Array([
-                -size.x/2, -size.y/2, 0,
-                size.x/2, -size.y/2, 0,
-                size.x/2, size.y/2, 0,
-                -size.x/2, size.y/2, 0,
-                -size.x/2, -size.y/2, 0
-              ])}
-              itemSize={3}
-            />
-          </bufferGeometry>
-          <lineBasicMaterial color="red" />
-        </line>
-        : null }
-        {/* Boxes on each corner: */}
-        {['topLeft', 'topRight', 'bottomLeft', 'bottomRight'].map((corner, i) => (
+        {resizing || rotating ? (
           <mesh
-            key={corner}
-            position={[
-              (i % 2 === 0 ? -1 : 1) * size.x / 2,
-              (i < 2 ? 1 : -1) * size.y / 2,
-              0
-            ]}
-            onPointerDown={(e) => {handleResizeStart(corner, e);}}
+            key={"invisible"}
+            visible={false}
+            onPointerMove={(e) => {
+              if (resizing) handleResizeDrag(e);
+              if (rotating) handleRotateDrag(e);
+            }}
+            onPointerUp={(e) => {
+              handleResizeEnd(e);
+              handleRotateEnd(e);
+            }}
+            onPointerLeave={(e) => {
+              if (resizing) handleResizeEnd(e);
+              if (rotating) handleRotateEnd(e);
+            }}
           >
-            <boxGeometry args={[0.2, 0.2, 0]} />
-            <meshBasicMaterial color="blue" />
+            <boxGeometry args={[size.x * 10, size.y * 10, 0]} />
           </mesh>
-        ))}
+        ) : null}
+        {/* Red Lines to show bounding box: */}
+        {!rotating && !resizing ? (
+          <line>
+            <bufferGeometry>
+              <bufferAttribute
+                attach="attributes-position"
+                count={5}
+                array={
+                  new Float32Array([
+                    -size.x / 2,
+                    -size.y / 2,
+                    0,
+                    size.x / 2,
+                    -size.y / 2,
+                    0,
+                    size.x / 2,
+                    size.y / 2,
+                    0,
+                    -size.x / 2,
+                    size.y / 2,
+                    0,
+                    -size.x / 2,
+                    -size.y / 2,
+                    0,
+                  ])
+                }
+                itemSize={3}
+              />
+            </bufferGeometry>
+            <lineBasicMaterial color="red" />
+          </line>
+        ) : null}
+        {/* Boxes on each corner: */}
+        {["topLeft", "topRight", "bottomLeft", "bottomRight"].map(
+          (corner, i) => (
+            <mesh
+              key={corner}
+              position={[
+                ((i % 2 === 0 ? -1 : 1) * size.x) / 2,
+                ((i < 2 ? 1 : -1) * size.y) / 2,
+                0,
+              ]}
+              onPointerDown={(e) => {
+                handleResizeStart(corner, e);
+              }}
+              onPointerEnter={() => {
+                setResizePointer(
+                  corner === "topRight" || corner === "bottomLeft"
+                    ? "nesw"
+                    : "nwse"
+                );
+              }}
+              onPointerLeave={() => {
+                setResizePointer(null);
+              }}
+            >
+              <boxGeometry args={[0.2, 0.2, 0]} />
+              <meshBasicMaterial color="blue" />
+            </mesh>
+          )
+        )}
         {/* Rotate circle: */}
         <mesh
           position={[0, size.y / 2 + 0.5, 0]}
@@ -339,21 +418,21 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
           <meshBasicMaterial color="green" />
         </mesh>
         {/* Line to Rotate circle: */}
-        {!resizing && !rotating ? 
-        <line>
-          <bufferGeometry>
-            <bufferAttribute
-              attach="attributes-position"
-              count={2}
-              array={new Float32Array([
-                0, size.y / 2, 0,
-                0, size.y / 2 + 0.5, 0,
-              ])}
-              itemSize={3}
-            />
-          </bufferGeometry>
-          <lineBasicMaterial color="red" />
-        </line> : null}
+        {!resizing && !rotating ? (
+          <line>
+            <bufferGeometry>
+              <bufferAttribute
+                attach="attributes-position"
+                count={2}
+                array={
+                  new Float32Array([0, size.y / 2, 0, 0, size.y / 2 + 0.5, 0])
+                }
+                itemSize={3}
+              />
+            </bufferGeometry>
+            <lineBasicMaterial color="red" />
+          </line>
+        ) : null}
       </group>
     );
   }, [boundingBox, isPolygonSelected, scene]);
@@ -388,9 +467,7 @@ const Polygon = ({ position, geometry, colour, index, selectable }: PolygonProps
           }}
           onClick={selectPolygon}
         >
-          <meshBasicMaterial
-            color={colour}
-          />
+          <meshBasicMaterial color={colour} />
         </mesh>
       </DragControls>
       {BoundingBox}
