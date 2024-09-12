@@ -40,11 +40,31 @@ function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron
 
         case "UPDATE_POLYHEDRON":
             const updatedPolyhedra = [...state.polyhedra];
-            updatedPolyhedra[action.index].position = action.position; 
+            
+            updatedPolyhedra[action.index] = {
+                ...updatedPolyhedra[action.index],
+                position: action.position,  
+                rotation: action.rotation,  
+                scale: action.scale,       
+            };
+
             return {
                 ...state,
                 polyhedra: updatedPolyhedra, 
-            };  
+            };
+
+        case "STORE_TRANSFORMED_VERTICES":
+            const updatedPolyhedraWithVertices = [...state.polyhedra];
+            
+            updatedPolyhedraWithVertices[action.index] = {
+                ...updatedPolyhedraWithVertices[action.index],
+                transformedVertices: action.transformedVertices, 
+            };
+
+            return {
+                ...state,
+                polyhedra: updatedPolyhedraWithVertices,
+            };
 
         default:
             return state;
