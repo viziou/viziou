@@ -43,6 +43,9 @@ const ThreeDEnv = () => {
 
     const { polyhedra, dispatch } = context;
 
+    const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+
     const addCube = () => {
         const newPolyhedron: PolyhedronData = {
             geometry: getCube(),
@@ -51,6 +54,8 @@ const ThreeDEnv = () => {
                 Math.random() * 4 - 2,
                 Math.random() * 4 - 2
             ],
+            rotation: [0, 0, 0],   
+            scale: [1, 1, 1], 
             colour: getRandomColour(),
         };
 
@@ -66,6 +71,8 @@ const ThreeDEnv = () => {
                 Math.random() * 4 - 2,
                 Math.random() * 4 - 2
             ],
+            rotation: [0, 0, 0],  
+            scale: [1, 1, 1], 
             colour: getRandomColour(),
         };
 
@@ -75,6 +82,7 @@ const ThreeDEnv = () => {
 
     const clearPolyhedra = () => {
         console.log("Dispatching CLEAR_POLYHEDRA");
+        setSelectedIndex(null);
         dispatch({ type: "CLEAR_POLYHEDRA" });
     };
 
@@ -82,6 +90,7 @@ const ThreeDEnv = () => {
       console.log("Saving canvas...");
       Storage.save3D(polyhedra, 'export');
     }
+
     const loadPolyhedra = async () => {
       console.log("Opening file dialog...");
       const polyhedronData = await Storage.load3D()
@@ -106,7 +115,7 @@ const ThreeDEnv = () => {
         <div className="ThreeDEnv">
             <main>
                 <div className="threed-canvas-container">
-                    <Scene3D/>
+                    <Scene3D polyhedra={polyhedra} setSelectedIndex={setSelectedIndex} selectedIndex={selectedIndex} />
                 </div>
             </main>
 
