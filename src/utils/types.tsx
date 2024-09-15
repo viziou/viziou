@@ -1,10 +1,22 @@
 import * as THREE from "three";
 
 export type PolygonData = {
+  id: number,
   position: [number, number];
   geometry: THREE.BufferGeometry;
   colour: string;
 };
+
+export type IOUPolygonData = PolygonData & {
+  parentLow: number;  // the lower ID of the parent polygon
+  parentHigh: number;
+}
+
+export type IOUPolygon2DAction =
+  | { type: "SET_POLYGON", payload: IOUPolygonData }
+  | { type: "SHOW_POLYGON", payload: [number, number] }
+  | { type: "HIDE_POLYGON", payload: [number, number] }
+  | { type: "DELETE_POLYGON", payload: [number, number] } ;
 
 export type Scene2DProps = {
   polygons: PolygonData[];
