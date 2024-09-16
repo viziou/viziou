@@ -48,7 +48,7 @@ const IOUPolygon = ({ position, geometry, colour, index }: PolygonProps) => {
           >
             <meshBasicMaterial color={colour} />
           </mesh>
-          {renderVertices(geometry)}
+          {/* renderVertices(geometry) */}
         </group>
     </>
   );

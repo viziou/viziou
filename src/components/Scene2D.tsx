@@ -9,7 +9,7 @@ const Scene2D = ({ polygons, iouPolygons, iouDispatch }: Scene2DProps) => {
     <Canvas style={{ height: "80vh", background: "#cccccc" }}>
       {polygons.map((polygon, index) => (
         <Polygon
-          id={0}
+          id={polygon.id}
           key={index}
           index={index}
           position={polygon.position}
@@ -19,7 +19,7 @@ const Scene2D = ({ polygons, iouPolygons, iouDispatch }: Scene2DProps) => {
         />
       ))}
       {Array.from(iouPolygons.values()).map((polygon, index) => (
-        <IOUPolygon id={1}
+        <IOUPolygon id={polygon.id}
           key={index}
           index={index}
           position={polygon.position}

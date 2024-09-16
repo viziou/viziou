@@ -9,8 +9,8 @@ export type PolygonData = {
 };
 
 export type IOUPolygonData = PolygonData & {
-  parentLow: number;  // the lower ID of the parent polygon
-  parentHigh: number;
+  parentIDa: number;  // the lower ID of the parent polygon
+  parentIDb: number;
 }
 
 export type IOUPolygon2DAction =
@@ -18,6 +18,8 @@ export type IOUPolygon2DAction =
   | { type: "SHOW_POLYGON", payload: [number, number] }
   | { type: "HIDE_POLYGON", payload: [number, number] }
   | { type: "DELETE_POLYGON", payload: [number, number] }
+  | { type: "DELETE_CHILD_IOUS", payload: PolygonData }
+  | { type: "DELETE_CHILD_IOUS_USING_ID", payload: number }
   | { type: "CLEAR_POLYGONS" };
 
 export type Scene2DProps = {

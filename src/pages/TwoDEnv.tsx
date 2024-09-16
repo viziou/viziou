@@ -122,17 +122,18 @@ const TwoDEnv = () => {
     const clearPolygons = () => {
         console.log("Dispatching CLEAR_POLYGONS");
         dispatch({ type: "CLEAR_POLYGONS" });
+        iouDispatch({ type: "CLEAR_POLYGONS" }); // clear IoUs as well
     };
 
     const showIoUs = () => {
         const IoUs: IOUPolygonData[] = [];
         for (const [a, b] of generatePairs(polygons)) {
           const {area, shape} = Backend2D.IoU(a, b);
-          console.log("IoU between " + a.geometry.id + " and " + b.geometry.id + ": " + area);
+          console.log("IoU between " + a.id + " and " + b.id + ": " + area);
           console.log("IoU shape: ", shape)
             const IoUPolygon: IOUPolygonData = {
-              parentLow: a.geometry.id,
-              parentHigh: b.geometry.id,
+              parentIDa: a.id,
+              parentIDb: b.id,
               geometry: shape,
               position: [0, 0],
               colour: '#ce206b',

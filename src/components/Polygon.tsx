@@ -3,13 +3,12 @@ import * as THREE from "three";
 import { IOUPolygon2DAction, PolygonData } from '../utils/types'
 import { PolygonContext } from "../contexts/PolygonContext";
 import { DragControls } from "@react-three/drei";
-import { IOUPolygonContext } from '../contexts/IOUPolygonContext.tsx'
 
 type PolygonProps = PolygonData & { index: number } & {iouDispatch: React.Dispatch<IOUPolygon2DAction>};
 
 // TODO: Make information on top of the polygon as a child instead?
 
-const Polygon = ({ position, geometry, colour, index, iouDispatch }: PolygonProps) => {
+const Polygon = ({id, position, geometry, colour, index, iouDispatch }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
   const { dispatch } = useContext(PolygonContext)!;
   const originalPosition = useRef<[number, number]>([0, 0]);
@@ -30,8 +29,8 @@ const Polygon = ({ position, geometry, colour, index, iouDispatch }: PolygonProp
       // test clearing all IoU polygons
       console.log("dispatch: ", iouDispatch)
       if (iouDispatch) {
-        console.log("trying to clear polygons....")
-        iouDispatch({type: "CLEAR_POLYGONS"});
+        console.log("trying to clear child IoUs that have ID ", id)
+        iouDispatch({type: "DELETE_CHILD_IOUS_USING_ID", payload: id});
       }
     }
   };
@@ -99,7 +98,7 @@ const Polygon = ({ position, geometry, colour, index, iouDispatch }: PolygonProp
           >
             <meshBasicMaterial color={colour} />
           </mesh>
-          {renderVertices(geometry)}
+          {/* {renderVertices(geometry)} */}
         </group>
       </DragControls>
     </>
