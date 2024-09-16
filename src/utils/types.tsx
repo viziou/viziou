@@ -20,6 +20,7 @@ export type IOUPolygon2DAction =
 
 export type Scene2DProps = {
   polygons: PolygonData[];
+  iouPolygons: Map<string, IOUPolygonData>;
 };
 
 export type Polygon2DAction =
@@ -33,7 +34,7 @@ export type Polygon2DAction =
 export interface PolyhedronData {
   geometry: THREE.BufferGeometry;
   position: [number, number, number];
-  colour: string;  
+  colour: string;
 }
 
 export type Scene3DProps = {

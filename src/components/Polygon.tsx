@@ -3,8 +3,6 @@ import * as THREE from "three";
 import { PolygonData } from "../utils/types";
 import { PolygonContext } from "../contexts/PolygonContext";
 import { DragControls } from "@react-three/drei";
-import { CircleGeometry } from 'three'
-import { i } from 'mathjs'
 
 type PolygonProps = PolygonData & { index: number };
 

@@ -1,15 +1,16 @@
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState } from 'react'
 import * as THREE from 'three';
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
 
 import Scene2D from '../components/Scene2D';
-import { PolygonData } from '../utils/types';
+import { IOUPolygonData, PolygonData } from '../utils/types'
 import { PolygonContext } from '../contexts/PolygonContext';
 import '../styles/TwoDEnv.css';
 
 import { Backend2D, Storage } from '../backend/Interface';
 
 import { generatePairs } from '../utils/Generic';
+import { IOUPolygonContext } from '../contexts/IOUPolygonContext.tsx'
 
 const getSquare = (): THREE.PlaneGeometry => {
     return new THREE.PlaneGeometry(1, 1);
@@ -44,12 +45,21 @@ const getRandomColour = (): string => {
 
 const TwoDEnv = () => {
     const context = useContext(PolygonContext);
+    const IoUcontext = useContext(IOUPolygonContext)
 
-    if (!context?.dispatch) {
+    const nonceGenerator = useRef(0);
+
+    const generateId = () => {
+      nonceGenerator.current += 1
+      return nonceGenerator.current
+    }
+
+    if (!context?.dispatch || !IoUcontext?.dispatch) {
         throw new Error("TwoDEnv must be used within a PolygonProvider");
     }
 
     const { polygons, dispatch } = context;
+    const { polygonMap: iouPolygons, dispatch: iouDispatch } = IoUcontext;
 
     const addSquare = () => {
         const newPolygon: PolygonData = {
@@ -59,6 +69,7 @@ const TwoDEnv = () => {
                 Math.random() * 4 - 2 // y coordinate
             ],
             colour: getRandomColour(),
+            id: generateId()
         };
 
         console.log("Dispatching ADD_SQUARE:", newPolygon);
@@ -73,6 +84,7 @@ const TwoDEnv = () => {
             //    Math.random() * 4 - 2, // y coordinate
             ],
             colour: getRandomColour(),
+            id: generateId()
         };
 
         console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
@@ -113,33 +125,37 @@ const TwoDEnv = () => {
     };
 
     const showIoUs = () => {
-        const IoUs: PolygonData[] = [];
+        const IoUs: IOUPolygonData[] = [];
         for (const [a, b] of generatePairs(polygons)) {
           const {area, shape} = Backend2D.IoU(a, b);
           console.log("IoU between " + a.geometry.id + " and " + b.geometry.id + ": " + area);
           console.log("IoU shape: ", shape)
-            const IoUPolygon: PolygonData = {
+            const IoUPolygon: IOUPolygonData = {
+              parentLow: a.geometry.id,
+              parentHigh: b.geometry.id,
               geometry: shape,
               position: [0, 0],
-              colour: '#ce206b'
+              colour: '#ce206b',
+              id: generateId()
             }
             IoUs.push(IoUPolygon);
         }
         //console.log("Clearing canvas...");
         //dispatch({type: "CLEAR_POLYGONS"});
         for (const polygon of IoUs) {
-          console.log("Dispatching IoU Polygon via ADD_RANDOM_POLYGON...", polygon);
-          dispatch({ type: 'ADD_RANDOM_POLYGON', payload: polygon });
+          console.log("Dispatching IoU Polygon via SET_POLYGON...", polygon);
+          iouDispatch({ type: 'SET_POLYGON', payload: polygon });
           const geomPos = polygon.geometry.getAttribute('position')
-          for (let i = 0, l = geomPos.count; i < l; i += 3) {
-            const newPoint: PolygonData = {
-              geometry: new THREE.CircleGeometry(0.02, 50),
-              position: [geomPos.array[i], geomPos.array[i + 1]],
-              colour: '#2bc800'
-            }
-            console.log("Placing IoU vertex:")
-            dispatch({ type: "ADD_POINT", payload: newPoint });
-          }
+          // for (let i = 0, l = geomPos.count; i < l; i += 3) {
+          //   const newPoint: PolygonData = {
+          //     geometry: new THREE.CircleGeometry(0.02, 50),
+          //     position: [geomPos.array[i], geomPos.array[i + 1]],
+          //     colour: '#2bc800',
+          //     id: this.geometry.id // dirty hack since we don't have an ID generator
+          //   }
+          //   console.log("Placing IoU vertex:")
+          //   dispatch({ type: "ADD_POINT", payload: newPoint });
+          // }
         }
     }
 
@@ -173,7 +189,7 @@ const TwoDEnv = () => {
         <div className="TwoDEnv">
             <main>
                 <div className="twod-canvas-container">
-                    <Scene2D polygons={polygons} />
+                    <Scene2D polygons={polygons} iouPolygons={iouPolygons} />
                 </div>
             </main>
 
