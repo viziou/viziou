@@ -1,7 +1,7 @@
 import { useContext, useRef } from "react";
 import * as THREE from "three";
 import { PolygonData } from "../utils/types";
-import { PolygonContext } from "../contexts/PolygonContext";
+import { IOUPolygonContext } from '../contexts/IOUPolygonContext.tsx'
 
 type PolygonProps = PolygonData & { index: number };
 
@@ -9,7 +9,7 @@ type PolygonProps = PolygonData & { index: number };
 
 const IOUPolygon = ({ position, geometry, colour, index }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
-  const { dispatch } = useContext(PolygonContext)!;
+  const { dispatch } = useContext(IOUPolygonContext)!;
 
   const renderPoint = ({x, y}: {x: number, y: number}, size = 0.03, smoothness = 50) => {
     return (

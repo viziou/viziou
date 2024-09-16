@@ -25,6 +25,13 @@ function IOUPolygonReducer(state: IOUPolygonContextInterface, action: IOUPolygon
                 polygonMap: state.polygonMap.set(key(action.payload), action.payload),
             }
 
+      case "CLEAR_POLYGONS":
+            state.polygonMap.clear();
+            return {
+                ...state,
+                polygonMap: state.polygonMap
+            }
+
         default:
             return state;
     }

@@ -189,7 +189,7 @@ const TwoDEnv = () => {
         <div className="TwoDEnv">
             <main>
                 <div className="twod-canvas-container">
-                    <Scene2D polygons={polygons} iouPolygons={iouPolygons} />
+                    <Scene2D polygons={polygons} iouPolygons={iouPolygons} iouDispatch={iouDispatch} />
                 </div>
             </main>
 

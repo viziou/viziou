@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import React from 'react'
 
 export type PolygonData = {
   id: number,
@@ -16,11 +17,13 @@ export type IOUPolygon2DAction =
   | { type: "SET_POLYGON", payload: IOUPolygonData }
   | { type: "SHOW_POLYGON", payload: [number, number] }
   | { type: "HIDE_POLYGON", payload: [number, number] }
-  | { type: "DELETE_POLYGON", payload: [number, number] } ;
+  | { type: "DELETE_POLYGON", payload: [number, number] }
+  | { type: "CLEAR_POLYGONS" };
 
 export type Scene2DProps = {
   polygons: PolygonData[];
   iouPolygons: Map<string, IOUPolygonData>;
+  iouDispatch: React.Dispatch<IOUPolygon2DAction>;
 };
 
 export type Polygon2DAction =

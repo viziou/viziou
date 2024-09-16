@@ -1,17 +1,19 @@
-import { useContext, useRef } from "react";
+import React, { useContext, useRef } from "react";
 import * as THREE from "three";
-import { PolygonData } from "../utils/types";
+import { IOUPolygon2DAction, PolygonData } from '../utils/types'
 import { PolygonContext } from "../contexts/PolygonContext";
 import { DragControls } from "@react-three/drei";
+import { IOUPolygonContext } from '../contexts/IOUPolygonContext.tsx'
 
-type PolygonProps = PolygonData & { index: number };
+type PolygonProps = PolygonData & { index: number } & {iouDispatch: React.Dispatch<IOUPolygon2DAction>};
 
 // TODO: Make information on top of the polygon as a child instead?
 
-const Polygon = ({ position, geometry, colour, index }: PolygonProps) => {
+const Polygon = ({ position, geometry, colour, index, iouDispatch }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
   const { dispatch } = useContext(PolygonContext)!;
   const originalPosition = useRef<[number, number]>([0, 0]);
+  //const { polygonMap, dispatch: iouDispatch} = useContext(IOUPolygonContext)!;
 
   const matrix = new THREE.Matrix4();
 
@@ -25,6 +27,12 @@ const Polygon = ({ position, geometry, colour, index }: PolygonProps) => {
       mesh.current.getWorldPosition(v)
       originalPosition.current = v.toArray().slice(0,2) as [number, number];
       //console.log('original_position: ', originalPosition);
+      // test clearing all IoU polygons
+      console.log("dispatch: ", iouDispatch)
+      if (iouDispatch) {
+        console.log("trying to clear polygons....")
+        iouDispatch({type: "CLEAR_POLYGONS"});
+      }
     }
   };
 
