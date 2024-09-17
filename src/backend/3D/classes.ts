@@ -37,23 +37,23 @@ class Point3D {
 		return this._z;
 	}
 
-    public translate(x: number, y: number, z: number): this;
-    public translate(p: Point3D): this;
-    public translate(x: unknown, y: unknown = null, z: unknown = null): this {
+    public translate(x: number, y: number, z: number): Point3D;
+    public translate(p: Point3D): Point3D;
+    public translate(x: unknown, y: unknown = null, z: unknown = null): Point3D {
         if (typeof x === 'number' && typeof y === 'number' && typeof z === 'number') {
-            this._x += x; this._y += y; this._z += z;
+            return new Point3D(this._x + x, this._y + y, this._z + z);
         } else if (x instanceof Point3D) {
-            this._x += x.x; this._y += x.y; this._z += x.z;
+            return new Point3D(this._x + x.x, this._y + x.y, this._z + x.z);
         }
-            // should probably throw exception if both failed
-            return this;
+        // should probably throw exception if both failed
+        return new Point3D(0, 0, 0);
     }
 
     public add(p: Point3D): Point3D {
         return new Point3D(this.x + p.x, this.y + p.y, this.z + p.z);
     }
 
-    public subtract(p: Point3D): Point3D {
+    public sub(p: Point3D): Point3D {
         return new Point3D(this.x - p.x, this.y - p.y, this.z - p.z);
     }
 
@@ -173,8 +173,8 @@ class Face3D {
         const Point3 = this._vertices[2];
 
         // Get parallel plane vectors
-        const vec12 = Point2.subtract(Point1);
-        const vec13 = Point3.subtract(Point1);
+        const vec12 = Point2.sub(Point1);
+        const vec13 = Point3.sub(Point1);
 
         // Get normal vector to plane
         const n = cross(vec12, vec13);
@@ -246,7 +246,7 @@ class Face3D {
         const coordinates: Pair<number, number>[] = [[1, 0]];
 
         // Set new x-direction component vector
-        const x = this._vertices[0].subtract(meanVertex);
+        const x = this._vertices[0].sub(meanVertex);
         const x_mag = x.magnitude();
         const x_hat = x.normalise();
 
@@ -257,7 +257,7 @@ class Face3D {
 
         // Redefine all centroid vectors in terms of x and y via scalar resolute
         for (let i = 1; i < this.numVertices; i++) {
-            let a = this._vertices[i].subtract(meanVertex);
+            let a = this._vertices[i].sub(meanVertex);
             let u_mag = dot(a, x_hat);
             let w_mag = dot(a, y_hat);
             coordinates.push([u_mag/x_mag, w_mag/y_mag]);
@@ -299,18 +299,16 @@ class Face3D {
         })
     }
 
-    public translate(x: number, y: number, z: number): this;
-    public translate(p: Point3D): this;
-    public translate(x: number | Point3D, y?: number, z?: number): this {
+    public translate(x: number, y: number, z: number): Face3D;
+    public translate(p: Point3D): Face3D;
+    public translate(x: number | Point3D, y?: number, z?: number): Face3D {
         if (!(x instanceof Point3D) && (y) && (z)) {
             x = new Point3D(x, y, z);
         }
 
         // this is necessary to keep TypeScript happy since we're doing funky things with types
         if (typeof x !== 'number') {
-            this._vertices.map((point: Point3D) => {
-            return point.translate(x);
-            })
+            return new Face3D(this.vertices.map((point: Point3D) => {return point.translate(x)}));
         }
         return this;
     }
@@ -332,8 +330,8 @@ class Face3D {
             q = edge.q;
 
             // Get side vectors of the triangle created with the centroid
-            side1 = p.subtract(meanVertex);
-            side2 = q.subtract(meanVertex);
+            side1 = p.sub(meanVertex);
+            side2 = q.sub(meanVertex);
 
             // Get area of triangle of the two vectors
             sum += cross(side1, side2).magnitude()/2;
@@ -435,6 +433,20 @@ class Polyhedra3D {
         return 1;   // TODO FIGURE THIS OUT
     }
 
+    public translate(x: number, y: number, z: number): Polyhedra3D;
+    public translate(p: Point3D): Polyhedra3D;
+    public translate(x: number | Point3D, y?: number, z?: number): Polyhedra3D {
+        if (!(x instanceof Point3D) && (y) && (z)) {
+            x = new Point3D(x, y, z);
+        }
+
+        // this is necessary to keep TypeScript happy since we're doing funky things with types
+        if (typeof x !== 'number') {
+            return new Polyhedra3D(this.faces.map((face: Face3D) => {return face.translate(x)}));
+        }
+        return this;
+    }
+
     public centroid(): Point3D {
         let sumPoint = new Point3D(0, 0, 0);
         for (let i = 0; i < this.numFaces; i++) {
@@ -450,7 +462,7 @@ class Polyhedra3D {
         // Go over every face
         this._faces.forEach((face) => {
             // Get face centroid to polyhedra centroid vector
-            let centreVector = polyhedraCentroid.subtract(face.centroid())
+            let centreVector = polyhedraCentroid.sub(face.centroid())
 
             // Compute scalar product of centre vector with respect to the normal
             let scalarProduct = dot(centreVector, face.normal);
@@ -479,7 +491,7 @@ class Polyhedra3D {
             // Get perpendicular height to apex by getting normal vector of face and 
             // doing scalar resolute with any slant vector
             let n = face.normal;
-            let slantVector = meanVertex.subtract(face.vertices[0]);
+            let slantVector = meanVertex.sub(face.vertices[0]);
             let height = Math.abs(dot(slantVector, n));
 
             // Add volume to total

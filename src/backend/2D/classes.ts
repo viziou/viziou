@@ -155,7 +155,7 @@ class Polygon2D {
 
         // this is necessary to keep TypeScript happy since we're doing funky things with types
         if (typeof x !== 'number') {
-            return new Polygon2D(this.vertices.map((point: Point2D) => {return point.translate(x)}))
+            return new Polygon2D(this.vertices.map((point: Point2D) => {return point.translate(x)}));
         }
         return this;
     }
