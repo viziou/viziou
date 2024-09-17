@@ -157,14 +157,14 @@ class Backend2D {
     if (onRight.length === 0) {
       angles = above.map(({point, orig_idx}) => {
         const vector = point.sub(reducedVertices[0])
-        return { angle: (Math.acos(vector.y / vector.distanceToOrigin())), orig_idx: orig_idx };
+        return { angle: (Math.acos(vector.y / vector.magnitude())), orig_idx: orig_idx };
       })
     }
     else {
       angles = onRight.map(({ point, orig_idx }) => {
         const vector = point.sub(reducedVertices[0]); // vector from extreme to this point
         //console.log(vector.x / vector.distanceToOrigin())
-        return { angle: (Math.acos(vector.x / vector.distanceToOrigin())), orig_idx: orig_idx };
+        return { angle: (Math.acos(vector.x / vector.magnitude())), orig_idx: orig_idx };
       })
     }
     //console.log('angles on the right: ', angles);
@@ -188,7 +188,7 @@ class Backend2D {
         const vector_behind = reducedVertices[reducedVertices.length - 1].sub(reducedVertices[reducedVertices.length - 2]) // recover previous vector
         const vector = reducedVertices[reducedVertices.length - 1].sub(point) // calculate this vector
         //console.log('inside next angle: ', vector.x / vector.distanceToOrigin());
-        return {angle: Math.acos(vector_behind.dot(vector) / (vector_behind.distanceToOrigin() * vector.distanceToOrigin())), orig_idx: index}
+        return {angle: Math.acos(vector_behind.dot(vector) / (vector_behind.magnitude() * vector.magnitude())), orig_idx: index}
       });
       //console.log('current wrap: ', reducedVertices);
       //console.log('next angles: ', angles);

@@ -31,16 +31,16 @@ class Point2D {
         return {x: this.x, y: this.y};
     }
 
-    public translate(x: number, y: number): this;
-    public translate(p: Point2D): this;
-    public translate(x: unknown, y: unknown = null): this {
+    public translate(x: number, y: number): Point2D;
+    public translate(p: Point2D): Point2D;
+    public translate(x: unknown, y: unknown = null): Point2D {
         if (typeof x === 'number' && typeof y === 'number') {
-            this._x += x; this._y += y;
+            return new Point2D(this._x + x, this._y + y);
         } else if (x instanceof Point2D) {
-            this._x += x.x; this._y += x.y;
+            return new Point2D(this._x + x.x, this._y + x.y);
         }
-            // should probably throw exception if both failed
-            return this;
+        // should probably throw exception if both failed
+        return new Point2D(0, 0);
     }
 
     public toList(): number[] {
@@ -75,7 +75,7 @@ class Point2D {
       return this.x * point.x + this.y * point.y; // dot product
     }
 
-    public distanceToOrigin(): number {
+    public magnitude(): number {
       // if you're using this as a vector then this is equal to the vector length
       return Math.sqrt(this.x ** 2 + this.y ** 2);
     }
@@ -146,18 +146,16 @@ class Polygon2D {
         return new Point2D(x/numVertices, y/numVertices);
     }
 
-    public translate(x: number, y: number): this;
-    public translate(p: Point2D): this;
-    public translate(x: number | Point2D, y?: number): this {
+    public translate(x: number, y: number): Polygon2D;
+    public translate(p: Point2D): Polygon2D;
+    public translate(x: number | Point2D, y?: number): Polygon2D {
         if (!(x instanceof Point2D) && (y)) {
             x = new Point2D(x, y);
         }
 
         // this is necessary to keep TypeScript happy since we're doing funky things with types
         if (typeof x !== 'number') {
-            this._vertices.map((point: Point2D) => {
-            return point.translate(x);
-            })
+            return new Polygon2D(this.vertices.map((point: Point2D) => {return point.translate(x)}))
         }
         return this;
     }
@@ -215,6 +213,22 @@ class Polygon2D {
             sum += (p.x*q.y - p.y*q.x);
         }
         return sum/2;
+    }
+
+    public perimeter(): number {
+        let sum: number = 0;
+        let p: Point2D;
+        let q: Point2D;
+        let edge: Edge2D;
+
+        // Loop over every edge counterclockwise
+        for (var i = 0; i < this._vertices.length; i++) {
+            edge = this.getEdge(i)
+            p = edge.p;
+            q = edge.q;
+            sum += p.sub(q).magnitude();
+        }
+        return sum;
     }
 
     public contains(testPoint: Point2D): boolean {
