@@ -325,4 +325,104 @@ describe("Testing Class: Polyhedra3D", () => {
         // it("Null Behaviour - Non Enclosed Faces", () => {
         // })
     });
+
+    describe("Polyhedra3D.surfaceArea()", () => {
+        it("Basic #1 - Cube", () => {
+            // Setup polyhedra
+            const A = new Point3D(0, 0, 0);
+            const B = new Point3D(1, 0, 0);
+            const C = new Point3D(1, 1, 0);
+            const D = new Point3D(0, 1, 0);
+            const E = new Point3D(0, 0, 1);
+            const F = new Point3D(1, 0, 1);
+            const G = new Point3D(1, 1, 1);
+            const H = new Point3D(0, 1, 1);
+            const face1 = new Face3D([A, B, C, D], true, true);
+            const face2 = new Face3D([A, B, F, E], true, true);
+            const face3 = new Face3D([B, C, G, F], true, true);
+            const face4 = new Face3D([C, D, H, G], true, true);
+            const face5 = new Face3D([D, A, E, H], true, true);
+            const face6 = new Face3D([E, F, G, H], true, true);
+            const cube = new Polyhedra3D([face1, face2, face3, face4, face5, face6]);
+
+            // Check if surface area match
+            const calculatedSurfaceArea = cube.surfaceArea();
+            const expectedSurfaceArea = 6;
+            calculatedSurfaceArea.should.be.a('number');
+            calculatedSurfaceArea.should.equal(expectedSurfaceArea);
+        });
+
+        it("Basic #2 - Prism", () => {
+            // Setup polyhedra
+            const A = new Point3D(0, 2, 0);
+            const B = new Point3D(-3, -3, 0);
+            const C = new Point3D(3, -2, 0);
+            const D = new Point3D(0, 2, 6);
+            const E = new Point3D(-3, -3, 6);
+            const F = new Point3D(3, -2, 6);
+            const face1 = new Face3D([A, B, C], true, true);
+            const face2 = new Face3D([A, B, E, D], true, true);
+            const face3 = new Face3D([B, C, F, E], true, true);
+            const face4 = new Face3D([C, A, D, F], true, true);
+            const face5 = new Face3D([D, E, F], true, true);
+            const prism = new Polyhedra3D([face1, face2, face3, face4, face5]);
+
+            // Check if surface areas match
+            const calculatedSurfaceArea = prism.surfaceArea();
+            const s = (5 + Math.sqrt(34) + Math.sqrt(37))/2;
+            const expectedSurfaceArea = 12*s + 2*Math.sqrt(s*(s-5)*(s-Math.sqrt(34))*(s-Math.sqrt(37)));
+            calculatedSurfaceArea.should.be.a('number');
+            calculatedSurfaceArea.should.equal(expectedSurfaceArea);
+        });
+    });
+
+    describe("Polyhedra3D.perimeter()", () => {
+        it("Basic #1 - Cube", () => {
+            // Setup polyhedra
+            const A = new Point3D(0, 0, 0);
+            const B = new Point3D(1, 0, 0);
+            const C = new Point3D(1, 1, 0);
+            const D = new Point3D(0, 1, 0);
+            const E = new Point3D(0, 0, 1);
+            const F = new Point3D(1, 0, 1);
+            const G = new Point3D(1, 1, 1);
+            const H = new Point3D(0, 1, 1);
+            const face1 = new Face3D([A, B, C, D], true, true);
+            const face2 = new Face3D([A, B, F, E], true, true);
+            const face3 = new Face3D([B, C, G, F], true, true);
+            const face4 = new Face3D([C, D, H, G], true, true);
+            const face5 = new Face3D([D, A, E, H], true, true);
+            const face6 = new Face3D([E, F, G, H], true, true);
+            const cube = new Polyhedra3D([face1, face2, face3, face4, face5, face6]);
+
+            // Check if perimeter match
+            const calculatedPerimeter = cube.perimeter();
+            const expectedPerimeter = 12;
+            calculatedPerimeter.should.be.a('number');
+            calculatedPerimeter.should.equal(expectedPerimeter);
+        });
+
+        it("Basic #2 - Prism", () => {
+            // Setup polyhedra
+            const A = new Point3D(0, 2, 0);
+            const B = new Point3D(-3, -3, 0);
+            const C = new Point3D(3, -2, 0);
+            const D = new Point3D(0, 2, 6);
+            const E = new Point3D(-3, -3, 6);
+            const F = new Point3D(3, -2, 6);
+            const face1 = new Face3D([A, B, C], true, true);
+            const face2 = new Face3D([A, B, E, D], true, true);
+            const face3 = new Face3D([B, C, F, E], true, true);
+            const face4 = new Face3D([C, A, D, F], true, true);
+            const face5 = new Face3D([D, E, F], true, true);
+            const prism = new Polyhedra3D([face1, face2, face3, face4, face5]);
+
+            // Check if perimeters match
+            const calculatedPerimeter = prism.perimeter();
+            const s = (5 + Math.sqrt(34) + Math.sqrt(37))/2;
+            const expectedPerimeter = 4*s + 18;
+            calculatedPerimeter.should.be.a('number');
+            calculatedPerimeter.should.equal(expectedPerimeter);
+        });
+    });
 });

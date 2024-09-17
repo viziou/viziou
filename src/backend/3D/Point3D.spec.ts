@@ -132,7 +132,7 @@ describe("Testing Class: Point3D", () => {
             const point2 = new Point3D(1, 1, 1);
             const point3 = new Point3D(2, 3, 4);
 
-            const result = point3.equals(point1.subtract(point2));
+            const result = point3.equals(point1.sub(point2));
             result.should.be.a('boolean');
             result.should.equal(true);
             should.exist(result);
@@ -144,7 +144,7 @@ describe("Testing Class: Point3D", () => {
             const point2 = new Point3D(-1, 4/5, Math.sqrt(2));
             const point3 = new Point3D(4, 16/5, 0);
 
-            const result = point3.equals(point1.subtract(point2));
+            const result = point3.equals(point1.sub(point2));
             result.should.be.a('boolean');
             result.should.equal(true);
             should.exist(result);

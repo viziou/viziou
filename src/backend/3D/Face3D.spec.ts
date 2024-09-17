@@ -271,4 +271,26 @@ describe("Testing Class: Face3D", () => {
             line.area().should.equal(0);
         })
     });
+
+    describe("Face3D.perimeter()", () => {
+        it("Basic #1 - Triangle", () => {
+            // Setup face
+            const points = [new Point3D(1, 1, 9), new Point3D(2, -2, 0), new Point3D(6, 4, 0)];
+            const face = new Face3D(points, true, true);
+            const calculatedPerimeter = face.perimeter();
+            const expectedPerimeter = Math.sqrt(91) + Math.sqrt(115) + 2*Math.sqrt(13);
+            calculatedPerimeter.should.be.a('number');
+            calculatedPerimeter.should.closeTo(expectedPerimeter, 1e-10);
+        });
+
+        it("Basic #2 - Rectangle", () => {
+            // Setup face
+            const points = [new Point3D(0, 0, 0), new Point3D(0, 1, 0), new Point3D(4, 0, 2), new Point3D(4, 1, 2)];
+            const face = new Face3D(points, true, true);
+            const calculatedPerimeter = face.perimeter();
+            const expectedPerimeter = 4*Math.sqrt(5) + 2;
+            calculatedPerimeter.should.be.a('number');
+            calculatedPerimeter.should.equal(expectedPerimeter);
+        });
+    });
 });
