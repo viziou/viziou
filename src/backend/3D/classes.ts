@@ -339,6 +339,22 @@ class Face3D {
         return sum;
     }
 
+    public perimeter(): number {
+        let sum: number = 0;
+        let p: Point3D;
+        let q: Point3D;
+        let edge: Edge3D;
+
+        // Loop over every edge counterclockwise
+        for (var i = 0; i < this._vertices.length; i++) {
+            edge = this.getEdge(i)
+            p = edge.p;
+            q = edge.q;
+            sum += p.sub(q).magnitude();
+        }
+        return sum;
+    }
+
     public getEdge(idx: number): Edge3D {
         return {
             p: this._vertices[idx],
@@ -497,8 +513,23 @@ class Polyhedra3D {
             // Add volume to total
             sum += 1/3 * baseArea * height;
         }
-
         return sum;
+    }
+
+    public surfaceArea(): number {
+        let sum = 0;
+        for (let face of this._faces) {
+            sum += face.area();
+        }
+        return sum;
+    }
+
+    public perimeter(): number {
+        let sum = 0;
+        for (let face of this._faces) {
+            sum += face.perimeter();
+        }
+        return sum/2;
     }
 
     public map(callbackfn: (point: Point3D) => Point3D): Polyhedra3D {
