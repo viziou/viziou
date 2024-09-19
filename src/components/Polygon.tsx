@@ -56,7 +56,9 @@ const Polygon = ({
   };
 
   const handleDragStart = () => {
-    selectPolygon();
+    if (!isPolygonSelected()) {
+      selectPolygon();
+    }
     if (mesh.current) {
       const v = new THREE.Vector3();
       mesh.current.getWorldPosition(v);
