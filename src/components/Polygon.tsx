@@ -17,8 +17,7 @@ const Polygon = ({
   selectable,
 }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
-  const { dispatch, selectedPolygonIndex, currentlyMousedOverPolygons } =
-    useContext(PolygonContext)!;
+  const { dispatch, selectedPolygonIndex, currentlyMousedOverPolygons } = useContext(PolygonContext)!;
   const originalPosition = useRef<[number, number]>([0, 0]);
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
@@ -37,11 +36,7 @@ const Polygon = ({
 
   const selectPolygon = () => {
     if (!selectable) return;
-    if (
-      (selectedPolygonIndex === null ||
-        Math.max(...currentlyMousedOverPolygons) === index) &&
-      dispatch
-    ) {
+    if ((selectedPolygonIndex === null || Math.max(...currentlyMousedOverPolygons) === index) && dispatch) {
       // only select the largest polygon index
       dispatch({ type: "SELECT_POLYGON", index: index });
     }
@@ -61,12 +56,12 @@ const Polygon = ({
   };
 
   const handleDragStart = () => {
-    // selectPolygon();
-    if (mesh.current && isPolygonSelected()) {
+    selectPolygon();
+    if (mesh.current) {
       const v = new THREE.Vector3();
       mesh.current.getWorldPosition(v);
       originalPosition.current = v.toArray().slice(0, 2) as [number, number];
-      //console.log('original_position: ', originalPosition);
+      // console.log('original_position: ', originalPosition);
     }
   };
 
