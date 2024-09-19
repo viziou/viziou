@@ -342,6 +342,7 @@ const Polygon = ({
             <boxGeometry args={[size.x * 10, size.y * 10, 0]} />
           </mesh>
         ) : null}
+
         {/* Red Lines to show bounding box: */}
         {!rotating && !resizing ? (
           <line>
@@ -374,6 +375,7 @@ const Polygon = ({
             <lineBasicMaterial color="red" />
           </line>
         ) : null}
+
         {/* Boxes on each corner: */}
         {["topLeft", "topRight", "bottomLeft", "bottomRight"].map(
           (corner, i) => (
@@ -403,6 +405,7 @@ const Polygon = ({
             </mesh>
           )
         )}
+
         {/* Rotate circle: */}
         <mesh
           position={[0, size.y / 2 + 0.5, 0]}
@@ -412,9 +415,10 @@ const Polygon = ({
           onPointerMove={handleRotateDrag}
           onPointerUp={handleRotateEnd}
         >
-          <sphereGeometry args={[0.1, 16, 16]} />
+          <circleGeometry args={[0.1, 16, 16]} />
           <meshBasicMaterial color="green" />
         </mesh>
+
         {/* Line to Rotate circle: */}
         {!resizing && !rotating ? (
           <line>
@@ -423,7 +427,7 @@ const Polygon = ({
                 attach="attributes-position"
                 count={2}
                 array={
-                  new Float32Array([0, size.y / 2, 0, 0, size.y / 2 + 0.5, 0])
+                  new Float32Array([0, size.y / 2, 0, 0, size.y / 2 + 0.5 - 0.1, 0])
                 }
                 itemSize={3}
               />
@@ -441,14 +445,7 @@ const Polygon = ({
         matrix={matrix}
         autoTransform={false}
         onDragStart={handleDragStart}
-        onDrag={(localMatrix) => {
-          handleDrag(localMatrix);
-          // Update bounding box immediately during drag
-          if (mesh.current) {
-            const newBox = new THREE.Box3().setFromObject(mesh.current);
-            setBoundingBox(newBox);
-          }
-        }}
+        onDrag={(localMatrix) => {handleDrag(localMatrix)}}
         onDragEnd={handleDragEnd}
       >
         <mesh
