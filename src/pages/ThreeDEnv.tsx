@@ -9,9 +9,9 @@ import '../styles/ThreeDEnv.css';
 import { Storage } from '../backend/Interface.ts'
 import Sidebar3D from '../components/Sidebar3D.tsx';
 
-const getCube = (): THREE.BoxGeometry => {
-    return new THREE.BoxGeometry(1, 1, 1);
-};
+// const getCube = (): THREE.BoxGeometry => {
+//     return new THREE.BoxGeometry(1, 1, 1);
+// };
 
 const getRandomGeometry = (): ConvexGeometry => {
     const numVertices = Math.floor(Math.random() * 8) + 5;
@@ -47,22 +47,22 @@ const ThreeDEnv = () => {
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
 
-    const addCube = () => {
-        const newPolyhedron: PolyhedronData = {
-            geometry: getCube(),
-            position: [
-                Math.random() * 4 - 2,
-                Math.random() * 4 - 2,
-                Math.random() * 4 - 2
-            ],
-            rotation: [0, 0, 0],   
-            scale: [1, 1, 1], 
-            colour: getRandomColour(),
-        };
+    // const addCube = () => {
+    //     const newPolyhedron: PolyhedronData = {
+    //         geometry: getCube(),
+    //         position: [
+    //             Math.random() * 4 - 2,
+    //             Math.random() * 4 - 2,
+    //             Math.random() * 4 - 2
+    //         ],
+    //         rotation: [0, 0, 0],   
+    //         scale: [1, 1, 1], 
+    //         colour: getRandomColour(),
+    //     };
 
-        console.log("Dispatching ADD_CUBE:", newPolyhedron);
-        dispatch({ type: "ADD_CUBE", payload: newPolyhedron });
-    };
+    //     console.log("Dispatching ADD_CUBE:", newPolyhedron);
+    //     dispatch({ type: "ADD_CUBE", payload: newPolyhedron });
+    // };
 
     const addRandomPolyhedron = () => {
         const newPolyhedron: PolyhedronData = {
@@ -121,7 +121,7 @@ const ThreeDEnv = () => {
                 setSelectedIndex={setSelectedIndex} 
                 />
             </main>
-            
+
         </div>
     );
 };

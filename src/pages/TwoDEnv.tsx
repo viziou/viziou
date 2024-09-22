@@ -12,9 +12,9 @@ import { Backend2D, Storage } from '../backend/Interface';
 
 import { generatePairs } from '../utils/Generic';
 
-const getSquare = (): THREE.PlaneGeometry => {
-    return new THREE.PlaneGeometry(1, 1);
-};
+// const getSquare = (): THREE.PlaneGeometry => {
+//     return new THREE.PlaneGeometry(1, 1);
+// };
 
 const getRandomGeometry = (): ConvexGeometry => {
     // random number of vertices between 5 and 12
@@ -52,19 +52,19 @@ const TwoDEnv = () => {
 
     const { polygons, dispatch } = context;
 
-    const addSquare = () => {
-        const newPolygon: PolygonData = {
-            geometry: getSquare(),
-            position: [
-                Math.random() * 4 - 2, // x coordinate
-                Math.random() * 4 - 2 // y coordinate
-            ],
-            colour: getRandomColour(),
-        };
+    // const addSquare = () => {
+    //     const newPolygon: PolygonData = {
+    //         geometry: getSquare(),
+    //         position: [
+    //             Math.random() * 4 - 2, // x coordinate
+    //             Math.random() * 4 - 2 // y coordinate
+    //         ],
+    //         colour: getRandomColour(),
+    //     };
 
-        console.log("Dispatching ADD_SQUARE:", newPolygon);
-        dispatch({ type: "ADD_SQUARE", payload: newPolygon });
-    };
+    //     console.log("Dispatching ADD_SQUARE:", newPolygon);
+    //     dispatch({ type: "ADD_SQUARE", payload: newPolygon });
+    // };
 
     const addRandomPolygon = () => {
         const newPolygon: PolygonData = {
