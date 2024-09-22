@@ -16,6 +16,7 @@ interface PolyhedronProps extends PolyhedronData {
     isSelected: boolean;
     onPointerOver?: () => void;
     onPointerOut?: () => void;
+    onDoubleClick?: () => void;
 }
 
 const Polyhedron = ({ index, position, rotation, scale, geometry, colour, onClick, isSelected, onPointerOver, onPointerOut }: PolyhedronProps) => {

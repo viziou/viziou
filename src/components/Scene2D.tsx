@@ -5,7 +5,8 @@ import Polygon from "./Polygon";
 
 const Scene2D = ({ polygons }: Scene2DProps) => {
   return (
-    <Canvas style={{ height: "80vh", background: "#cccccc" }}>
+    <Canvas style={{ height: "100vh", width: "100%", background: "#cccccc" }}>
+
       {polygons.map((polygon, index) => (
         <Polygon
           key={index}
