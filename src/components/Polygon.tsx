@@ -51,11 +51,6 @@ const Polygon = ({
     return selectedPolygonIndex === index;
   };
 
-  // uncomment this if it becomes useful
-  // const deselectPolygon = () => {
-  //   if (dispatch) dispatch({ type: "SELECT_POLYGON", index: null });
-  // };
-
   const handleDragEnd = () => {
     /* Could trigger updates to IoU or something here maybe */
   };
@@ -68,7 +63,6 @@ const Polygon = ({
       const v = new THREE.Vector3();
       mesh.current.getWorldPosition(v);
       originalPosition.current = v.toArray().slice(0, 2) as [number, number];
-      // console.log('original_position: ', originalPosition);
     }
   };
 
@@ -78,7 +72,6 @@ const Polygon = ({
       const new_v = new THREE.Vector3();
       localMatrix.decompose(new_v, new THREE.Quaternion(), new THREE.Vector3());
       const new_pos = new_v.toArray().slice(0, 2) as [number, number];
-      //console.log('original position (inside handleDrag): ', originalPosition);
       new_pos[0] += originalPosition.current[0];
       new_pos[1] += originalPosition.current[1]; // TODO: this is ugly
       if (dispatch) {
@@ -107,8 +100,7 @@ const Polygon = ({
   //! RESIZE FUNCTIONS:
   const [resizing, setResizing] = useState(false);
   const [corner, setCorner] = useState<string | null>(null);
-  const [initialMousePosition, setInitialMousePosition] =
-    useState<THREE.Vector3 | null>(null);
+  const [initialMousePosition, setInitialMousePosition] = useState<THREE.Vector3 | null>(null);
   const [initialScale, setInitialScale] = useState<[number, number]>([1, 1]);
   const [initialSize, setInitialSize] = useState<THREE.Vector3 | null>(null);
 
@@ -137,50 +129,83 @@ const Polygon = ({
     const mouseDelta = newMousePosition.sub(initialMousePosition);
 
     let newScale = [...initialScale];
+    setScale(initialScale);
     let newPosition: [number, number] = [...position];
+    // let translateCornerToOriginMatrix = new THREE.Matrix4();
 
     switch (corner) {
       case "topLeft":
         newScale[0] = initialScale[0] * (1 - mouseDelta.x / initialSize.x);
         newScale[1] = initialScale[1] * (1 + mouseDelta.y / initialSize.y);
-        newPosition[0] += mouseDelta.x / 2;
-        newPosition[1] += mouseDelta.y / 2;
+        // newPosition[0] += mouseDelta.x / 2;
+        // newPosition[1] += mouseDelta.y / 2;
+        // translateCornerToOriginMatrix = new THREE.Matrix4().makeTranslation(
+        //   -position[0],
+        //   -position[1],
+        //   0
+        // );
         break;
       case "topRight":
         newScale[0] = initialScale[0] * (1 + mouseDelta.x / initialSize.x);
         newScale[1] = initialScale[1] * (1 + mouseDelta.y / initialSize.y);
-        newPosition[0] += mouseDelta.x / 2;
-        newPosition[1] += mouseDelta.y / 2;
+        // newPosition[0] += mouseDelta.x / 2;
+        // newPosition[1] += mouseDelta.y / 2;
+        // translateCornerToOriginMatrix = new THREE.Matrix4().makeTranslation(
+        //   -position[0],
+        //   -position[1],
+        //   0
+        // );
         break;
       case "bottomLeft":
         newScale[0] = initialScale[0] * (1 - mouseDelta.x / initialSize.x);
         newScale[1] = initialScale[1] * (1 - mouseDelta.y / initialSize.y);
-        newPosition[0] += mouseDelta.x / 2;
-        newPosition[1] += mouseDelta.y / 2;
+        // newPosition[0] += mouseDelta.x / 2;
+        // newPosition[1] += mouseDelta.y / 2;
+        // translateCornerToOriginMatrix = new THREE.Matrix4().makeTranslation(
+        //   -position[0],
+        //   -position[1],
+        //   0
+        // );
         break;
       case "bottomRight":
         newScale[0] = initialScale[0] * (1 + mouseDelta.x / initialSize.x);
         newScale[1] = initialScale[1] * (1 - mouseDelta.y / initialSize.y);
-        newPosition[0] += mouseDelta.x / 2;
-        newPosition[1] += mouseDelta.y / 2;
+        // newPosition[0] += mouseDelta.x / 2;
+        // newPosition[1] += mouseDelta.y / 2;
+        // translateCornerToOriginMatrix = new THREE.Matrix4().makeTranslation(
+        //   -position[0],
+        //   -position[1],
+        //   0
+        // );
         break;
     }
 
     // Apply the new scale and position
+    
     const scaleMatrix = new THREE.Matrix4().makeScale(
       newScale[0],
       newScale[1],
       1
     );
     const translateMatrix = new THREE.Matrix4().makeTranslation(
-      newPosition[0] - position[0],
-      newPosition[1] - position[1],
+      -initialSize.x/2,
+      -initialSize.y/2,
+      0
+    );
+
+    const translateMatrix2 = new THREE.Matrix4().makeTranslation(
+      +initialSize.x/2,
+      +initialSize.y/2,
       0
     );
 
     const combinedMatrix = new THREE.Matrix4()
+      // .multiply(translateCornerToOriginMatrix)
       .multiply(translateMatrix)
-      .multiply(scaleMatrix);
+      .multiply(scaleMatrix)
+      .multiply(translateMatrix2)
+      ;
+      
 
     const newGeometry = geometry.clone().applyMatrix4(combinedMatrix);
 
@@ -197,13 +222,17 @@ const Polygon = ({
       });
     }
 
-    setScale(newScale as [number, number]);
+    // setScale(newScale as [number, number]);
 
     // Update bounding box immediately
     if (mesh.current) {
       const newBox = new THREE.Box3().setFromObject(mesh.current);
       setBoundingBox(newBox);
     }
+
+    // if (boundingBox) {
+    //   setInitialSize(boundingBox.getSize(new THREE.Vector3()));
+    // }
   };
 
   const handleResizeEnd = (_: ThreeEvent<MouseEvent>) => {
@@ -316,11 +345,6 @@ const Polygon = ({
     setPointer(null);
   };
 
-  // const [rotatingPointer, setRotatingPointer] = useState(false);
-  // useEffect(() => {
-  //   document.body.style.cursor = rotatingPointer ? `move` : "auto";
-  // }, [rotatingPointer]);
-
 
   // Handler for deleting polygon
   const deleteSelectedPolygon = () => {
@@ -357,15 +381,16 @@ const Polygon = ({
               if (rotating) handleRotateDrag(e);
             }}
             onPointerUp={(e) => {
-              handleResizeEnd(e);
-              handleRotateEnd(e);
+              if (resizing) handleResizeEnd(e);
+              if (rotating) handleRotateEnd(e);
             }}
             onPointerLeave={(e) => {
               if (resizing) handleResizeEnd(e);
               if (rotating) handleRotateEnd(e);
             }}
           >
-            <boxGeometry args={[size.x * 10, size.y * 10, 0]} />
+            <boxGeometry args={[size.x * 100, size.y * 100, 0]} />
+            {/* <meshBasicMaterial color="green" /> */}
           </mesh>
         ) : null}
 
