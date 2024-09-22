@@ -482,40 +482,19 @@ const Polygon = ({
               <meshBasicMaterial map={editIconTexture}/>
             </mesh>
           </group>
-        ) : null}
-
-        {/* Delete button */}
-        {!resizing && !rotating ? (
-          <group>
-            <mesh
-              position={[1, size.y / 2 + 0.5, 0]}
-            >
-              <circleGeometry args={[0.21, 64]} />
-              <meshBasicMaterial color={"black"}/>
-            </mesh>
-            <mesh
-              position={[1, size.y / 2 + 0.5, 0]}
-              onClick={deleteSelectedPolygon}
-              onPointerEnter={() => setPointer("pointer")}
-              onPointerLeave={() => setPointer(null)}
-            >
-              <circleGeometry args={[0.2, 64]} />
-              <meshBasicMaterial map={deleteIconTexture}/>
-            </mesh>
-          </group>
-        ) : null}
+        ) : null}        
 
         {/* Duplicate button */}
         {!resizing && !rotating ? (
           <group>
             <mesh
-              position={[1.5, size.y / 2 + 0.5, 0]}
+              position={[1, size.y / 2 + 0.5, 0]}
             >
               <circleGeometry args={[0.21, 64]} />
               <meshBasicMaterial color={"black"}/>
             </mesh>
             <mesh
-              position={[1.5, size.y / 2 + 0.5, 0]}
+              position={[1, size.y / 2 + 0.5, 0]}
               onClick={duplicateSelectedPolygon}
               onPointerEnter={() => setPointer("pointer")}
               onPointerLeave={() => setPointer(null)}
@@ -523,6 +502,27 @@ const Polygon = ({
             >
               <circleGeometry args={[0.2, 64]} />
               <meshBasicMaterial map={duplicateIconTexture}/>
+            </mesh>
+          </group>
+        ) : null}
+
+        {/* Delete button */}
+        {!resizing && !rotating ? (
+          <group>
+            <mesh
+              position={[1.5, size.y / 2 + 0.5, 0]}
+            >
+              <circleGeometry args={[0.21, 64]} />
+              <meshBasicMaterial color={"black"}/>
+            </mesh>
+            <mesh
+              position={[1.5, size.y / 2 + 0.5, 0]}
+              onClick={deleteSelectedPolygon}
+              onPointerEnter={() => setPointer("pointer")}
+              onPointerLeave={() => setPointer(null)}
+            >
+              <circleGeometry args={[0.2, 64]} />
+              <meshBasicMaterial map={deleteIconTexture}/>
             </mesh>
           </group>
         ) : null}
