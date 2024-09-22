@@ -1,5 +1,6 @@
 import { createContext, useReducer, ReactNode } from 'react';
 import { PolygonData, Polygon2DAction } from '../utils/types';
+import * as THREE from "three";
 
 const initialState: PolygonContextInterface = {
     polygons: [],
@@ -60,6 +61,37 @@ function PolygonReducer(state: PolygonContextInterface, action: Polygon2DAction)
         return {
           ...state,
           selectedPolygonIndex: action.index,
+        };
+
+      case "DELETE_POLYGON":
+        const remainingPolygons = [...state.polygons];
+        remainingPolygons.splice(action.index, 1)
+        return {
+          ...state,
+          polygons: remainingPolygons,
+        };
+
+      case "DUPLICATE_POLYGON":
+        const currentPolygons = [...state.polygons];
+        const duplicatePolygon: PolygonData = {
+          position: [currentPolygons[action.index].position[0], currentPolygons[action.index].position[1]],
+          geometry: currentPolygons[action.index].geometry.clone(),
+          colour: currentPolygons[action.index].colour.slice()
+        }
+
+        // Get bbox to figure out optimal placement of clone
+        duplicatePolygon.geometry.computeBoundingBox()
+        const box = duplicatePolygon.geometry.boundingBox;
+        if (box) {
+          const size = box.getSize(new THREE.Vector3())
+          duplicatePolygon.position[0] += size.x/2
+          duplicatePolygon.position[1] -= size.y/2
+          currentPolygons.push(duplicatePolygon)
+        }
+        
+        return {
+          ...state,
+          polygons: currentPolygons,
         };
 
       case "ADD_MOUSED_OVER_POLYGON":

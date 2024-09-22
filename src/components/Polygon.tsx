@@ -7,6 +7,11 @@ import { useThree, ThreeEvent } from "@react-three/fiber";
 
 type PolygonProps = PolygonData & { index: number; selectable: boolean };
 
+// Load texture icons
+const editIconTexture = new THREE.TextureLoader().load("src/assets/edit.jpg")
+const deleteIconTexture = new THREE.TextureLoader().load("src/assets/delete.jpg")
+const duplicateIconTexture = new THREE.TextureLoader().load("src/assets/duplicate.jpg")
+
 // TODO: Make information on top of the polygon as a child instead?
 
 const Polygon = ({
@@ -207,20 +212,24 @@ const Polygon = ({
     setInitialMousePosition(null);
     setInitialScale([1, 1]);
     setInitialSize(null);
-    setResizePointer(null);
+    setPointer(null);
     selectPolygon();
   };
 
-  const [resizePointer, setResizePointer] = useState<string | null>(null);
+  const [pointer, setPointer] = useState<string | null>(null);
 
   useEffect(() => {
     document.body.style.cursor =
-      resizePointer === "nesw"
+      pointer === "nesw"
         ? `nesw-resize`
-        : resizePointer === "nwse"
+        : pointer === "nwse"
         ? "nwse-resize"
+        : pointer === "move"
+        ? "move"
+        : pointer === "pointer"
+        ? "pointer"
         : "auto";
-  }, [resizePointer]);
+  }, [pointer]);
 
   //! ROTATE FUNCTIONS:
   const [rotating, setRotating] = useState(false);
@@ -239,7 +248,7 @@ const Polygon = ({
       const angle = Math.atan2(e.point.y - center.y, e.point.x - center.x);
       setInitialRotation(angle);
     }
-    setRotatingPointer(true);
+    setPointer("move");
   };
 
   const handleRotateDrag = (event: ThreeEvent<MouseEvent>) => {
@@ -291,7 +300,7 @@ const Polygon = ({
     setTotalRotation(newTotalRotation);
     setMousePosition(newMousePosition);
     setInitialRotation(newAngle);
-    setRotatingPointer(true);
+    setPointer("move");
 
     // Update bounding box immediately
     if (mesh.current) {
@@ -304,13 +313,30 @@ const Polygon = ({
     setRotating(false);
     setRotationCenter(null);
     setInitialRotation(0);
-    setRotatingPointer(false);
+    setPointer(null);
   };
 
-  const [rotatingPointer, setRotatingPointer] = useState(false);
-  useEffect(() => {
-    document.body.style.cursor = rotatingPointer ? `move` : "auto";
-  }, [rotatingPointer]);
+  // const [rotatingPointer, setRotatingPointer] = useState(false);
+  // useEffect(() => {
+  //   document.body.style.cursor = rotatingPointer ? `move` : "auto";
+  // }, [rotatingPointer]);
+
+
+  // Handler for deleting polygon
+  const deleteSelectedPolygon = () => {
+    document.body.style.cursor = "auto";
+    if (dispatch) {
+      dispatch({type: "DELETE_POLYGON", index: index})
+    }
+  }
+
+  // Handler for duplicating polygon
+  const duplicateSelectedPolygon = () => {
+    if (dispatch) {
+      dispatch({type: "DUPLICATE_POLYGON", index: index})
+    }
+  }
+
 
   // bounding box component:
   const BoundingBox = useMemo(() => {
@@ -390,14 +416,14 @@ const Polygon = ({
                 handleResizeStart(corner, e);
               }}
               onPointerEnter={() => {
-                setResizePointer(
+                setPointer(
                   corner === "topRight" || corner === "bottomLeft"
                     ? "nesw"
                     : "nwse"
                 );
               }}
               onPointerLeave={() => {
-                if (!resizing)setResizePointer(null);
+                if (!resizing)setPointer(null);
               }}
             >
               <boxGeometry args={[0.2, 0.2, 0]} />
@@ -410,12 +436,12 @@ const Polygon = ({
         <mesh
           position={[0, size.y / 2 + 0.5, 0]}
           onPointerDown={handleRotateStart}
-          onPointerEnter={() => setRotatingPointer(true)}
-          onPointerLeave={() => setRotatingPointer(false)}
+          onPointerEnter={() => setPointer("move")}
+          onPointerLeave={() => setPointer(null)}
           onPointerMove={handleRotateDrag}
           onPointerUp={handleRotateEnd}
         >
-          <circleGeometry args={[0.1, 16, 16]} />
+          <circleGeometry args={[0.1, 16]} />
           <meshBasicMaterial color="green" />
         </mesh>
 
@@ -434,6 +460,71 @@ const Polygon = ({
             </bufferGeometry>
             <lineBasicMaterial color="red" />
           </line>
+        ) : null}
+
+        {/* Edit button */}
+        {!resizing && !rotating ? (
+          <group>
+            <mesh
+              position={[0.5, size.y / 2 + 0.5, 0]}
+            >
+              <circleGeometry args={[0.21, 64]} />
+              <meshBasicMaterial color={"black"}/>
+            </mesh>
+            <mesh
+              position={[0.5, size.y / 2 + 0.5, 0]}
+              // onClick={deleteSelectedPolygon}
+              onPointerEnter={() => setPointer("pointer")}
+              onPointerLeave={() => setPointer(null)}
+              onPointerUp={() => setPointer(null)}
+            >
+              <circleGeometry args={[0.2, 64]} />
+              <meshBasicMaterial map={editIconTexture}/>
+            </mesh>
+          </group>
+        ) : null}
+
+        {/* Delete button */}
+        {!resizing && !rotating ? (
+          <group>
+            <mesh
+              position={[1, size.y / 2 + 0.5, 0]}
+            >
+              <circleGeometry args={[0.21, 64]} />
+              <meshBasicMaterial color={"black"}/>
+            </mesh>
+            <mesh
+              position={[1, size.y / 2 + 0.5, 0]}
+              onClick={deleteSelectedPolygon}
+              onPointerEnter={() => setPointer("pointer")}
+              onPointerLeave={() => setPointer(null)}
+            >
+              <circleGeometry args={[0.2, 64]} />
+              <meshBasicMaterial map={deleteIconTexture}/>
+            </mesh>
+          </group>
+        ) : null}
+
+        {/* Duplicate button */}
+        {!resizing && !rotating ? (
+          <group>
+            <mesh
+              position={[1.5, size.y / 2 + 0.5, 0]}
+            >
+              <circleGeometry args={[0.21, 64]} />
+              <meshBasicMaterial color={"black"}/>
+            </mesh>
+            <mesh
+              position={[1.5, size.y / 2 + 0.5, 0]}
+              onClick={duplicateSelectedPolygon}
+              onPointerEnter={() => setPointer("pointer")}
+              onPointerLeave={() => setPointer(null)}
+              onPointerUp={() => setPointer(null)}
+            >
+              <circleGeometry args={[0.2, 64]} />
+              <meshBasicMaterial map={duplicateIconTexture}/>
+            </mesh>
+          </group>
         ) : null}
       </group>
     );
