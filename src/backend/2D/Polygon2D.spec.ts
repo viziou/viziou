@@ -308,7 +308,49 @@ describe("Testing Class: Polygon2D", () => {
           })
 
         })
+    });
 
+    describe("Polygon2D.perimeter()", () => {
+        it("Basic #1 - Triangle", () => {
+            // Setup polygon
+            const points = [new Point2D(0, 0), new Point2D(5, 0), new Point2D(1, 3)];
+            const polygon = new Polygon2D(points, true);
+            const calculatedPerimeter = polygon.perimeter();
+            const expectedPerimeter = 10 + Math.sqrt(10);
+            calculatedPerimeter.should.be.a('number');
+            calculatedPerimeter.should.equal(expectedPerimeter);
+        });
+
+        it("Basic #2 - Rectangle", () => {
+            // Setup polygon
+            const points = [new Point2D(0, 0), new Point2D(5, 0), new Point2D(5, 2), new Point2D(0, 2)];
+            const polygon = new Polygon2D(points, true);
+            const calculatedPerimeter = polygon.perimeter();
+            const expectedPerimeter = 14;
+            calculatedPerimeter.should.be.a('number');
+            calculatedPerimeter.should.equal(expectedPerimeter);
+        });
+
+        it("Basic #3 - Octagon", () => {
+            // Setup octagon
+            const points = [
+                new Point2D(1, 0),
+                new Point2D(Math.sqrt(2)/2, Math.sqrt(2)/2),
+                new Point2D(0, 1),
+                new Point2D(-Math.sqrt(2)/2, Math.sqrt(2)/2),
+                new Point2D(-1, 0),
+                new Point2D(-Math.sqrt(2)/2, -Math.sqrt(2)/2),
+                new Point2D(0, -1),
+                new Point2D(Math.sqrt(2)/2, -Math.sqrt(2)/2)
+            ];
+            const polygon = new Polygon2D(points, true);
+            const calculatedPerimeter = polygon.perimeter();
+            calculatedPerimeter.should.be.a('number');
+
+            const expectedPerimeter = 8*Math.sqrt(2-Math.SQRT2);
+            const areTheyEqual = nearlyEqual(calculatedPerimeter, expectedPerimeter);
+            areTheyEqual.should.equal(true);
+        });
     });
 
     describe("Polygon2D.contains()", () => {
