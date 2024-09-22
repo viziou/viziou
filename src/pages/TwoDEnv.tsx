@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import * as THREE from 'three';
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
 
@@ -6,6 +6,7 @@ import Scene2D from '../components/Scene2D';
 import { PolygonData } from '../utils/types';
 import { PolygonContext } from '../contexts/PolygonContext';
 import '../styles/TwoDEnv.css';
+import Sidebar from '../components/Sidebar2D';
 
 import { Backend2D, Storage } from '../backend/Interface';
 
@@ -159,39 +160,20 @@ const TwoDEnv = () => {
         }
     }
 
-    const [overflowVisible, setOverflowVisible] = useState(false);
-
-    const toggleOverflowMenu = () => {
-        setOverflowVisible(!overflowVisible);
-    };
-
-    const closeOverflowMenu = () => {
-        setOverflowVisible(false);
-    };
-
     return (
         <div className="TwoDEnv">
-            <main>
-                <div className="twod-canvas-container">
-                    <Scene2D polygons={polygons} />
-                </div>
+            <Sidebar 
+              polygons={polygons}
+              addRandomPolygon={addRandomPolygon}
+              clearPolygons={clearPolygons}
+              showIoUs={showIoUs}
+              savePolygons={savePolygons}
+              loadPolygons={loadPolygons}
+            />
+
+            <main className="twod-canvas-container">
+                <Scene2D polygons={polygons} />
             </main>
-
-            <div className="twod-button-container">
-                <button className="twod-button" onClick={addRandomPolygon}>Add Random Polygon</button>
-                <button className="twod-button" onClick={addSquare}>Add Square</button>
-                <button className="twod-button" onClick={clearPolygons}>Clear Shapes</button>
-                <button className="twod-button" onClick={showIoUs}>Show IoUs</button>
-
-                <button className="overflow-button" onClick={toggleOverflowMenu}>⋮</button>
-                <div className={`overflow-menu ${overflowVisible ? 'show' : ''}`}>
-                    <button className="twod-button" onClick={() => { closeOverflowMenu(); }}>Add Custom Shape</button>
-                    <button className="twod-button" onClick={() => { closeOverflowMenu(); savePolygons() }}>Export Scene</button>
-                    <button className="twod-button" onClick={() => { closeOverflowMenu(); loadPolygons() }}>Import Scene</button>
-                </div>
-
-            </div>
-
         </div>
     );
 };

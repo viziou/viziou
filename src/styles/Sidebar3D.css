@@ -1,0 +1,147 @@
+.sidebar-3d {
+  width: 260px;
+  background-color: #2b2240;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.logo-container-3d {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.logo-image-3d {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.logo-text-3d {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.nav-3d {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-link-3d {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  margin-bottom: 10px;
+  padding: 5px 0;
+  position: relative;
+}
+
+.nav-link-3d::after {
+  content: '';
+  width: 0;
+  height: 2px;
+  background-color: white;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transition: width 0.3s ease-in-out;
+}
+
+.nav-link-3d:hover::after {
+  width: 100%;
+}
+
+.active-link-3d::after {
+  width: 100%; 
+}
+
+.env-buttons-3d {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+}
+
+.section-3d {
+  margin-bottom: 20px;
+}
+
+.settings-3d {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.checkbox-label-3d {
+  display: flex;
+  align-items: center;
+}
+
+.canvas-buttons-3d {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.threed-button-3d {
+  background-color: #4a56de;
+  color: white;
+  padding: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  font-size: 14px;
+  width: 48%;
+}
+
+.threed-button-3d:hover {
+  background-color: #353ea9;
+}
+
+input, select {
+  background-color: white;
+  color: black;
+  padding: 5px;
+  border-radius: 4px;
+  border: none;
+  margin-top: 5px;
+  width: 100%;
+  font-size: 12px;
+}
+
+.polyhedron-list-3d {
+  margin-bottom: 10px;
+  height: 200px;
+  overflow-y: auto;
+}
+
+.polyhedron-item-3d {
+  background-color: #4a4a6a;
+  padding: 5px;
+  margin-bottom: 5px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.footer-3d {
+  margin-top: auto;
+}
+
+.footer-buttons-3d {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 0;
+  padding-top: 10px;
+}
+
+.footer-buttons-3d .threed-button-3d {
+  width: 48%;
+}

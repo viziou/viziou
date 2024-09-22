@@ -1,64 +1,14 @@
-:root {
-    /*========== Colors ==========*/
-    --first-colour: hsl(203, 71%, 60%);
-    --second-colour: hsl(277, 56%, 68%);
-    --text-colour: hsl(203, 8%, 98%);
-    --body-colour: hsl(259, 20%, 18%);
-    --btn-colour: hsl(239, 62%, 60%);
-    --btn-hover-colour: hsl(239, 72%, 56%);
-  
-    /*========== Font and typography ==========*/
-}
-
 .TwoDEnv {
-    padding-top: 4rem; 
-    padding-bottom: 5rem; 
-}
- 
-main {
     display: flex;
-    justify-content: center;
-    padding: 1rem;
+    height: 100vh;
 }
 
 .twod-canvas-container {
+    flex-grow: 1;
+    background-color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 100%;
-}
-
-.twod-button-container {
-    display: flex;
-    justify-content: center; 
-    align-items: center; 
-    width: auto;
-    margin: 0 auto; 
-    padding: 10px;
-    gap: 10px;
-}
-
-.twod-button {
-    padding: 10px 20px; 
-    background-color: var(--btn-colour);
-    border: none;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.twod-button:not(:last-child) {
-    margin-right: 1rem;
-}
-  
-button:hover {
-    background-color: var(--btn-hover-colour);
-}
-
-.overflow-button {
-    display: none;
 }
   
 @media only screen and (max-width: 853px) {

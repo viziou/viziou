@@ -7,6 +7,7 @@ import { PolyhedronData } from '../utils/types';
 import { PolyhedronContext } from '../contexts/PolyhedronContext';
 import '../styles/ThreeDEnv.css';
 import { Storage } from '../backend/Interface.ts'
+import Sidebar3D from '../components/Sidebar3D.tsx';
 
 const getCube = (): THREE.BoxGeometry => {
     return new THREE.BoxGeometry(1, 1, 1);
@@ -101,38 +102,26 @@ const ThreeDEnv = () => {
       }
     }
 
-    const [overflowVisible, setOverflowVisible] = useState(false);
-
-    const toggleOverflowMenu = () => {
-        setOverflowVisible(!overflowVisible);
-    };
-
-    const closeOverflowMenu = () => {
-        setOverflowVisible(false);
-    };
-
     return (
+       
         <div className="ThreeDEnv">
-            <main>
-                <div className="threed-canvas-container">
-                    <Scene3D polyhedra={polyhedra} setSelectedIndex={setSelectedIndex} selectedIndex={selectedIndex} />
-                </div>
+
+            <Sidebar3D 
+                polyhedrons={polyhedra}
+                addRandomPolyhedron={addRandomPolyhedron}
+                clearPolyhedrons={clearPolyhedra}
+                savePolyhedrons={savePolyhedra}
+                loadPolyhedrons={loadPolyhedra}
+            />
+
+            <main className="threed-canvas-container">
+                <Scene3D 
+                polyhedra={polyhedra} 
+                selectedIndex={selectedIndex} 
+                setSelectedIndex={setSelectedIndex} 
+                />
             </main>
-
-            <div className="threed-button-container">
-                <button className="threed-button" onClick={addRandomPolyhedron}>Add Random Polyhedron</button>
-                <button className="threed-button" onClick={addCube}>Add Cube</button>
-                <button className="threed-button" onClick={clearPolyhedra}>Clear Shapes</button>
-
-                <button className="overflow-button" onClick={toggleOverflowMenu}>⋮</button>
-                <div className={`overflow-menu ${overflowVisible ? 'show' : ''}`}>
-                    <button className="threed-button" onClick={() => { closeOverflowMenu(); }}>Add Custom Shape</button>
-                    <button className="threed-button" onClick={() => { closeOverflowMenu(); savePolyhedra() }}>Export Scene</button>
-                    <button className="threed-button" onClick={() => { closeOverflowMenu(); loadPolyhedra() }}>Import Scene</button>
-                </div>
-
-            </div>
-
+            
         </div>
     );
 };
