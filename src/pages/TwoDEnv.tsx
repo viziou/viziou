@@ -11,6 +11,7 @@ import { Backend2D, Storage } from "../backend/Interface";
 import AddPolygonModal from "../modals/AddPolygonModal";
 
 import { generatePairs } from "../utils/Generic";
+import EditPolygonModal from "../modals/EditPolygonModal";
 
 const getSquare = (): THREE.PlaneGeometry => {
   return new THREE.PlaneGeometry(1, 1);
@@ -53,14 +54,17 @@ const TwoDEnv = () => {
     throw new Error("TwoDEnv must be used within a PolygonProvider");
   }
 
-  const { polygons, dispatch } = context;
+  const { polygons, dispatch, selectedPolygonIndex, editingShape } = context;
 
   const [isAddShapeModalOpen, setIsAddShapeModalOpen] = useState(false);
 
-  const handleModalOpen = () => setIsAddShapeModalOpen(true);
+  const handleAddShapeModalOpen = () => setIsAddShapeModalOpen(true);
   const handleModalClose = () => setIsAddShapeModalOpen(false);
 
-  const handleModalSubmit = (points: [number, number][], colour: string) => {
+  const handleAddShapeModalSubmit = (
+    points: [number, number][],
+    colour: string
+  ) => {
     console.log(points);
     if (points.length > 2) {
       const newPolygon: PolygonData = {
@@ -232,7 +236,7 @@ const TwoDEnv = () => {
             className="twod-button"
             onClick={() => {
               closeOverflowMenu();
-              handleModalOpen();
+              handleAddShapeModalOpen();
             }}
           >
             Add Custom Shape
@@ -260,8 +264,44 @@ const TwoDEnv = () => {
       <AddPolygonModal
         isOpen={isAddShapeModalOpen}
         onClose={handleModalClose}
-        onSubmit={handleModalSubmit}
+        onSubmit={handleAddShapeModalSubmit}
       />
+      {editingShape ? (
+        <EditPolygonModal
+          isOpen={editingShape !== null}
+          onClose={() => {
+            if (dispatch) dispatch({ type: "SET_EDIT", index: null });
+          }}
+          onSave={(newPoints, newColour) => {
+            // todo: make a dispatch here
+            console.log("Updated points:", newPoints);
+            console.log("Updated color:", newColour);
+            if (dispatch) {
+              console.log(polygons);
+              dispatch({
+                type: "EDIT_POLYGON",
+                geometry: ConvexGeometry.fromPoints(
+                  newPoints.map((p) => new THREE.Vector3(p[0], p[1], 0))
+                ),
+                colour: newColour,
+                index: selectedPolygonIndex!,
+              });
+              console.log(polygons);
+              dispatch({ type: "SET_EDIT", index: null });
+            }
+          }}
+          // temp initial state for now:
+          initialPoints={[
+            [0, 0],
+            [0, 1],
+            [1, 0],
+            [1, 1],
+          ]}
+          initialColour={"green"}
+        />
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

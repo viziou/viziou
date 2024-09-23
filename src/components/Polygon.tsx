@@ -361,6 +361,13 @@ const Polygon = ({
     }
   }
 
+  // Handler for editing polygon
+  const editSelectedPolygon = () => {
+    if (dispatch) {
+      dispatch({type: "SET_EDIT", index: index})
+    }
+  }
+
 
   // bounding box component:
   const BoundingBox = useMemo(() => {
@@ -498,7 +505,7 @@ const Polygon = ({
             </mesh>
             <mesh
               position={[0.5, size.y / 2 + 0.5, 0]}
-              // onClick={deleteSelectedPolygon}
+              onClick={editSelectedPolygon}
               onPointerEnter={() => setPointer("pointer")}
               onPointerLeave={() => setPointer(null)}
               onPointerUp={() => setPointer(null)}
@@ -577,6 +584,8 @@ const Polygon = ({
               dispatch({ type: "REMOVE_MOUSED_OVER_POLYGON", index: index });
           }}
           onClick={selectPolygon}
+          // TEsting:
+          onDoubleClick={editSelectedPolygon}
         >
           <meshBasicMaterial color={colour} />
         </mesh>
