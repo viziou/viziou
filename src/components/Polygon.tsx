@@ -26,7 +26,7 @@ const Polygon = ({
   const originalPosition = useRef<[number, number]>([0, 0]);
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
-  const { scene, camera, gl } = useThree();
+  const { scene, camera, pointer } = useThree();
   const [scale, setScale] = useState<[number, number]>([1, 1]);
   const [mousePosition, setMousePosition] = useState<THREE.Vector3 | null>(
     null
@@ -86,15 +86,19 @@ const Polygon = ({
   };
 
   // get the position of the mouse in terms of the 3JS coordinates
-  const getWorldPosition = (event: ThreeEvent<MouseEvent>) => {
-    const { clientX, clientY } = event;
-    const { left, top, width, height } = gl.domElement.getBoundingClientRect();
-    const x = ((clientX - left) / width) * 2 - 1;
-    const y = -((clientY - top) / height) * 2 + 1;
-
-    const pos = new THREE.Vector3(x, y, 0);
-    pos.unproject(camera as THREE.OrthographicCamera);
-    return pos;
+  const getCanvasMousePosition = (_: ThreeEvent<MouseEvent>) => {
+    let vec = new THREE.Vector3(); // create once and reuse
+    let pos = new THREE.Vector3(); // create once and reuse
+    vec.set(
+      pointer.x,
+      pointer.y,
+      0.5,
+    );
+    vec.unproject( camera as THREE.OrthographicCamera);
+    vec.sub( camera.position ).normalize();
+    let distance = - camera.position.z / vec.z;
+    pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
+    return pos
   };
 
   //! RESIZE FUNCTIONS:
@@ -107,7 +111,7 @@ const Polygon = ({
   const handleResizeStart = (corner: string, event: ThreeEvent<MouseEvent>) => {
     setResizing(true);
     setCorner(corner);
-    setInitialMousePosition(getWorldPosition(event));
+    setInitialMousePosition(getCanvasMousePosition(event));
     setInitialScale([...scale]);
     if (boundingBox) {
       setInitialSize(boundingBox.getSize(new THREE.Vector3()));
@@ -125,51 +129,26 @@ const Polygon = ({
     )
       return;
 
-    const newMousePosition = getWorldPosition(event);
-    const mouseDelta = newMousePosition.sub(initialMousePosition);
+    const newMousePosition = getCanvasMousePosition(event);
+    const bboxCenter = boundingBox.getCenter(new THREE.Vector3());
+    const initialCornerLocation = bboxCenter.clone().add(initialSize.clone().divideScalar(2))
+    // const relativeMousePosition = newMousePosition.sub(initialCornerLocation);
+    // console.log(mouse);
+    console.log(initialCornerLocation);
+    console.log(newMousePosition);
+    
+    
+    // const mouseDelta = newMousePosition.sub(initialMousePosition);
 
-    let newScale = [...initialScale];
+    // let newScale = [...initialScale];
     setScale(initialScale);
     let newPosition: [number, number] = [...position];
     // let translateCornerToOriginMatrix = new THREE.Matrix4();
 
     switch (corner) {
       case "topLeft":
-        newScale[0] = initialScale[0] * (1 - mouseDelta.x / initialSize.x);
-        newScale[1] = initialScale[1] * (1 + mouseDelta.y / initialSize.y);
-        // newPosition[0] += mouseDelta.x / 2;
-        // newPosition[1] += mouseDelta.y / 2;
-        // translateCornerToOriginMatrix = new THREE.Matrix4().makeTranslation(
-        //   -position[0],
-        //   -position[1],
-        //   0
-        // );
-        break;
-      case "topRight":
-        newScale[0] = initialScale[0] * (1 + mouseDelta.x / initialSize.x);
-        newScale[1] = initialScale[1] * (1 + mouseDelta.y / initialSize.y);
-        // newPosition[0] += mouseDelta.x / 2;
-        // newPosition[1] += mouseDelta.y / 2;
-        // translateCornerToOriginMatrix = new THREE.Matrix4().makeTranslation(
-        //   -position[0],
-        //   -position[1],
-        //   0
-        // );
-        break;
-      case "bottomLeft":
-        newScale[0] = initialScale[0] * (1 - mouseDelta.x / initialSize.x);
-        newScale[1] = initialScale[1] * (1 - mouseDelta.y / initialSize.y);
-        // newPosition[0] += mouseDelta.x / 2;
-        // newPosition[1] += mouseDelta.y / 2;
-        // translateCornerToOriginMatrix = new THREE.Matrix4().makeTranslation(
-        //   -position[0],
-        //   -position[1],
-        //   0
-        // );
-        break;
-      case "bottomRight":
-        newScale[0] = initialScale[0] * (1 + mouseDelta.x / initialSize.x);
-        newScale[1] = initialScale[1] * (1 - mouseDelta.y / initialSize.y);
+        // newScale[0] = initialScale[0] * (1 - mouseDelta.x / initialSize.x);
+        // newScale[1] = initialScale[1] * (1 + mouseDelta.y / initialSize.y);
         // newPosition[0] += mouseDelta.x / 2;
         // newPosition[1] += mouseDelta.y / 2;
         // translateCornerToOriginMatrix = new THREE.Matrix4().makeTranslation(
@@ -182,32 +161,33 @@ const Polygon = ({
 
     // Apply the new scale and position
     
-    const scaleMatrix = new THREE.Matrix4().makeScale(
-      newScale[0],
-      newScale[1],
-      1
-    );
-    const translateMatrix = new THREE.Matrix4().makeTranslation(
-      -initialSize.x/2,
-      -initialSize.y/2,
-      0
-    );
+    // const scaleMatrix = new THREE.Matrix4().makeScale(
+    //   newScale[0],
+    //   newScale[1],
+    //   1
+    // );
+    // const translateMatrix = new THREE.Matrix4().makeTranslation(
+    //   -initialSize.x/2,
+    //   -initialSize.y/2,
+    //   0
+    // );
 
-    const translateMatrix2 = new THREE.Matrix4().makeTranslation(
-      +initialSize.x/2,
-      +initialSize.y/2,
-      0
-    );
+    // const translateMatrix2 = new THREE.Matrix4().makeTranslation(
+    //   +initialSize.x/2,
+    //   +initialSize.y/2,
+    //   0
+    // );
 
-    const combinedMatrix = new THREE.Matrix4()
-      // .multiply(translateCornerToOriginMatrix)
-      .multiply(translateMatrix)
-      .multiply(scaleMatrix)
-      .multiply(translateMatrix2)
-      ;
+    // const combinedMatrix = new THREE.Matrix4()
+    //   // .multiply(translateCornerToOriginMatrix)
+    //   .multiply(translateMatrix)
+    //   .multiply(scaleMatrix)
+    //   .multiply(translateMatrix2)
+    //   ;
       
 
-    const newGeometry = geometry.clone().applyMatrix4(combinedMatrix);
+    // const newGeometry = geometry.clone().applyMatrix4(combinedMatrix);
+    const newGeometry = geometry.clone();
 
     if (dispatch) {
       dispatch({
@@ -225,10 +205,10 @@ const Polygon = ({
     // setScale(newScale as [number, number]);
 
     // Update bounding box immediately
-    if (mesh.current) {
-      const newBox = new THREE.Box3().setFromObject(mesh.current);
-      setBoundingBox(newBox);
-    }
+    // if (mesh.current) {
+    //   const newBox = new THREE.Box3().setFromObject(mesh.current);
+    //   setBoundingBox(newBox);
+    // }
 
     // if (boundingBox) {
     //   setInitialSize(boundingBox.getSize(new THREE.Vector3()));
@@ -241,24 +221,24 @@ const Polygon = ({
     setInitialMousePosition(null);
     setInitialScale([1, 1]);
     setInitialSize(null);
-    setPointer(null);
+    setMousePointer(null);
     selectPolygon();
   };
 
-  const [pointer, setPointer] = useState<string | null>(null);
+  const [mousePointer, setMousePointer] = useState<string | null>(null);
 
   useEffect(() => {
     document.body.style.cursor =
-      pointer === "nesw"
+      mousePointer === "nesw"
         ? `nesw-resize`
-        : pointer === "nwse"
+        : mousePointer === "nwse"
         ? "nwse-resize"
-        : pointer === "move"
+        : mousePointer === "move"
         ? "move"
-        : pointer === "pointer"
+        : mousePointer === "pointer"
         ? "pointer"
         : "auto";
-  }, [pointer]);
+  }, [mousePointer]);
 
   //! ROTATE FUNCTIONS:
   const [rotating, setRotating] = useState(false);
@@ -270,20 +250,20 @@ const Polygon = ({
 
   const handleRotateStart = (e: ThreeEvent<MouseEvent>) => {
     setRotating(true);
-    setMousePosition(getWorldPosition(e));
+    setMousePosition(getCanvasMousePosition(e));
     if (boundingBox) {
       const center = boundingBox.getCenter(new THREE.Vector3());
       setRotationCenter(center);
       const angle = Math.atan2(e.point.y - center.y, e.point.x - center.x);
       setInitialRotation(angle);
     }
-    setPointer("move");
+    setMousePointer("move");
   };
 
   const handleRotateDrag = (event: ThreeEvent<MouseEvent>) => {
     if (!rotating || !mousePosition || !rotationCenter || !mesh.current) return;
 
-    const newMousePosition = getWorldPosition(event);
+    const newMousePosition = getCanvasMousePosition(event);
 
     // Calculate angle difference
     const newAngle = Math.atan2(
@@ -329,7 +309,7 @@ const Polygon = ({
     setTotalRotation(newTotalRotation);
     setMousePosition(newMousePosition);
     setInitialRotation(newAngle);
-    setPointer("move");
+    setMousePointer("move");
 
     // Update bounding box immediately
     if (mesh.current) {
@@ -342,7 +322,7 @@ const Polygon = ({
     setRotating(false);
     setRotationCenter(null);
     setInitialRotation(0);
-    setPointer(null);
+    setMousePointer(null);
   };
 
 
@@ -448,14 +428,14 @@ const Polygon = ({
                 handleResizeStart(corner, e);
               }}
               onPointerEnter={() => {
-                setPointer(
+                setMousePointer(
                   corner === "topRight" || corner === "bottomLeft"
                     ? "nesw"
                     : "nwse"
                 );
               }}
               onPointerLeave={() => {
-                if (!resizing)setPointer(null);
+                if (!resizing)setMousePointer(null);
               }}
             >
               <boxGeometry args={[0.2, 0.2, 0]} />
@@ -468,8 +448,8 @@ const Polygon = ({
         <mesh
           position={[0, size.y / 2 + 0.5, 0]}
           onPointerDown={handleRotateStart}
-          onPointerEnter={() => setPointer("move")}
-          onPointerLeave={() => setPointer(null)}
+          onPointerEnter={() => setMousePointer("move")}
+          onPointerLeave={() => setMousePointer(null)}
           onPointerMove={handleRotateDrag}
           onPointerUp={handleRotateEnd}
         >
@@ -506,9 +486,9 @@ const Polygon = ({
             <mesh
               position={[0.5, size.y / 2 + 0.5, 0]}
               onClick={editSelectedPolygon}
-              onPointerEnter={() => setPointer("pointer")}
-              onPointerLeave={() => setPointer(null)}
-              onPointerUp={() => setPointer(null)}
+              onPointerEnter={() => setMousePointer("pointer")}
+              onPointerLeave={() => setMousePointer(null)}
+              onPointerUp={() => setMousePointer(null)}
             >
               <circleGeometry args={[0.2, 64]} />
               <meshBasicMaterial map={editIconTexture}/>
@@ -528,9 +508,9 @@ const Polygon = ({
             <mesh
               position={[1, size.y / 2 + 0.5, 0]}
               onClick={duplicateSelectedPolygon}
-              onPointerEnter={() => setPointer("pointer")}
-              onPointerLeave={() => setPointer(null)}
-              onPointerUp={() => setPointer(null)}
+              onPointerEnter={() => setMousePointer("pointer")}
+              onPointerLeave={() => setMousePointer(null)}
+              onPointerUp={() => setMousePointer(null)}
             >
               <circleGeometry args={[0.2, 64]} />
               <meshBasicMaterial map={duplicateIconTexture}/>
@@ -550,8 +530,8 @@ const Polygon = ({
             <mesh
               position={[1.5, size.y / 2 + 0.5, 0]}
               onClick={deleteSelectedPolygon}
-              onPointerEnter={() => setPointer("pointer")}
-              onPointerLeave={() => setPointer(null)}
+              onPointerEnter={() => setMousePointer("pointer")}
+              onPointerLeave={() => setMousePointer(null)}
             >
               <circleGeometry args={[0.2, 64]} />
               <meshBasicMaterial map={deleteIconTexture}/>
