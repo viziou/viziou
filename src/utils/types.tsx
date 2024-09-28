@@ -24,7 +24,8 @@ export type Polygon2DAction =
   | { type: "DELETE_POLYGON"; index: number }
   | { type: "DUPLICATE_POLYGON"; index: number }
   | { type: "SET_EDIT"; index: number | null}
-  | { type: "EDIT_POLYGON"; index: number, geometry: THREE.BufferGeometry; colour: string};
+  | { type: "EDIT_POLYGON"; index: number, geometry: THREE.BufferGeometry; colour: string}
+  | { type: "SELECTABILITY"; payload: boolean};
 
 export interface PolyhedronData {
   geometry: THREE.BufferGeometry;

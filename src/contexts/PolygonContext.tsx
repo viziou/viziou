@@ -7,6 +7,7 @@ const initialState: PolygonContextInterface = {
   selectedPolygonIndex: null,
   currentlyMousedOverPolygons: [],
   editingShape: null,
+  selectability: true,
 };
 
 interface PolygonContextInterface {
@@ -15,6 +16,7 @@ interface PolygonContextInterface {
   selectedPolygonIndex: number | null;
   currentlyMousedOverPolygons: number[];
   editingShape: number | null;
+  selectability: boolean;
 }
 
 export const PolygonContext = createContext<
@@ -67,13 +69,19 @@ function PolygonReducer(
     case "SELECT_POLYGON":
       // Take the polygon out and move it to the back
       // let splicedPolygons = [...state.polygons];
+      // console.log(action.index);
+      // console.log({splicedPolygons});
       // if (action.index) {
       //   const selectedPolygon = splicedPolygons[action.index];
       //   splicedPolygons.splice(action.index, 1);
-      //   splicedPolygons = [...state.polygons, selectedPolygon];
+      //   splicedPolygons.push(selectedPolygon)
+      //   console.log({splicedPolygons});
+      //   action.index = splicedPolygons.length - 1;
       // }
+      // console.log(action.index);
       return {
         ...state,
+        // polygons: splicedPolygons,
         selectedPolygonIndex: action.index,
       };
 
@@ -109,6 +117,7 @@ function PolygonReducer(
       return {
         ...state,
         polygons: currentPolygons,
+        selectedPolygonIndex: currentPolygons.length - 1,
       };
 
     case "ADD_MOUSED_OVER_POLYGON":
@@ -168,6 +177,12 @@ function PolygonReducer(
         ),
       };
 
+    case "SELECTABILITY":
+      return {
+        ...state,
+        selectability: action.payload,
+      };
+
     default:
       return state;
   }
@@ -188,6 +203,7 @@ export function PolygonProvider(props: PolygonProviderProps) {
         selectedPolygonIndex: state.selectedPolygonIndex,
         currentlyMousedOverPolygons: state.currentlyMousedOverPolygons,
         editingShape: state.editingShape,
+        selectability: state.selectability,
       }}
     >
       {props.children}

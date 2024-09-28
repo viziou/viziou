@@ -22,7 +22,7 @@ const Polygon = ({
   selectable,
 }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
-  const { dispatch, selectedPolygonIndex, currentlyMousedOverPolygons } = useContext(PolygonContext)!;
+  const { dispatch, selectedPolygonIndex, currentlyMousedOverPolygons, selectability, polygons } = useContext(PolygonContext)!;
   const originalPosition = useRef<[number, number]>([0, 0]);
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
@@ -41,7 +41,7 @@ const Polygon = ({
   }, [geometry, position]);
 
   const selectPolygon = () => {
-    if (!selectable) return;
+    if (!selectability || !selectable) return;
     if ((selectedPolygonIndex === null || Math.max(...currentlyMousedOverPolygons) === index) && dispatch) {
       // only select the largest polygon index
       dispatch({ type: "SELECT_POLYGON", index: index });
@@ -120,6 +120,8 @@ const Polygon = ({
   const handleResizeStart = (corner: string) => {
     setResizing(true);
     setCorner(corner);
+    if (dispatch)
+      dispatch({ type: "SELECTABILITY",  payload: false});
   };
 
   const handleResizeDrag = () => {
@@ -185,8 +187,6 @@ const Polygon = ({
   const handleResizeEnd = () => {
     setResizing(false);
     setCorner(null);
-    setMousePointer(null);
-    selectPolygon();
   };
   /**********************************/
 
@@ -194,11 +194,14 @@ const Polygon = ({
   const handleRotateStart = () => {
     setRotating(true);
     setOrientation(0);
+    if (dispatch)
+      dispatch({ type: "SELECTABILITY",  payload: false});
   };
 
   const handleRotateDrag = () => {
     if (!rotating || !boundingBox) 
       return;
+    setMousePointer("move")
 
     // Obtain bounding box center
     const center = boundingBox.getCenter(new THREE.Vector3());
@@ -239,7 +242,9 @@ const Polygon = ({
     setRotating(false);
     setOrientation(0);
     setMousePointer(null);
-    selectPolygon();
+    if (dispatch) {
+      dispatch({ type: "SELECTABILITY",  payload: true});
+    }
   };
   /**********************************/
 
@@ -247,6 +252,7 @@ const Polygon = ({
     document.body.style.cursor = "auto";
     if (dispatch) {
       dispatch({type: "DELETE_POLYGON", index: index})
+      dispatch({ type: "SELECT_POLYGON", index: null });
     }
   }
 
@@ -264,7 +270,8 @@ const Polygon = ({
 
   // bounding box component:
   const BoundingBox = useMemo(() => {
-    if (!boundingBox || !isPolygonSelected()) return null;
+    if (!boundingBox || !isPolygonSelected()) 
+      return <></>;
 
     const size = boundingBox.getSize(new THREE.Vector3());
     const center = boundingBox.getCenter(new THREE.Vector3());
@@ -281,7 +288,7 @@ const Polygon = ({
               if (rotating) handleRotateDrag();
             }}
             onPointerUp={(_) => {
-              if (resizing) handleResizeEnd();
+              if (resizing) handleResizeEnd()
               if (rotating) handleRotateEnd();
             }}
             onPointerLeave={(_) => {
@@ -345,8 +352,14 @@ const Polygon = ({
                     ? "nesw"
                     : "nwse"
                 );
+                if (dispatch && !rotating)
+                  dispatch({ type: "SELECTABILITY",  payload: false});
               }}
-              onPointerLeave={() => {setMousePointer(null)}}
+              onPointerLeave={() => {
+                setMousePointer(null);
+                if (dispatch && !rotating)
+                  dispatch({ type: "SELECTABILITY",  payload: true});
+              }}
             >
               <boxGeometry args={[0.2, 0.2, 0]} />
               <meshBasicMaterial color="blue" />
@@ -359,6 +372,7 @@ const Polygon = ({
           position={[0, size.y / 2 + 0.5, 0]}
           onPointerDown={handleRotateStart}
           onPointerEnter={() => setMousePointer("move")}
+          onPointerUp={() => setMousePointer(null)}
           onPointerLeave={() => setMousePointer(null)}
         >
           <circleGeometry args={[0.1, 16]} />
@@ -448,7 +462,7 @@ const Polygon = ({
         ) : null}
       </group>
     );
-  }, [boundingBox, isPolygonSelected, scene]);
+  }, [boundingBox, isPolygonSelected, scene, polygons]);
 
   return (
     <>

@@ -20,7 +20,7 @@ const Scene2D = ({ polygons }: Scene2DProps) => {
   return (
     <Canvas
       style={{ height: "80vh", background: "#cccccc" }}
-      onClick={handleCanvasClick}
+      onPointerMissed={handleCanvasClick}
     >
       {polygons.map((polygon, index) => (
         <Polygon
