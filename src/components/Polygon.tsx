@@ -1,6 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable prefer-const */
 import { useContext, useRef, useState, useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { PolygonData } from "../utils/types";
@@ -30,17 +27,13 @@ const Polygon = ({
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
   const { scene, camera, pointer } = useThree();
-  const [scale, setScale] = useState<[number, number]>([1, 1]);
-  const [mousePosition, setMousePosition] = useState<THREE.Vector3 | null>(
-    null
-  );
 
   useEffect(() => {
     if (mesh.current) {
       const box = new THREE.Box3().setFromObject(mesh.current);
       setBoundingBox(box);
     }
-  }, [geometry, position, scale, mousePosition]);
+  }, [geometry, position]);
 
   const selectPolygon = () => {
     if (!selectable) return;
@@ -97,104 +90,126 @@ const Polygon = ({
       pointer.y,
       0.5,
     );
-    vec.unproject( camera as THREE.OrthographicCamera);
-    vec.sub( camera.position ).normalize();
-    const distance = - camera.position.z / vec.z;
-    pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
+    vec.unproject(camera as THREE.OrthographicCamera);
+    vec.sub(camera.position).normalize();
+    const distance = -camera.position.z / vec.z;
+    pos.copy(camera.position).add(vec.multiplyScalar(distance));
     return pos
   };
 
   //! RESIZE FUNCTIONS:
   const [resizing, setResizing] = useState(false);
   const [corner, setCorner] = useState<string | null>(null);
-  const [initialMousePosition, setInitialMousePosition] = useState<THREE.Vector3 | null>(null);
-  const [initialScale, setInitialScale] = useState<[number, number]>([1, 1]);
-  const [initialSize, setInitialSize] = useState<THREE.Vector3 | null>(null);
 
-  const handleResizeStart = (corner: string, event: ThreeEvent<MouseEvent>) => {
+  const handleResizeStart = (corner: string, _: ThreeEvent<MouseEvent>) => {
     setResizing(true);
     setCorner(corner);
-    setInitialMousePosition(getCanvasMousePosition(event));
-    setInitialScale([...scale]);
-    if (boundingBox) {
-      setInitialSize(boundingBox.getSize(new THREE.Vector3()));
-    }
   };
 
   const handleResizeDrag = (event: ThreeEvent<MouseEvent>) => {
     if (
       !resizing ||
       !boundingBox ||
-      !initialMousePosition ||
       !corner ||
-      !mesh.current ||
-      !initialSize
+      !mesh.current
     )
       return;
 
-    setInitialSize(boundingBox.getSize(new THREE.Vector3()));
-    const mousePosition = getCanvasMousePosition(event);
-    const bboxCenter = boundingBox.getCenter(new THREE.Vector3());
-    const initialCornerLocation = bboxCenter.clone().add(initialSize.clone().divideScalar(2))
-    // const relativeMousePosition = newMousePosition.sub(initialCornerLocation);
-    // console.log(mouse);
-    // console.log(initialCornerLocation);
-    console.log(bboxCenter);
-    
-    
-    // const mouseDelta = newMousePosition.sub(initialMousePosition);
+    // Obtain bounding box size and center
+    const size = boundingBox.getSize(new THREE.Vector3());
+    const center = boundingBox.getCenter(new THREE.Vector3());
 
-    let newScale = [1, 1];
-    let newPosition: [number, number] = [...position];
-    // let translateCornerToOriginMatrix = new THREE.Matrix4();
+    // Get mouse position and where the corner is w.r.t the center
+    const mousePosition = getCanvasMousePosition(event).sub(center);
+    let cornerPosition: THREE.Vector3;
+    
+    let scaleX: number;
+    let scaleY: number;
+    let translationX: number;
+    let translationY: number;
 
     switch (corner) {
-      case "topRight":
-        newScale[0] = mousePosition.x / initialCornerLocation.x;
-        newScale[1] = mousePosition.y / initialCornerLocation.y;
+      case "topLeft":
+        // Calculate the corner position
+        cornerPosition = size.clone().divideScalar(2);
+        cornerPosition.x *= -1;
 
+        // Calculate the multiplier needed to bring the corner box to the current mouse position
+        scaleX = mousePosition.x / cornerPosition.x;
+        scaleY = mousePosition.y / cornerPosition.y;
 
-        // console.log(newScale)
-        // newPosition[0] += mouseDelta.x / 2;
-        // newPosition[1] += mouseDelta.y / 2;
-        // translateCornerToOriginMatrix = new THREE.Matrix4().makeTranslation(
-        //   -position[0],
-        //   -position[1],
-        //   0
-        // );
+        // Create the translations to anchor all scaling to opposite corner
+        translationX = position[0] - center.x - size.x/2;
+        translationY = position[1] - center.y + size.y/2;
         break;
+      case "topRight":
+        // Calculate the corner position
+        cornerPosition = size.clone().divideScalar(2);
+
+        // Calculate the multiplier needed to bring the corner box to the current mouse position
+        scaleX = mousePosition.x / cornerPosition.x;
+        scaleY = mousePosition.y / cornerPosition.y;
+
+        // Create the translations to anchor all scaling to opposite corner
+        translationX = position[0] - center.x + size.x/2;
+        translationY = position[1] - center.y + size.y/2;
+        break;
+      case "bottomLeft":
+        // Calculate the corner position
+        cornerPosition = size.clone().divideScalar(2).multiplyScalar(-1);
+
+        // Calculate the multiplier needed to bring the corner box to the current mouse position
+        scaleX = mousePosition.x / cornerPosition.x;
+        scaleY = mousePosition.y / cornerPosition.y;
+
+        // Create the translations to anchor all scaling to opposite corner
+        translationX = position[0] - center.x - size.x/2;
+        translationY = position[1] - center.y - size.y/2;
+        break;
+      case "bottomRight":
+        // Calculate the corner position
+        cornerPosition = size.clone().divideScalar(2);
+        cornerPosition.y *= -1;
+
+        // Calculate the multiplier needed to bring the corner box to the current mouse position
+        scaleX = mousePosition.x / cornerPosition.x;
+        scaleY = mousePosition.y / cornerPosition.y;
+
+        // Create the translations to anchor all scaling to opposite corner
+        translationX = position[0] - center.x + size.x/2;
+        translationY = position[1] - center.y - size.y/2;
+        break;
+      default:
+        scaleX = 1;
+        scaleY = 1;
+        translationX = 0;
+        translationY = 0;
     }
 
-    // Apply the new scale and position
-    
+    // Apply the new scale and translations
+    const translateMatrix = new THREE.Matrix4().makeTranslation(
+      translationX,
+      translationY,
+      0
+    );
+
     const scaleMatrix = new THREE.Matrix4().makeScale(
-      newScale[0],
-      newScale[1],
+      scaleX,
+      scaleY,
       1
     );
-    // console.log(scaleMatrix);
-    // const translateMatrix = new THREE.Matrix4().makeTranslation(
-    //   -initialSize.x/2,
-    //   -initialSize.y/2,
-    //   0
-    // );
 
-    // const translateMatrix2 = new THREE.Matrix4().makeTranslation(
-    //   +initialSize.x/2,
-    //   +initialSize.y/2,
-    //   0
-    // );
+    const translateMatrix2 = new THREE.Matrix4().makeTranslation(
+      -translationX,
+      -translationY,
+      0
+    );
 
-    const combinedMatrix = new THREE.Matrix4()
-      // .multiply(translateCornerToOriginMatrix)
-      // .multiply(translateMatrix)
-      .multiply(scaleMatrix)
-      // .multiply(translateMatrix2)
-      ;
-      
-
-    const newGeometry = geometry.clone().applyMatrix4(combinedMatrix);
-    // const newGeometry = geometry.clone();
+    // Translate from position to bbox center
+    let newGeometry = geometry.clone();
+    newGeometry = newGeometry.applyMatrix4(translateMatrix);
+    newGeometry = newGeometry.applyMatrix4(scaleMatrix);
+    newGeometry = newGeometry.applyMatrix4(translateMatrix2);
 
     if (dispatch) {
       dispatch({
@@ -202,32 +217,12 @@ const Polygon = ({
         geometry: newGeometry,
         index: index,
       });
-      // dispatch({
-      //   type: "UPDATE_POSITION",
-      //   index: index,
-      //   position: newPosition,
-      // });
-    }
-
-    // setScale(newScale as [number, number]);
-
-    // Update bounding box immediately
-    if (mesh.current) {
-      const newBox = new THREE.Box3().setFromObject(mesh.current);
-      setBoundingBox(newBox);
-    }
-
-    if (boundingBox) {
-      setInitialSize(boundingBox.getSize(new THREE.Vector3()));
     }
   };
 
   const handleResizeEnd = (_: ThreeEvent<MouseEvent>) => {
     setResizing(false);
     setCorner(null);
-    setInitialMousePosition(null);
-    setInitialScale([1, 1]);
-    setInitialSize(null);
     setMousePointer(null);
     selectPolygon();
   };
@@ -257,7 +252,6 @@ const Polygon = ({
 
   const handleRotateStart = (e: ThreeEvent<MouseEvent>) => {
     setRotating(true);
-    setMousePosition(getCanvasMousePosition(e));
     if (boundingBox) {
       const center = boundingBox.getCenter(new THREE.Vector3());
       setRotationCenter(center);
@@ -268,7 +262,7 @@ const Polygon = ({
   };
 
   const handleRotateDrag = (event: ThreeEvent<MouseEvent>) => {
-    if (!rotating || !mousePosition || !rotationCenter || !mesh.current) return;
+    if (!rotating || !rotationCenter || !mesh.current) return;
 
     const newMousePosition = getCanvasMousePosition(event);
 
@@ -314,7 +308,6 @@ const Polygon = ({
     }
 
     setTotalRotation(newTotalRotation);
-    setMousePosition(newMousePosition);
     setInitialRotation(newAngle);
     setMousePointer("move");
 
@@ -462,6 +455,22 @@ const Polygon = ({
         >
           <circleGeometry args={[0.1, 16]} />
           <meshBasicMaterial color="green" />
+        </mesh>
+
+        {/* Circle at bbox center: */}
+        <mesh
+          position={[0, 0, 0]}
+        >
+          <circleGeometry args={[0.1, 16]} />
+          <meshBasicMaterial color="purple" />
+        </mesh>
+
+        {/* Circle at polygon position: */}
+        <mesh
+          position={[position[0] - center.x, position[1] - center.y, 0]}
+        >
+          <circleGeometry args={[0.1, 16]} />
+          <meshBasicMaterial color="yellow" />
         </mesh>
 
         {/* Line to Rotate circle: */}
