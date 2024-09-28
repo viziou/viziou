@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable prefer-const */
 import { useContext, useRef, useState, useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { PolygonData } from "../utils/types";
@@ -87,8 +90,8 @@ const Polygon = ({
 
   // get the position of the mouse in terms of the 3JS coordinates
   const getCanvasMousePosition = (_: ThreeEvent<MouseEvent>) => {
-    let vec = new THREE.Vector3(); // create once and reuse
-    let pos = new THREE.Vector3(); // create once and reuse
+    const vec = new THREE.Vector3(); // create once and reuse
+    const pos = new THREE.Vector3(); // create once and reuse
     vec.set(
       pointer.x,
       pointer.y,
@@ -96,7 +99,7 @@ const Polygon = ({
     );
     vec.unproject( camera as THREE.OrthographicCamera);
     vec.sub( camera.position ).normalize();
-    let distance = - camera.position.z / vec.z;
+    const distance = - camera.position.z / vec.z;
     pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
     return pos
   };
@@ -129,26 +132,29 @@ const Polygon = ({
     )
       return;
 
-    const newMousePosition = getCanvasMousePosition(event);
+    setInitialSize(boundingBox.getSize(new THREE.Vector3()));
+    const mousePosition = getCanvasMousePosition(event);
     const bboxCenter = boundingBox.getCenter(new THREE.Vector3());
     const initialCornerLocation = bboxCenter.clone().add(initialSize.clone().divideScalar(2))
     // const relativeMousePosition = newMousePosition.sub(initialCornerLocation);
     // console.log(mouse);
-    console.log(initialCornerLocation);
-    console.log(newMousePosition);
+    // console.log(initialCornerLocation);
+    console.log(bboxCenter);
     
     
     // const mouseDelta = newMousePosition.sub(initialMousePosition);
 
-    // let newScale = [...initialScale];
-    setScale(initialScale);
+    let newScale = [1, 1];
     let newPosition: [number, number] = [...position];
     // let translateCornerToOriginMatrix = new THREE.Matrix4();
 
     switch (corner) {
-      case "topLeft":
-        // newScale[0] = initialScale[0] * (1 - mouseDelta.x / initialSize.x);
-        // newScale[1] = initialScale[1] * (1 + mouseDelta.y / initialSize.y);
+      case "topRight":
+        newScale[0] = mousePosition.x / initialCornerLocation.x;
+        newScale[1] = mousePosition.y / initialCornerLocation.y;
+
+
+        // console.log(newScale)
         // newPosition[0] += mouseDelta.x / 2;
         // newPosition[1] += mouseDelta.y / 2;
         // translateCornerToOriginMatrix = new THREE.Matrix4().makeTranslation(
@@ -161,11 +167,12 @@ const Polygon = ({
 
     // Apply the new scale and position
     
-    // const scaleMatrix = new THREE.Matrix4().makeScale(
-    //   newScale[0],
-    //   newScale[1],
-    //   1
-    // );
+    const scaleMatrix = new THREE.Matrix4().makeScale(
+      newScale[0],
+      newScale[1],
+      1
+    );
+    // console.log(scaleMatrix);
     // const translateMatrix = new THREE.Matrix4().makeTranslation(
     //   -initialSize.x/2,
     //   -initialSize.y/2,
@@ -178,16 +185,16 @@ const Polygon = ({
     //   0
     // );
 
-    // const combinedMatrix = new THREE.Matrix4()
-    //   // .multiply(translateCornerToOriginMatrix)
-    //   .multiply(translateMatrix)
-    //   .multiply(scaleMatrix)
-    //   .multiply(translateMatrix2)
-    //   ;
+    const combinedMatrix = new THREE.Matrix4()
+      // .multiply(translateCornerToOriginMatrix)
+      // .multiply(translateMatrix)
+      .multiply(scaleMatrix)
+      // .multiply(translateMatrix2)
+      ;
       
 
-    // const newGeometry = geometry.clone().applyMatrix4(combinedMatrix);
-    const newGeometry = geometry.clone();
+    const newGeometry = geometry.clone().applyMatrix4(combinedMatrix);
+    // const newGeometry = geometry.clone();
 
     if (dispatch) {
       dispatch({
@@ -195,24 +202,24 @@ const Polygon = ({
         geometry: newGeometry,
         index: index,
       });
-      dispatch({
-        type: "UPDATE_POSITION",
-        index: index,
-        position: newPosition,
-      });
+      // dispatch({
+      //   type: "UPDATE_POSITION",
+      //   index: index,
+      //   position: newPosition,
+      // });
     }
 
     // setScale(newScale as [number, number]);
 
     // Update bounding box immediately
-    // if (mesh.current) {
-    //   const newBox = new THREE.Box3().setFromObject(mesh.current);
-    //   setBoundingBox(newBox);
-    // }
+    if (mesh.current) {
+      const newBox = new THREE.Box3().setFromObject(mesh.current);
+      setBoundingBox(newBox);
+    }
 
-    // if (boundingBox) {
-    //   setInitialSize(boundingBox.getSize(new THREE.Vector3()));
-    // }
+    if (boundingBox) {
+      setInitialSize(boundingBox.getSize(new THREE.Vector3()));
+    }
   };
 
   const handleResizeEnd = (_: ThreeEvent<MouseEvent>) => {
