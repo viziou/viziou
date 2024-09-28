@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { PolygonData } from "../utils/types";
 import { PolygonContext } from "../contexts/PolygonContext";
 import { DragControls } from "@react-three/drei";
-import { useThree, ThreeEvent } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
 
 type PolygonProps = PolygonData & { index: number; selectable: boolean };
 
@@ -27,6 +27,11 @@ const Polygon = ({
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
   const { scene, camera, pointer } = useThree();
+  const [mousePointer, setMousePointer] = useState<string | null>(null);
+  const [resizing, setResizing] = useState(false);
+  const [corner, setCorner] = useState<string | null>(null);
+  const [rotating, setRotating] = useState(false);
+  const [orientation, setOrientation] = useState(0);
 
   useEffect(() => {
     if (mesh.current) {
@@ -47,6 +52,7 @@ const Polygon = ({
     return selectedPolygonIndex === index;
   };
 
+  /**********************************/
   const handleDragEnd = () => {
     /* Could trigger updates to IoU or something here maybe */
   };
@@ -80,8 +86,7 @@ const Polygon = ({
     }
     // console.log('mouse over', currentlyMousedOverPolygons)
   };
-
-  const [mousePointer, setMousePointer] = useState<string | null>(null);
+  /**********************************/
 
   useEffect(() => {
     document.body.style.cursor =
@@ -96,8 +101,7 @@ const Polygon = ({
         : "auto";
   }, [mousePointer]);
 
-  // get the position of the mouse in terms of the 3JS coordinates
-  const getCanvasMousePosition = (_: ThreeEvent<MouseEvent>) => {
+  const getCanvasMousePosition = () => {
     const vec = new THREE.Vector3(); // create once and reuse
     const pos = new THREE.Vector3(); // create once and reuse
     vec.set(
@@ -110,23 +114,16 @@ const Polygon = ({
     const distance = -camera.position.z / vec.z;
     pos.copy(camera.position).add(vec.multiplyScalar(distance));
     return pos
-  };
+  };  
 
-  //! RESIZE FUNCTIONS:
-  const [resizing, setResizing] = useState(false);
-  const [corner, setCorner] = useState<string | null>(null);
-
-  const handleResizeStart = (corner: string, _: ThreeEvent<MouseEvent>) => {
+  /**********************************/
+  const handleResizeStart = (corner: string) => {
     setResizing(true);
     setCorner(corner);
   };
 
-  const handleResizeDrag = (event: ThreeEvent<MouseEvent>) => {
-    if (
-      !resizing ||
-      !boundingBox ||
-      !corner
-    )
+  const handleResizeDrag = () => {
+    if (!resizing || !boundingBox || !corner)
       return;
 
     // Obtain bounding box size and center
@@ -134,7 +131,7 @@ const Polygon = ({
     const center = boundingBox.getCenter(new THREE.Vector3());
 
     // Get mouse position relative to the box center
-    const mousePosition = getCanvasMousePosition(event).sub(center);
+    const mousePosition = getCanvasMousePosition().sub(center);
 
     // Initialise corner position
     let cornerPosition = new THREE.Vector3(0, 0, 0);
@@ -185,64 +182,47 @@ const Polygon = ({
     }
   };
 
-  const handleResizeEnd = (_: ThreeEvent<MouseEvent>) => {
+  const handleResizeEnd = () => {
     setResizing(false);
     setCorner(null);
     setMousePointer(null);
     selectPolygon();
   };
+  /**********************************/
 
-  //! ROTATE FUNCTIONS:
-  const [rotating, setRotating] = useState(false);
-  const [rotationCenter, setRotationCenter] = useState<THREE.Vector3 | null>(
-    null
-  );
-  const [initialRotation, setInitialRotation] = useState(0);
-  const [totalRotation, setTotalRotation] = useState(0);
-
-  const handleRotateStart = (e: ThreeEvent<MouseEvent>) => {
+  /**********************************/
+  const handleRotateStart = () => {
     setRotating(true);
-    if (boundingBox) {
-      const center = boundingBox.getCenter(new THREE.Vector3());
-      setRotationCenter(center);
-      const angle = Math.atan2(e.point.y - center.y, e.point.x - center.x);
-      setInitialRotation(angle);
-    }
-    setMousePointer("move");
+    setOrientation(0);
   };
 
-  const handleRotateDrag = (event: ThreeEvent<MouseEvent>) => {
-    if (!rotating || !rotationCenter || !mesh.current) return;
+  const handleRotateDrag = () => {
+    if (!rotating || !boundingBox) 
+      return;
 
-    const newMousePosition = getCanvasMousePosition(event);
+    // Obtain bounding box center
+    const center = boundingBox.getCenter(new THREE.Vector3());
 
-    // Calculate angle difference
-    const newAngle = Math.atan2(
-      newMousePosition.y - rotationCenter.y,
-      newMousePosition.x - rotationCenter.x
-    );
-    let angleDiff = newAngle - initialRotation;
+    // Get mouse position relative to the box center
+    const mousePosition = getCanvasMousePosition().sub(center);
 
-    // Ensure continuous rotation
-    if (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
-    if (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+    // Calculate angle of new orientation w.r.t the vertical
+    const vertical = new THREE.Vector3(0, 1, 0);
+    let newOrientation = mousePosition.angleTo(vertical);
+    if (mousePosition.cross(vertical).z > 0) {
+      newOrientation *= -1;
+    }
 
-    const newTotalRotation = totalRotation + angleDiff;
-
-    // Create rotation matrix
-    const rotationMatrix = new THREE.Matrix4().makeRotationZ(
-      newTotalRotation / 270
-    ); // this 270 is magic number that seems to work well
+    // Calculate the angle to rotate
+    const angleDiff = newOrientation - orientation;
 
     // Apply rotation to geometry
-    const newGeometry = geometry.clone().applyMatrix4(rotationMatrix);
-
-    // Update position
-    const worldPosition = new THREE.Vector3();
-    mesh.current.getWorldPosition(worldPosition);
-    const localPosition = worldPosition.sub(rotationCenter);
-    localPosition.applyMatrix4(rotationMatrix);
-    const newPosition = localPosition.add(rotationCenter);
+    const newGeometry = geometry.clone()
+    const translationX = center.x - position[0];
+    const translationY = center.y - position[1];
+    newGeometry.translate(-translationX, -translationY, 0);
+    newGeometry.rotateZ(angleDiff);
+    newGeometry.translate(translationX, translationY, 0);
 
     if (dispatch) {
       dispatch({
@@ -250,33 +230,19 @@ const Polygon = ({
         geometry: newGeometry,
         index: index,
       });
-      dispatch({
-        type: "UPDATE_POSITION",
-        index: index,
-        position: [newPosition.x, newPosition.y],
-      });
     }
 
-    setTotalRotation(newTotalRotation);
-    setInitialRotation(newAngle);
-    setMousePointer("move");
-
-    // Update bounding box immediately
-    if (mesh.current) {
-      const newBox = new THREE.Box3().setFromObject(mesh.current);
-      setBoundingBox(newBox);
-    }
+    setOrientation(newOrientation);
   };
 
-  const handleRotateEnd = (_: ThreeEvent<MouseEvent>) => {
+  const handleRotateEnd = () => {
     setRotating(false);
-    setRotationCenter(null);
-    setInitialRotation(0);
+    setOrientation(0);
     setMousePointer(null);
+    selectPolygon();
   };
+  /**********************************/
 
-
-  // Handler for deleting polygon
   const deleteSelectedPolygon = () => {
     document.body.style.cursor = "auto";
     if (dispatch) {
@@ -284,20 +250,17 @@ const Polygon = ({
     }
   }
 
-  // Handler for duplicating polygon
   const duplicateSelectedPolygon = () => {
     if (dispatch) {
       dispatch({type: "DUPLICATE_POLYGON", index: index})
     }
   }
 
-  // Handler for editing polygon
   const editSelectedPolygon = () => {
     if (dispatch) {
       dispatch({type: "SET_EDIT", index: index})
     }
   }
-
 
   // bounding box component:
   const BoundingBox = useMemo(() => {
@@ -313,21 +276,20 @@ const Polygon = ({
           <mesh
             key={"invisible"}
             visible={false}
-            onPointerMove={(e) => {
-              if (resizing) handleResizeDrag(e);
-              if (rotating) handleRotateDrag(e);
+            onPointerMove={(_) => {
+              if (resizing) handleResizeDrag();
+              if (rotating) handleRotateDrag();
             }}
-            onPointerUp={(e) => {
-              if (resizing) handleResizeEnd(e);
-              if (rotating) handleRotateEnd(e);
+            onPointerUp={(_) => {
+              if (resizing) handleResizeEnd();
+              if (rotating) handleRotateEnd();
             }}
-            onPointerLeave={(e) => {
-              if (resizing) handleResizeEnd(e);
-              if (rotating) handleRotateEnd(e);
+            onPointerLeave={(_) => {
+              if (resizing) handleResizeEnd();
+              if (rotating) handleRotateEnd();
             }}
           >
             <boxGeometry args={[size.x * 100, size.y * 100, 0]} />
-            {/* <meshBasicMaterial color="green" /> */}
           </mesh>
         ) : null}
 
@@ -374,8 +336,8 @@ const Polygon = ({
                 ((i < 2 ? 1 : -1) * size.y) / 2,
                 0,
               ]}
-              onPointerDown={(e) => {
-                handleResizeStart(corner, e);
+              onPointerDown={(_) => {
+                handleResizeStart(corner);
               }}
               onPointerEnter={() => {
                 setMousePointer(
@@ -384,9 +346,7 @@ const Polygon = ({
                     : "nwse"
                 );
               }}
-              onPointerLeave={() => {
-                if (!resizing)setMousePointer(null);
-              }}
+              onPointerLeave={() => {setMousePointer(null)}}
             >
               <boxGeometry args={[0.2, 0.2, 0]} />
               <meshBasicMaterial color="blue" />
@@ -400,8 +360,6 @@ const Polygon = ({
           onPointerDown={handleRotateStart}
           onPointerEnter={() => setMousePointer("move")}
           onPointerLeave={() => setMousePointer(null)}
-          onPointerMove={handleRotateDrag}
-          onPointerUp={handleRotateEnd}
         >
           <circleGeometry args={[0.1, 16]} />
           <meshBasicMaterial color="green" />

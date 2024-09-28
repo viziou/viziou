@@ -65,6 +65,13 @@ function PolygonReducer(
       };
 
     case "SELECT_POLYGON":
+      // Take the polygon out and move it to the back
+      // let splicedPolygons = [...state.polygons];
+      // if (action.index) {
+      //   const selectedPolygon = splicedPolygons[action.index];
+      //   splicedPolygons.splice(action.index, 1);
+      //   splicedPolygons = [...state.polygons, selectedPolygon];
+      // }
       return {
         ...state,
         selectedPolygonIndex: action.index,
