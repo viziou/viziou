@@ -169,7 +169,6 @@ const Polygon = ({
     // const translationY = center.y - position[1] - cornerPosition.y;
     const translationX = center.x - position[0];
     const translationY = center.y - position[1];
-    console.log(translationX);
 
     // Translate from position to bbox center
     let newGeometry = geometry.clone();
