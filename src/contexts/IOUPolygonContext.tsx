@@ -25,8 +25,8 @@ function updateParents(state: IOUPolygonContextInterface, IOUPolygon: IOUPolygon
     const parentsA = state.parentsMap.get(`${IOUPolygon.parentIDa}`);
     const parentsB = state.parentsMap.get(`${IOUPolygon.parentIDb}`);
     // If there already is a parent set here then add to it. Otherwise, we have to initialise a new set.
-    parentsA ? parentsA.add(key(IOUPolygon)) : (create || state.parentsMap.set(`${IOUPolygon.parentIDa}`, new Set([key(IOUPolygon)])));
-    parentsB ? parentsB.add(key(IOUPolygon)) : (create || state.parentsMap.set(`${IOUPolygon.parentIDb}`, new Set([key(IOUPolygon)])));
+    parentsA ? parentsA.add(key(IOUPolygon)) : (create && state.parentsMap.set(`${IOUPolygon.parentIDa}`, new Set([key(IOUPolygon)])));
+    parentsB ? parentsB.add(key(IOUPolygon)) : (create && state.parentsMap.set(`${IOUPolygon.parentIDb}`, new Set([key(IOUPolygon)])));
 }
 
 export const IOUPolygonContext = createContext<IOUPolygonContextInterface | undefined>(undefined);
@@ -73,20 +73,20 @@ function IOUPolygonReducer(state: IOUPolygonContextInterface, action: IOUPolygon
             parentsMap: state.parentsMap,
           }
 
-      case "RECALCULATE_CHILD_IOUS_USING_ID":
-        state.parentsMap.get(`${action.payload.id}`)?.
-        forEach((key) => {
-          const polygon = state.polygonMap.get(key);
-          if (polygon) {
-            polygon.geometry = Backend2D.IoU()
-            state.polygonMap.set(key, polygon); // this set probably isn't necessary but might as well be safe
-          }
-        });
-        return {
-          ...state,
-          polygonMap: state.polygonMap,
-          parentsMap: state.parentsMap
-        }
+      // case "RECALCULATE_CHILD_IOUS_USING_ID":
+      //   state.parentsMap.get(`${action.payload.id}`)?.
+      //   forEach((key) => {
+      //     const polygon = state.polygonMap.get(key);
+      //     if (polygon) {
+      //       polygon.geometry = Backend2D.IoU()
+      //       state.polygonMap.set(key, polygon); // this set probably isn't necessary but might as well be safe
+      //     }
+      //   });
+      //   return {
+      //     ...state,
+      //     polygonMap: state.polygonMap,
+      //     parentsMap: state.parentsMap
+      //   }
 
       case "HIDE_CHILD_IOUS":
           state.parentsMap.get(`${action.payload.id}`)?.
@@ -104,12 +104,16 @@ function IOUPolygonReducer(state: IOUPolygonContextInterface, action: IOUPolygon
           }
 
       case "HIDE_CHILD_IOUS_USING_ID":
+          console.log('inside hide children')
           state.parentsMap.get(`${action.payload}`)?.
           forEach((key) => {
             const polygon = state.polygonMap.get(key);
             if (polygon) {
+              console.log('setting child with key ', key, ' to have 0 opacity')
+              console.log('state before: ', state.polygonMap);
               polygon.opacity = 0.0;
               state.polygonMap.set(key, polygon); // this set probably isn't necessary but might as well be safe
+              console.log('state after: ', state.polygonMap);
             }
           });
           return {

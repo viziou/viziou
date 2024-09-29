@@ -18,9 +18,9 @@ const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity }:
 
   const handleDragEnd = () => {
     /* Could trigger updates to IoU or something here maybe */
-    if (iouDispatch) {
-
-    }
+    // if (iouDispatch) {
+    //
+    // }
   };
 
   const handleDragStart = () => {
