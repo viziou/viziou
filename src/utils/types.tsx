@@ -25,7 +25,8 @@ export type Polygon2DAction =
   | { type: "DUPLICATE_POLYGON"; index: number }
   | { type: "SET_EDIT"; index: number | null}
   | { type: "EDIT_POLYGON"; index: number, geometry: THREE.BufferGeometry; colour: string}
-  | { type: "SELECTABILITY"; payload: boolean};
+  | { type: "SELECTABILITY"; payload: boolean}
+  | { type: "SET_DECIMAL_PRECISION"; precision: number};
 
 export interface PolyhedronData {
   geometry: THREE.BufferGeometry;

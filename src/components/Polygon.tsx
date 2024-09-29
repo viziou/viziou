@@ -476,7 +476,7 @@ const Polygon = ({
         {/* {Math.max(...currentlyMousedOverPolygons) === index && (
           <Infographic 
           position={!boundingBox ? new THREE.Vector3(position[0], position[1], 0) : boundingBox.getCenter(new THREE.Vector3).sub(boundingBox.getSize(new THREE.Vector3).multiplyScalar(0.5))
-          } info={{"hi": "yeah", "hello": "ok"}} />
+          } info={{"hi": "yeah", "hello": 12.345678.toPrecision(currentDecimalPlaces+2)}} />
         )} */}
       </DragControls>
       {BoundingBox}

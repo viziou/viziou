@@ -2,9 +2,13 @@ import { NavLink } from 'react-router-dom';
 import { SidebarProps2D } from '../utils/types';
 import logo from '../assets/favicon.png';
 import '../styles/Sidebar2D.css';
+import { PolygonContext } from '../contexts/PolygonContext';
+import { useContext } from 'react';
 
 const Sidebar2D = (props: SidebarProps2D) => {
   const { polygons, addPolygon: addPolygon, clearPolygons, showIoUs, savePolygons, loadPolygons } = props;
+
+  const { dispatch, currentDecimalPlaces } = useContext(PolygonContext)!;
 
   return (
       <aside className="sidebar-2d">
@@ -39,7 +43,7 @@ const Sidebar2D = (props: SidebarProps2D) => {
               </label>
               <label htmlFor="decimal-places-2d">
                   Decimal places:
-                  <input type="number" id="decimal-places-2d" min="0" max="5" value="2" />
+                  <input type="number" id="decimal-places-2d" min="0" max="5" value={currentDecimalPlaces} onChange={(event) => dispatch!({type: "SET_DECIMAL_PRECISION", precision:parseInt(event.target.value)})} />
               </label>
           </div>
       </div>

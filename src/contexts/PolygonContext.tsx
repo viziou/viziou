@@ -8,6 +8,7 @@ const initialState: PolygonContextInterface = {
   currentlyMousedOverPolygons: [],
   editingShape: null,
   selectability: true,
+  currentDecimalPlaces: 2,
 };
 
 interface PolygonContextInterface {
@@ -17,6 +18,7 @@ interface PolygonContextInterface {
   currentlyMousedOverPolygons: number[];
   editingShape: number | null;
   selectability: boolean;
+  currentDecimalPlaces: number;
 }
 
 export const PolygonContext = createContext<
@@ -183,6 +185,12 @@ function PolygonReducer(
         selectability: action.payload,
       };
 
+    case "SET_DECIMAL_PRECISION":
+      return {
+        ...state,
+        currentDecimalPlaces: action.precision,
+      }
+
     default:
       return state;
   }
@@ -204,6 +212,7 @@ export function PolygonProvider(props: PolygonProviderProps) {
         currentlyMousedOverPolygons: state.currentlyMousedOverPolygons,
         editingShape: state.editingShape,
         selectability: state.selectability,
+        currentDecimalPlaces: state.currentDecimalPlaces
       }}
     >
       {props.children}
