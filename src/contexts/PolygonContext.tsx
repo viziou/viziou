@@ -2,54 +2,67 @@ import { createContext, useReducer, ReactNode } from 'react';
 import { PolygonData, Polygon2DAction } from '../utils/types';
 
 const initialState: PolygonContextInterface = {
-    polygons: [],
+    polygons: new Map<string, PolygonData>,
 };
 
 interface PolygonContextInterface {
-    polygons: PolygonData[];
+    polygons: Map<string, PolygonData>;
     dispatch?: React.Dispatch<Polygon2DAction>;
 }
 
 export const PolygonContext = createContext<PolygonContextInterface | undefined>(undefined);
+
+function key(polygon: PolygonData): string {
+  // The key that uniquely indexes a polygon. This key can be more sophisticated if required.
+  return `${polygon.id}`;
+}
 
 function PolygonReducer(state: PolygonContextInterface, action: Polygon2DAction) {
     switch (action.type) {
         case "ADD_SQUARE":
             return {
                 ...state,
-                polygons: [...state.polygons, action.payload],
+                polygons: state.polygons.set(key(action.payload), action.payload),
             };
 
         case "ADD_RANDOM_POLYGON":
             return {
-                ...state,
-                polygons: [...state.polygons, action.payload],
+              ...state,
+              polygons: state.polygons.set(key(action.payload), action.payload),
             };
+
 
       case "ADD_POINT":
             return {
-                ...state,
-                polygons: [...state.polygons, action.payload],
+              ...state,
+              polygons: state.polygons.set(key(action.payload), action.payload),
             };
 
         case "SET_POLYGONS":
+                state.polygons.clear();
+                for (const polygon of action.payload) {
+                  state.polygons.set(key(polygon), polygon);
+                }
             return {
                 ...state,
-                polygons: [...action.payload],
+                polygons: state.polygons,
             };
 
         case "CLEAR_POLYGONS":
             return {
                 ...state,
-                polygons: [],
+                polygons: new Map<string, PolygonData>,
             };
 
         case "UPDATE_POSITION":
-            const updatedPolygons = [...state.polygons];
-            updatedPolygons[action.index].position = action.position;
+            const updatedPolygon = state.polygons.get(`${action.id}`);
+            if (updatedPolygon) {
+              updatedPolygon.position = action.position;
+              state.polygons.set(key(updatedPolygon), updatedPolygon);
+            }
             return {
                 ...state,
-                polygons: updatedPolygons
+                polygons: state.polygons,
             }
 
         default:

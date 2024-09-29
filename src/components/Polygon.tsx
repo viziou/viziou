@@ -51,7 +51,7 @@ const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity }:
       if (dispatch) {
         dispatch({
           type: "UPDATE_POSITION",
-          index: index,
+          id: id,
           position: new_pos,
         })
       }

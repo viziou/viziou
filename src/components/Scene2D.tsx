@@ -7,7 +7,7 @@ import IOUPolygon from './IOUPolygon.tsx'
 const Scene2D = ({ polygons, iouPolygons, iouDispatch }: Scene2DProps) => {
   return (
     <Canvas style={{ height: "80vh", background: "#cccccc" }}>
-      {polygons.map((polygon, index) => (
+      {Array.from(polygons.values()).map((polygon, index) => (
         <Polygon
           id={polygon.id}
           key={index}

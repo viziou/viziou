@@ -129,7 +129,7 @@ const TwoDEnv = () => {
 
     const showIoUs = () => {
         const IoUs: IOUPolygonData[] = [];
-        for (const [a, b] of generatePairs(polygons)) {
+        for (const [a, b] of generatePairs(Array.from(polygons.values()))) {
           const {area, shape} = Backend2D.IoU(a, b);
           console.log("IoU between " + a.id + " and " + b.id + ": " + area);
           console.log("IoU shape: ", shape)
@@ -165,7 +165,7 @@ const TwoDEnv = () => {
 
     const savePolygons = () => {
       console.log("Saving canvas...");
-      Storage.save2D(polygons, 'export');
+      Storage.save2D(Array.from(polygons.values()), 'export');
     }
     const loadPolygons = async () => {
         console.log("Opening file dialog...");

@@ -112,6 +112,7 @@ class v1 implements PolygonFile {
 //
 // }
 
+// TODO: write a v2 implementation that upgrades v1 files by adding an ID parameter (just index) and opacity of 1.0
 class vLatest extends v1 {}
 
 class Handler {

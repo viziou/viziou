@@ -29,7 +29,7 @@ export type IOUPolygon2DAction =
   | { type: "CLEAR_POLYGONS" };
 
 export type Scene2DProps = {
-  polygons: PolygonData[];
+  polygons: Map<string, PolygonData>;
   iouPolygons: Map<string, IOUPolygonData>;
   iouDispatch: React.Dispatch<IOUPolygon2DAction>;
 };
@@ -40,7 +40,7 @@ export type Polygon2DAction =
   | { type: "ADD_POINT", payload: PolygonData }
   | { type: "SET_POLYGONS"; payload: PolygonData[] }
   | { type: "CLEAR_POLYGONS" }
-  | { type: "UPDATE_POSITION"; index: number; position: [number, number] };
+  | { type: "UPDATE_POSITION"; id: number; position: [number, number] };
 
 export interface PolyhedronData {
   geometry: THREE.BufferGeometry;
