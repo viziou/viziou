@@ -6,7 +6,7 @@ import Scene2D from "../components/Scene2D";
 import { IOUPolygonData, PolygonData } from "../utils/types";
 import { PolygonContext } from "../contexts/PolygonContext";
 import "../styles/TwoDEnv.css";
-import Sidebar2D from '../components/Sidebar2D';
+import Sidebar from "../components/Sidebar2D";
 
 import { Backend2D, Storage } from "../backend/Interface";
 import AddPolygonModal from "../modals/AddPolygonModal";
@@ -22,49 +22,122 @@ const TwoDEnv = () => {
 
     const nonceGenerator = useRef(0);
 
-    const generateId = () => {
-        nonceGenerator.current += 1;
-        return nonceGenerator.current;
-    };
-
-    if (!context?.dispatch || !IoUcontext?.dispatch) {
-        throw new Error("TwoDEnv must be used within a PolygonProvider");
+  const generateId = () => {
+      nonceGenerator.current += 1
+      return nonceGenerator.current
     }
 
-    const { polygons, dispatch, selectedPolygonID, editingShape } = context;
+    if (!context?.dispatch || !IoUcontext?.dispatch) {
+    throw new Error("TwoDEnv must be used within a PolygonProvider");
+  }
+
+  const { polygons, dispatch, selectedPolygonID, editingShape, confirmationInfo } = context;
     const { polygonMap: iouPolygons, dispatch: iouDispatch } = IoUcontext;
 
-    const [isAddShapeModalOpen, setIsAddShapeModalOpen] = useState(false);
 
-    const handleAddShapeModalOpen = () => setIsAddShapeModalOpen(true);
-    const handleModalClose = () => setIsAddShapeModalOpen(false);
+  const [isAddShapeModalOpen, setIsAddShapeModalOpen] = useState(false);
 
-    const handleAddShapeModalSubmit = (
-        points: [number, number][],
-        colour: string
-    ) => {
-        console.log(points);
-        if (points.length > 2) {
-            const newPolygon: PolygonData = {
-                geometry: ConvexGeometry.fromPoints(
-                  points.map((p) => new THREE.Vector3(p[0], p[1], 0))
-                ),
-                position: [0, 0],
-                colour: colour,
-                id: generateId(),
-                opacity: 1,
-            };
-            dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
-        }
-        handleModalClose();
-    };
+  const handleAddShapeModalOpen = () => setIsAddShapeModalOpen(true);
+  const handleModalClose = () => setIsAddShapeModalOpen(false);
+
+  const handleAddShapeModalSubmit = (
+    points: [number, number][],
+    colour: string
+  ) => {
+    console.log(points);
+    if (points.length > 2) {
+      const newPolygon: PolygonData = {
+        geometry: ConvexGeometry.fromPoints(
+          points.map((p) => new THREE.Vector3(p[0], p[1], 0))
+        ),
+        position: [0, 0],
+        colour: colour,
+        id: generateId(),
+        opacity: 1,
+      };
+      dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
+    }
+    handleModalClose();
+  };
+
+  // const addSquare = () => {
+  //   const newPolygon: PolygonData = {
+  //     geometry: getSquare(),
+  //     position: [
+  //       Math.random() * 4 - 2, // x coordinate
+  //       Math.random() * 4 - 2, // y coordinate
+  //     ],
+  //     colour: getRandomColour(),
+  //   };
+
+  //   console.log("Dispatching ADD_SQUARE:", newPolygon);
+  //   dispatch({ type: "ADD_SQUARE", payload: newPolygon });
+  // };
+
+  // const addRandomPolygon = () => {
+  //   const newPolygon: PolygonData = {
+  //     geometry: getRandomGeometry(),
+  //     position: [
+  //       0, 0,
+  //       //    Math.random() * 4 - 2, // x coordinate
+  //       //    Math.random() * 4 - 2, // y coordinate
+  //     ],
+  //     colour: getRandomColour(),
+  //   };
+
+  //   console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
+  //   dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
+  //   // const geometryPosition = newPolygon.geometry.getAttribute('position');
+  //   // for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
+  //   //   const newPoint: PolygonData = {
+  //   //     geometry: new THREE.CircleGeometry(0.02, 50),
+  //   //     position: [geometryPosition.array[i], geometryPosition.array[i + 1]],
+  //   //     colour: '#C81400'
+  //   //   }
+  //   //   console.log("Dispatching ADD_POINT:")
+  //   //   //dispatch({ type: "ADD_POINT", payload: newPoint });
+  //   // }
+  //   console.time("Calculating Area of Polygon");
+  //   console.log("Area of new random polygon: ", Backend2D.area(newPolygon));
+  //   console.timeEnd("Calculating Area of Polygon");
+  //   console.time("Calculating Centroid");
+  //   const { x, y } = Backend2D.centreOfMass(newPolygon);
+  //   console.log("Centroid: (", x, ", ", y, ")");
+  //   console.time("Calculating Centroid");
+  //   console.log("Reducing polygon...");
+  //   const result = Backend2D.reduceThreeGeometry(newPolygon);
+  //   console.log("reduced polygon: ", result);
+  //   // for (const vertex of result.vertices) {
+  //   //   const newPoint: PolygonData = {
+  //   //     geometry: new THREE.CircleGeometry(0.02, 50),
+  //   //     position: [vertex.x, vertex.y],
+  //   //     colour: '#0dc800'
+  //   //   }
+  //   //   //dispatch({ type: "ADD_POINT", payload: newPoint })
+  //   // }
+  // };
 
   const clearPolygons = () => {
+    const onSubmit = () => {
       console.log("Dispatching CLEAR_POLYGONS");
       dispatch({ type: "CLEAR_POLYGONS" });
       iouDispatch({ type: "CLEAR_POLYGONS" }); // clear IoUs as well
-  };
+      dispatch( {type: "CLOSE_CONFIRMATION_MODAL"})
+    };
 
+    console.log("Opening clear confirmation modal");
+    dispatch({
+      type: "OPEN_CONFIRMATION_MODAL",
+      info: {
+        isOpen: true,
+        onClose: () => {dispatch( {type: "CLOSE_CONFIRMATION_MODAL"})},
+        onConfirm: onSubmit,
+        message: "Are you sure you want to clear the canvas?",
+        description: "This action cannot be undone.",
+      },
+    });
+  };
+  
   const showIoUs = () => {
       const IoUs: IOUPolygonData[] = [];
       for (const [a, b] of generatePairs(Array.from(polygons.values()))) {
@@ -162,7 +235,13 @@ const TwoDEnv = () => {
         <main className="twod-canvas-container">
             <Scene2D polygons={polygons} iouPolygons={iouPolygons} iouDispatch={iouDispatch} />
         </main>
-        <ConfirmationModal isOpen={true}  message="Are you sure you want to delete?" onConfirm={() => console.log("oh boy")}/>
+        <ConfirmationModal
+        isOpen={confirmationInfo.isOpen}
+        message={confirmationInfo.message}
+        description={confirmationInfo.description}
+        onConfirm={confirmationInfo.onConfirm}
+        onClose={confirmationInfo.onClose}
+      />
     </div>
   );
 };
