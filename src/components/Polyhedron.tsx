@@ -69,22 +69,12 @@ const Polyhedron = ({ index, position, rotation, scale, geometry, colour, onClic
                     const box = new THREE.Box3().setFromObject(mesh.current);
                     console.log(box.getSize(new THREE.Vector3()));
                     scene.add(boundingBoxRef.current); 
-
-                    const material = new THREE.SpriteMaterial( { map: editIconTexture } );
-                    spriteRef.current = new THREE.Sprite( material );
-                    // spriteRef.current.scale.set(5, 5, 1)
-                    spriteRef.current.position.set(6, 6, 6)
-                    scene.add(spriteRef.current);
                 }
                 
             } else {
                 if (boundingBoxRef.current) {
                     scene.remove(boundingBoxRef.current);
                     boundingBoxRef.current = null;
-                }
-                if (spriteRef.current) {
-                    scene.remove(spriteRef.current);
-                    spriteRef.current = null;
                 }
             }
         }
@@ -103,20 +93,33 @@ const Polyhedron = ({ index, position, rotation, scale, geometry, colour, onClic
     });
 
     return (
-        <mesh
-            ref={mesh}
-            position={position}
-            rotation={rotation}
-            scale={scale}
-            geometry={geometry}
-            onClick={onClick}
-            onDoubleClick={onDoubleClick}
-            onPointerOver={onPointerOver}
-            onPointerOut={onPointerOut}
+        // <group>
+        //     {/* <mesh
+        //         ref={mesh}
+        //         position={position}
+        //         rotation={rotation}
+        //         scale={scale}
+        //         geometry={geometry}
+        //         onClick={onClick}
+        //         onDoubleClick={onDoubleClick}
+        //         onPointerOver={onPointerOver}
+        //         onPointerOut={onPointerOut}
+        //     >
+        //         <meshStandardMaterial color={colour} />
+        //         <Edges geometry={geometry} scale={1} color="white" />
+        //     </mesh> */}
+            
+        // </group>
+        <sprite
+            position={[position[0] + 5, position[1] + 5, position[2] + 5]}
+            // onClick={duplicateSelectedPolygon}
+            // onPointerEnter={() => setMousePointer("pointer")}
+            // onPointerLeave={() => setMousePointer(null)}
+            // onPointerUp={() => setMousePointer(null)}
+            scale={[100, 100, 100]}
         >
-        <meshStandardMaterial color={colour} />
-        <Edges geometry={geometry} scale={1} color="white" />
-        </mesh>
+        <spriteMaterial map={duplicateIconTexture}/>
+    </sprite>
     );
 };
 
