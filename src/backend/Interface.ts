@@ -79,17 +79,23 @@ class Backend2D {
   }
 
   private static _threeGeometryToPolygon2D( geometry: BufferGeometry ): Polygon2D {
-    const geometryPosition = geometry.getAttribute('position');
-    let vertices: Point2D[] = [];
-    const vertexSet: Set<{x: number, y: number}> = new Set();
-    for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
-      //vertices.push(new Point2D(geometryPosition.array[i], geometryPosition.array[i + 1]));
-      vertexSet.add({x: geometryPosition.array[i], y: geometryPosition.array[i + 1]});  // sets do not allow duplicates
+    function key({x, y}: {x: number; y: number}) {
+      return `${x},${y}`;
     }
-    vertexSet.forEach(({x, y}) => {
+
+    const geometryPosition = geometry.getAttribute('position');
+    console.log('geometryPosition: ', geometryPosition)
+    let vertices: Point2D[] = [];
+    const vertexMap: Map<string, {x: number, y: number}> = new Map();
+    for (let i = 0; i < geometryPosition.array.length; i+=3 ) {
+      //vertices.push(new Point2D(geometryPosition.array[i], geometryPosition.array[i + 1]));
+      const pos = {x: geometryPosition.array[i], y: geometryPosition.array[i + 1]};
+      vertexMap.set(key(pos), pos);  // maps do not allow duplicates
+    }
+    vertexMap.forEach(({x, y}) => {
       vertices.push(new Point2D(x, y))
     })
-    console.log('vertexSet: ', vertexSet);
+    console.log('vertexMap: ', vertexMap);
     console.log('vertices: ', vertices)
     console.log('number of vertices parsed: ', geometryPosition.count / 3);
     console.log('number of vertices included: ', vertices.length)
@@ -159,7 +165,7 @@ class Backend2D {
     // This code is ugly as hell since there was so much debugging involved to get it working.
     //console.log('initial points: ', points);
     // Step 0: If you have a triangle (or less), there's nothing to do.
-    if (points.length <= 3) return points;
+    if (points.length < 3) return points;
     const reducedVertices: Point2D[] = [];
 
     // Step 1: Find an extremal starting point.

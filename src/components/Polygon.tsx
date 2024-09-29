@@ -1,6 +1,6 @@
-import { useContext, useRef, useState, useEffect, useMemo } from "react";
+import React, { useContext, useRef, useState, useEffect, useMemo } from "react";
 import * as THREE from "three";
-import { PolygonData } from "../utils/types";
+import { IOUPolygon2DAction, PolygonData } from '../utils/types'
 import { PolygonContext } from "../contexts/PolygonContext";
 import { DragControls } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
@@ -9,8 +9,7 @@ import bin from '../assets/new_bin.png';
 import duplicate from '../assets/new_duplicate.png';
 // import Infographic from "./Infographic";
 
-type PolygonProps = PolygonData & { index: number; selectable: boolean };
-
+type PolygonProps = PolygonData & { index: number; selectable: boolean } & {iouDispatch?: React.Dispatch<IOUPolygon2DAction>} & {polygons?: Map<string, PolygonData>;};
 // Load texture icons
 const editIconTexture = new THREE.TextureLoader().load(edit);
 const deleteIconTexture = new THREE.TextureLoader().load(bin);
@@ -18,15 +17,9 @@ const duplicateIconTexture = new THREE.TextureLoader().load(duplicate);
 
 // TODO: Make information on top of the polygon as a child instead?
 
-const Polygon = ({
-  position,
-  geometry,
-  colour,
-  index,
-  selectable,
-}: PolygonProps) => {
+const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectable }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
-  const { dispatch, selectedPolygonIndex, currentlyMousedOverPolygons, selectability, polygons } = useContext(PolygonContext)!;
+  const { dispatch, selectedPolygonID, currentlyMousedOverPolygons, selectability, polygons } = useContext(PolygonContext)!;
   const originalPosition = useRef<[number, number]>([0, 0]);
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
@@ -46,19 +39,22 @@ const Polygon = ({
 
   const selectPolygon = () => {
     if (!selectability || !selectable) return;
-    if ((selectedPolygonIndex === null || Math.max(...currentlyMousedOverPolygons) === index) && dispatch) {
+    if ((selectedPolygonID === null || Math.max(...currentlyMousedOverPolygons) === id) && dispatch) {
       // only select the largest polygon index
-      dispatch({ type: "SELECT_POLYGON", index: index });
+      dispatch({ type: "SELECT_POLYGON", id: id });
     }
   };
 
   const isPolygonSelected = () => {
-    return selectedPolygonIndex === index;
+    return selectedPolygonID === id;
   };
 
   /**********************************/
   const handleDragEnd = () => {
     /* Could trigger updates to IoU or something here maybe */
+    if (iouDispatch) {
+      iouDispatch({type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: id, polygons: polygons}})
+    }
   };
 
   const handleDragStart = () => {
@@ -67,6 +63,16 @@ const Polygon = ({
     }
     if (mesh.current) {
       const v = new THREE.Vector3();
+      mesh.current.getWorldPosition(v)
+      originalPosition.current = v.toArray().slice(0,2) as [number, number];
+      //console.log('original_position: ', originalPosition);
+      // test clearing all IoU polygons
+      console.log("dispatch: ", iouDispatch)
+      if (iouDispatch) {
+        console.log("trying to hide child IoUs that have ID ", id)
+        //iouDispatch({type: "DELETE_CHILD_IOUS_USING_ID", payload: id});
+        iouDispatch({type: "HIDE_CHILD_IOUS_USING_ID", payload: id})
+      }
       mesh.current.getWorldPosition(v);
       originalPosition.current = v.toArray().slice(0, 2) as [number, number];
     }
@@ -83,7 +89,7 @@ const Polygon = ({
       if (dispatch) {
         dispatch({
           type: "UPDATE_POSITION",
-          index: index,
+          id: id,
           position: new_pos,
         });
       }
@@ -118,7 +124,7 @@ const Polygon = ({
     const distance = -camera.position.z / vec.z;
     pos.copy(camera.position).add(vec.multiplyScalar(distance));
     return pos
-  };  
+  };
 
   /**********************************/
   const handleResizeStart = (corner: string) => {
@@ -174,7 +180,7 @@ const Polygon = ({
     const translationY = center.y - position[1];
 
     // Translate from position to bbox center
-    let newGeometry = geometry.clone();
+    const newGeometry = geometry.clone();
     newGeometry.translate(-translationX, -translationY, 0);
     newGeometry.scale(scaleX, scaleY, 1);
     newGeometry.translate(translationX, translationY, 0);
@@ -183,7 +189,7 @@ const Polygon = ({
       dispatch({
         type: "UPDATE_GEOMETRY",
         geometry: newGeometry,
-        index: index,
+        id: id,
       });
     }
   };
@@ -203,7 +209,7 @@ const Polygon = ({
   };
 
   const handleRotateDrag = () => {
-    if (!rotating || !boundingBox) 
+    if (!rotating || !boundingBox)
       return;
     setMousePointer("move")
 
@@ -235,7 +241,7 @@ const Polygon = ({
       dispatch({
         type: "UPDATE_GEOMETRY",
         geometry: newGeometry,
-        index: index,
+        id: id,
       });
     }
 
@@ -255,26 +261,27 @@ const Polygon = ({
   const deleteSelectedPolygon = () => {
     document.body.style.cursor = "auto";
     if (dispatch) {
-      dispatch({type: "DELETE_POLYGON", index: index})
-      dispatch({ type: "SELECT_POLYGON", index: null });
+      dispatch({type: "DELETE_POLYGON", id: id})
+      dispatch({ type: "SELECT_POLYGON", id: null });
     }
   }
 
   const duplicateSelectedPolygon = () => {
     if (dispatch) {
-      dispatch({type: "DUPLICATE_POLYGON", index: index})
+      // TODO: pass down a reference to the nonce generator. THIS MUST BE FIXED BEFORE PRODUCTION
+      dispatch({type: "DUPLICATE_POLYGON", id: id, newId: id*100000})
     }
   }
 
   const editSelectedPolygon = () => {
     if (dispatch) {
-      dispatch({type: "SET_EDIT", index: index})
+      dispatch({type: "SET_EDIT", id: id})
     }
   }
 
   // bounding box component:
   const BoundingBox = useMemo(() => {
-    if (!boundingBox || !isPolygonSelected()) 
+    if (!boundingBox || !isPolygonSelected())
       return <></>;
 
     const size = boundingBox.getSize(new THREE.Vector3());
@@ -412,7 +419,7 @@ const Polygon = ({
           >
             <spriteMaterial map={editIconTexture}/>
           </sprite>
-        ) : null}        
+        ) : null}
 
         {/* Duplicate button */}
         {!resizing && !rotating ? (
@@ -445,6 +452,33 @@ const Polygon = ({
     );
   }, [boundingBox, isPolygonSelected, scene, polygons]);
 
+  // const renderPoint = ({x, y}: {x: number, y: number}, size = 0.03, smoothness = 50) => {
+  //   return (
+  //     <mesh
+  //       position={[x, y, 0]}
+  //       geometry={new THREE.CircleGeometry(size, smoothness)}
+  //     >
+  //       <meshStandardMaterial color={'#000000'} />
+  //     </mesh>);
+  // }
+
+  // const renderVertices = (geometry: THREE.BufferGeometry) => {
+  //   /* Dynamically generate the vertices of a polygon. */
+  //   const pos = geometry.getAttribute('position')
+  //   const idx: {x: number, y: number, z:number}[] = [];
+  //   for (let i = 0; i < pos.count; i += 3) {
+  //     idx.push({x: pos.array[i], y: pos.array[i+1], z: pos.array[i+2]});
+  //   }
+  //
+  //   return (
+  //     <>
+  //       {idx.map((args) => {
+  //         return renderPoint(args)
+  //       })}
+  //   </>
+  //   )
+  // }
+
   return (
     <>
       <DragControls
@@ -460,21 +494,25 @@ const Polygon = ({
           ref={mesh}
           onPointerEnter={() => {
             if (dispatch)
-              dispatch({ type: "ADD_MOUSED_OVER_POLYGON", index: index });
+              dispatch({ type: "ADD_MOUSED_OVER_POLYGON", id: id });
           }}
           onPointerLeave={() => {
             if (dispatch)
-              dispatch({ type: "REMOVE_MOUSED_OVER_POLYGON", index: index });
+              dispatch({ type: "REMOVE_MOUSED_OVER_POLYGON", id: id });
           }}
           onClick={selectPolygon}
           // TEsting:
           onDoubleClick={editSelectedPolygon}
         >
-          <meshBasicMaterial color={colour} />
+          <meshBasicMaterial
+            color={colour}
+            transparent={true}
+            opacity={opacity}
+          />
         </mesh>
         {/* Example infographic: */}
         {/* {Math.max(...currentlyMousedOverPolygons) === index && (
-          <Infographic 
+          <Infographic
           position={!boundingBox ? new THREE.Vector3(position[0], position[1], 0) : boundingBox.getCenter(new THREE.Vector3).sub(boundingBox.getSize(new THREE.Vector3).multiplyScalar(0.5))
           } info={{"hi": "yeah", "hello": 12.345678.toPrecision(currentDecimalPlaces+2)}} />
         )} */}

@@ -1,9 +1,9 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useRef } from "react";
 import * as THREE from "three";
 import { ConvexGeometry } from "../backend/Interface";
 
 import Scene2D from "../components/Scene2D";
-import { PolygonData } from "../utils/types";
+import { IOUPolygonData, PolygonData } from "../utils/types";
 import { PolygonContext } from "../contexts/PolygonContext";
 import "../styles/TwoDEnv.css";
 import Sidebar from '../components/Sidebar2D';
@@ -13,6 +13,7 @@ import AddPolygonModal from "../modals/AddPolygonModal";
 
 import { generatePairs } from "../utils/Generic";
 import EditPolygonModal from "../modals/EditPolygonModal";
+import { IOUPolygonContext } from '../contexts/IOUPolygonContext.tsx'
 
 // const getSquare = (): THREE.PlaneGeometry => {
 //   return new THREE.PlaneGeometry(1, 1);
@@ -46,12 +47,21 @@ import EditPolygonModal from "../modals/EditPolygonModal";
 
 const TwoDEnv = () => {
   const context = useContext(PolygonContext);
+    const IoUcontext = useContext(IOUPolygonContext)
 
-  if (!context?.dispatch) {
+    const nonceGenerator = useRef(0);
+
+  const generateId = () => {
+      nonceGenerator.current += 1
+      return nonceGenerator.current
+    }
+
+    if (!context?.dispatch || !IoUcontext?.dispatch) {
     throw new Error("TwoDEnv must be used within a PolygonProvider");
   }
 
-  const { polygons, dispatch, selectedPolygonIndex, editingShape } = context;
+  const { polygons, dispatch, selectedPolygonID, editingShape } = context;
+    const { polygonMap: iouPolygons, dispatch: iouDispatch } = IoUcontext;
 
   const [isAddShapeModalOpen, setIsAddShapeModalOpen] = useState(false);
 
@@ -70,6 +80,8 @@ const TwoDEnv = () => {
         ),
         position: [0, 0],
         colour: colour,
+        id: generateId(),
+        opacity: 1,
       };
       dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
     }
@@ -133,47 +145,52 @@ const TwoDEnv = () => {
   //   // }
   // };
 
-  const clearPolygons = () => {
-    console.log("Dispatching CLEAR_POLYGONS");
-    dispatch({ type: "CLEAR_POLYGONS" });
-  };
+    const clearPolygons = () => {
+        console.log("Dispatching CLEAR_POLYGONS");
+        dispatch({ type: "CLEAR_POLYGONS" });
+        iouDispatch({ type: "CLEAR_POLYGONS" }); // clear IoUs as well
+    };
 
   const showIoUs = () => {
-    const IoUs: PolygonData[] = [];
-    for (const [a, b] of generatePairs(polygons)) {
-      const { area, shape } = Backend2D.IoU(a, b);
-      console.log(
-        "IoU between " + a.geometry.id + " and " + b.geometry.id + ": " + area
-      );
-      console.log("IoU shape: ", shape);
-      const IoUPolygon: PolygonData = {
+    const IoUs: IOUPolygonData[] = [];
+    for (const [a, b] of generatePairs(Array.from(polygons.values()))) {
+      const {area, shape} = Backend2D.IoU(a, b);
+      console.log("IoU between " + a.id + " and " + b.id + ": " + area);
+      console.log("IoU shape: ", shape)
+      // TODO: don't push an IoU polygon if area is 0?
+      const IoUPolygon: IOUPolygonData = {
+        parentIDa: a.id,
+        parentIDb: b.id,
         geometry: shape,
         position: [0, 0],
-        colour: "#ce206b",
-      };
+        colour: '#ce206b',
+        id: generateId(),
+        opacity: 1.0,
+      }
       IoUs.push(IoUPolygon);
     }
     //console.log("Clearing canvas...");
     //dispatch({type: "CLEAR_POLYGONS"});
     for (const polygon of IoUs) {
-      console.log("Dispatching IoU Polygon via ADD_RANDOM_POLYGON...", polygon);
-      dispatch({ type: "ADD_RANDOM_POLYGON", payload: polygon });
-      const geomPos = polygon.geometry.getAttribute("position");
-      for (let i = 0, l = geomPos.count; i < l; i += 3) {
-        const newPoint: PolygonData = {
-          geometry: new THREE.CircleGeometry(0.02, 50),
-          position: [geomPos.array[i], geomPos.array[i + 1]],
-          colour: "#2bc800",
-        };
-        console.log("Placing IoU vertex:");
-        dispatch({ type: "ADD_POINT", payload: newPoint });
-      }
+      console.log("Dispatching IoU Polygon via SET_POLYGON...", polygon);
+      iouDispatch({ type: 'SET_POLYGON', payload: polygon });
+      //const geomPos = polygon.geometry.getAttribute('position')
+      // for (let i = 0, l = geomPos.count; i < l; i += 3) {
+      //   const newPoint: PolygonData = {
+      //     geometry: new THREE.CircleGeometry(0.02, 50),
+      //     position: [geomPos.array[i], geomPos.array[i + 1]],
+      //     colour: '#2bc800',
+      //     id: this.geometry.id // dirty hack since we don't have an ID generator
+      //   }
+      //   console.log("Placing IoU vertex:")
+      //   dispatch({ type: "ADD_POINT", payload: newPoint });
+      // }
     }
   };
 
   const savePolygons = () => {
     console.log("Saving canvas...");
-    Storage.save2D(polygons, "export");
+    Storage.save2D(Array.from(polygons.values()), "export");
   };
   const loadPolygons = async () => {
     console.log("Opening file dialog...");
@@ -193,11 +210,11 @@ const TwoDEnv = () => {
     }
   };
 
- 
+
   return (
     <div className="TwoDEnv">
-        <Sidebar 
-          polygons={polygons}
+        <Sidebar
+          polygons={Array.from(polygons.values())}
           addPolygon={handleAddShapeModalOpen}
           clearPolygons={clearPolygons}
           showIoUs={showIoUs}
@@ -213,7 +230,7 @@ const TwoDEnv = () => {
           <EditPolygonModal
             isOpen={editingShape !== null}
             onClose={() => {
-              if (dispatch) dispatch({ type: "SET_EDIT", index: null });
+              if (dispatch) dispatch({ type: "SET_EDIT", id: null });
             }}
             onSave={(newPoints, newColour) => {
               // todo: make a dispatch here
@@ -227,10 +244,10 @@ const TwoDEnv = () => {
                     newPoints.map((p) => new THREE.Vector3(p[0], p[1], 0))
                   ),
                   colour: newColour,
-                  index: selectedPolygonIndex!,
+                  id: selectedPolygonID!,
                 });
                 console.log(polygons);
-                dispatch({ type: "SET_EDIT", index: null });
+                dispatch({ type: "SET_EDIT", id: null });
               }
             }}
             // temp initial state for now:
@@ -247,7 +264,7 @@ const TwoDEnv = () => {
         )}
 
         <main className="twod-canvas-container">
-            <Scene2D polygons={polygons} />
+            <Scene2D polygons={polygons} iouPolygons={iouPolygons} iouDispatch={iouDispatch} />
         </main>
     </div>
   );

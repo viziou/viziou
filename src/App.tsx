@@ -10,27 +10,29 @@ import PageNotFound from './pages/PageNotFound';
 
 import { PolygonProvider } from './contexts/PolygonContext';
 import { PolyhedronProvider } from './contexts/PolyhedronContext';
+import { IOUPolygonProvider } from './contexts/IOUPolygonContext.tsx'
 
 function App() {
 
   return (
       <BrowserRouter>
           <div>
-
               <Routes>
-                    <Route 
-                            path="/" 
+                    <Route
+                            path="/"
                             element={
                             <>
-                                <Navbar /> 
+                                <Navbar />
                                 <Hero />
                             </>
-                            } 
+                            }
                     />
 
                   <Route path="/2D-Environment" element={
                       <PolygonProvider>
+                        <IOUPolygonProvider>
                           <TwoD />
+                        </IOUPolygonProvider>
                       </PolygonProvider>
                       }
                   />
@@ -39,17 +41,17 @@ function App() {
                       <PolyhedronProvider>
                           <ThreeD />
                       </PolyhedronProvider>
-                      } 
+                      }
                   />
-                  
-                  <Route 
-                            path="/about" 
+
+                  <Route
+                            path="/about"
                             element={
                             <>
-                                <Navbar /> 
+                                <Navbar />
                                 <About />
                             </>
-                            } 
+                            }
                     />
 
                   <Route path="*" element={<PageNotFound />} />
