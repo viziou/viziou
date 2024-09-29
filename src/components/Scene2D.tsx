@@ -17,6 +17,7 @@ const Scene2D = ({ polygons, iouPolygons, iouDispatch }: Scene2DProps) => {
           colour={polygon.colour}
           iouDispatch={iouDispatch}
           opacity={polygon.opacity}
+          polygons={polygons}
         />
       ))}
       {Array.from(iouPolygons.values()).map((polygon, index) => (

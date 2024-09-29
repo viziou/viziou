@@ -1,6 +1,7 @@
 import { createContext, useReducer, ReactNode } from 'react';
 import { IOUPolygon2DAction, IOUPolygonData } from '../utils/types';
 import { Backend2D } from '../backend/Interface';
+import { key as parentKey } from './PolygonContext.tsx'
 
 const initialState: IOUPolygonContextInterface = {
     polygonMap: new Map<string, IOUPolygonData>,
@@ -19,6 +20,12 @@ function key(IOUPolygon: IOUPolygonData): string {
     const low = Math.min(...parentIDs);
     const high = Math.max(...parentIDs);
     return `${low}+${high}`;
+}
+
+function extractParents(key: string): [string, string] {
+  /* From an IoU key, returns the two parent polygon's IDs. */
+  const [a, b] = key.split('+', 2);
+  return [a, b];
 }
 
 function updateParents(state: IOUPolygonContextInterface, IOUPolygon: IOUPolygonData, create = true): void {
@@ -73,20 +80,33 @@ function IOUPolygonReducer(state: IOUPolygonContextInterface, action: IOUPolygon
             parentsMap: state.parentsMap,
           }
 
-      // case "RECALCULATE_CHILD_IOUS_USING_ID":
-      //   state.parentsMap.get(`${action.payload.id}`)?.
-      //   forEach((key) => {
-      //     const polygon = state.polygonMap.get(key);
-      //     if (polygon) {
-      //       polygon.geometry = Backend2D.IoU()
-      //       state.polygonMap.set(key, polygon); // this set probably isn't necessary but might as well be safe
-      //     }
-      //   });
-      //   return {
-      //     ...state,
-      //     polygonMap: state.polygonMap,
-      //     parentsMap: state.parentsMap
-      //   }
+      case "RECALCULATE_CHILD_IOUS_USING_ID":
+        console.log('recalculating children...')
+        console.log('polygons map is ', action.payload.polygons)
+        state.parentsMap.get(`${action.payload.id}`)?.
+        forEach((key) => {
+          const polygon = state.polygonMap.get(key);
+
+          if (polygon) {
+            console.log('found IoU polygon with key ', key)
+            const parentA = action.payload.polygons.get(`${polygon.parentIDa}`)
+            const parentB = action.payload.polygons.get(`${polygon.parentIDb}`)
+
+            if (parentA && parentB) {
+              console.log('found parents: ', parentA, parentB)
+              const { area, shape } = Backend2D.IoU(parentA, parentB)
+              console.log('recalculated IoU is: ', area)
+              polygon.geometry = shape;
+              polygon.opacity = 1.0; // of course I forgot this lol
+              state.polygonMap.set(key, polygon); // this set probably isn't necessary but might as well be safe
+            }
+          }
+        });
+        return {
+          ...state,
+          polygonMap: state.polygonMap,
+          parentsMap: state.parentsMap
+        }
 
       case "HIDE_CHILD_IOUS":
           state.parentsMap.get(`${action.payload.id}`)?.

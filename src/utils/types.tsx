@@ -24,7 +24,7 @@ export type IOUPolygon2DAction =
   | { type: "DELETE_CHILD_IOUS_USING_ID", payload: number }
   | { type: "HIDE_CHILD_IOUS", payload: PolygonData}
   | { type: "HIDE_CHILD_IOUS_USING_ID", payload: number}
-  | { type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: number, parentGeometry: THREE.BufferGeometry}}
+  | { type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: number, polygons: Map<string, PolygonData>}}
   | { type: "SHOW_CHILD_IOUS_USING_ID", payload: number }
   | { type: "CLEAR_POLYGONS" };
 

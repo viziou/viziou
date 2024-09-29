@@ -12,7 +12,7 @@ interface PolygonContextInterface {
 
 export const PolygonContext = createContext<PolygonContextInterface | undefined>(undefined);
 
-function key(polygon: PolygonData): string {
+export function key(polygon: PolygonData): string {
   // The key that uniquely indexes a polygon. This key can be more sophisticated if required.
   return `${polygon.id}`;
 }

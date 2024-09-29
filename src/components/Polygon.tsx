@@ -4,23 +4,22 @@ import { IOUPolygon2DAction, PolygonData } from '../utils/types'
 import { PolygonContext } from "../contexts/PolygonContext";
 import { DragControls } from "@react-three/drei";
 
-type PolygonProps = PolygonData & { index: number } & {iouDispatch: React.Dispatch<IOUPolygon2DAction>};
+type PolygonProps = PolygonData & { index: number } & {iouDispatch: React.Dispatch<IOUPolygon2DAction>} & {polygons: Map<string, PolygonData>;};
 
 // TODO: Make information on top of the polygon as a child instead?
 
-const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity }: PolygonProps) => {
+const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity, polygons }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
   const { dispatch } = useContext(PolygonContext)!;
   const originalPosition = useRef<[number, number]>([0, 0]);
-  //const { polygonMap, dispatch: iouDispatch} = useContext(IOUPolygonContext)!;
 
   const matrix = new THREE.Matrix4();
 
   const handleDragEnd = () => {
     /* Could trigger updates to IoU or something here maybe */
-    // if (iouDispatch) {
-    //
-    // }
+    if (iouDispatch) {
+      iouDispatch({type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: id, polygons: polygons}})
+    }
   };
 
   const handleDragStart = () => {

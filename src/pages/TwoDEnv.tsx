@@ -133,6 +133,7 @@ const TwoDEnv = () => {
           const {area, shape} = Backend2D.IoU(a, b);
           console.log("IoU between " + a.id + " and " + b.id + ": " + area);
           console.log("IoU shape: ", shape)
+          // TODO: don't push an IoU polygon if area is 0?
             const IoUPolygon: IOUPolygonData = {
               parentIDa: a.id,
               parentIDb: b.id,
