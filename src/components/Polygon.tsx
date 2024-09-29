@@ -4,13 +4,16 @@ import { PolygonData } from "../utils/types";
 import { PolygonContext } from "../contexts/PolygonContext";
 import { DragControls } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
+import edit from '../assets/new_edit.png';
+import bin from '../assets/new_bin.png';
+import duplicate from '../assets/new_duplicate.png';
 
 type PolygonProps = PolygonData & { index: number; selectable: boolean };
 
 // Load texture icons
-const editIconTexture = new THREE.TextureLoader().load("src/assets/edit.jpg")
-const deleteIconTexture = new THREE.TextureLoader().load("src/assets/delete.jpg")
-const duplicateIconTexture = new THREE.TextureLoader().load("src/assets/duplicate.jpg")
+const editIconTexture = new THREE.TextureLoader().load(edit);
+const deleteIconTexture = new THREE.TextureLoader().load(bin);
+const duplicateIconTexture = new THREE.TextureLoader().load(duplicate);
 
 // TODO: Make information on top of the polygon as a child instead?
 
@@ -398,67 +401,44 @@ const Polygon = ({
 
         {/* Edit button */}
         {!resizing && !rotating ? (
-          <group>
-            <mesh
-              position={[0.5, size.y / 2 + 0.5, 0]}
-            >
-              <circleGeometry args={[0.21, 64]} />
-              <meshBasicMaterial color={"black"}/>
-            </mesh>
-            <mesh
-              position={[0.5, size.y / 2 + 0.5, 0]}
-              onClick={editSelectedPolygon}
-              onPointerEnter={() => setMousePointer("pointer")}
-              onPointerLeave={() => setMousePointer(null)}
-              onPointerUp={() => setMousePointer(null)}
-            >
-              <circleGeometry args={[0.2, 64]} />
-              <meshBasicMaterial map={editIconTexture}/>
-            </mesh>
-          </group>
+          <sprite
+            position={[0.5, size.y / 2 + 0.5, 0]}
+            onClick={editSelectedPolygon}
+            onPointerEnter={() => setMousePointer("pointer")}
+            onPointerLeave={() => setMousePointer(null)}
+            onPointerUp={() => setMousePointer(null)}
+            scale={[0.4, 0.4, 0]}
+          >
+            <spriteMaterial map={editIconTexture}/>
+          </sprite>
         ) : null}        
 
         {/* Duplicate button */}
         {!resizing && !rotating ? (
-          <group>
-            <mesh
-              position={[1, size.y / 2 + 0.5, 0]}
-            >
-              <circleGeometry args={[0.21, 64]} />
-              <meshBasicMaterial color={"black"}/>
-            </mesh>
-            <mesh
-              position={[1, size.y / 2 + 0.5, 0]}
-              onClick={duplicateSelectedPolygon}
-              onPointerEnter={() => setMousePointer("pointer")}
-              onPointerLeave={() => setMousePointer(null)}
-              onPointerUp={() => setMousePointer(null)}
-            >
-              <circleGeometry args={[0.2, 64]} />
-              <meshBasicMaterial map={duplicateIconTexture}/>
-            </mesh>
-          </group>
+          <sprite
+            position={[1, size.y / 2 + 0.5, 0]}
+            onClick={duplicateSelectedPolygon}
+            onPointerEnter={() => setMousePointer("pointer")}
+            onPointerLeave={() => setMousePointer(null)}
+            onPointerUp={() => setMousePointer(null)}
+            scale={[0.4, 0.4, 0]}
+          >
+            <spriteMaterial map={duplicateIconTexture}/>
+          </sprite>
         ) : null}
 
         {/* Delete button */}
         {!resizing && !rotating ? (
-          <group>
-            <mesh
-              position={[1.5, size.y / 2 + 0.5, 0]}
-            >
-              <circleGeometry args={[0.21, 64]} />
-              <meshBasicMaterial color={"black"}/>
-            </mesh>
-            <mesh
-              position={[1.5, size.y / 2 + 0.5, 0]}
-              onClick={deleteSelectedPolygon}
-              onPointerEnter={() => setMousePointer("pointer")}
-              onPointerLeave={() => setMousePointer(null)}
-            >
-              <circleGeometry args={[0.2, 64]} />
-              <meshBasicMaterial map={deleteIconTexture}/>
-            </mesh>
-          </group>
+          <sprite
+            position={[1.5, size.y / 2 + 0.5, 0]}
+            onClick={deleteSelectedPolygon}
+            onPointerEnter={() => setMousePointer("pointer")}
+            onPointerLeave={() => setMousePointer(null)}
+            onPointerUp={() => setMousePointer(null)}
+            scale={[0.4, 0.4, 0]}
+          >
+            <spriteMaterial map={deleteIconTexture}/>
+          </sprite>
         ) : null}
       </group>
     );
