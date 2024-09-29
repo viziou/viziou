@@ -14,6 +14,7 @@ import AddPolygonModal from "../modals/AddPolygonModal";
 import { generatePairs } from "../utils/Generic";
 import EditPolygonModal from "../modals/EditPolygonModal";
 import { IOUPolygonContext } from '../contexts/IOUPolygonContext.tsx'
+import ConfirmationModal from "../modals/ConfirmationModal";
 
 // const getSquare = (): THREE.PlaneGeometry => {
 //   return new THREE.PlaneGeometry(1, 1);
@@ -272,6 +273,7 @@ const TwoDEnv = () => {
         <main className="twod-canvas-container">
             <Scene2D polygons={polygons} iouPolygons={iouPolygons} iouDispatch={iouDispatch} />
         </main>
+        <ConfirmationModal isOpen={true}  message="Are you sure you want to delete?" onConfirm={() => console.log("Fuck")}/>
     </div>
   );
 };
