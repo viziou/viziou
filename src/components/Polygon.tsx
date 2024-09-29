@@ -7,6 +7,7 @@ import { useThree } from "@react-three/fiber";
 import edit from '../assets/new_edit.png';
 import bin from '../assets/new_bin.png';
 import duplicate from '../assets/new_duplicate.png';
+// import Infographic from "./Infographic";
 
 type PolygonProps = PolygonData & { index: number; selectable: boolean };
 
@@ -471,6 +472,12 @@ const Polygon = ({
         >
           <meshBasicMaterial color={colour} />
         </mesh>
+        {/* Example infographic: */}
+        {/* {Math.max(...currentlyMousedOverPolygons) === index && (
+          <Infographic 
+          position={!boundingBox ? new THREE.Vector3(position[0], position[1], 0) : boundingBox.getCenter(new THREE.Vector3).sub(boundingBox.getSize(new THREE.Vector3).multiplyScalar(0.5))
+          } info={{"hi": "yeah", "hello": "ok"}} />
+        )} */}
       </DragControls>
       {BoundingBox}
     </>
