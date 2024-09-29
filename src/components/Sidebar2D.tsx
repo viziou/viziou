@@ -4,7 +4,7 @@ import logo from '../assets/favicon.png';
 import '../styles/Sidebar2D.css';
 
 const Sidebar2D = (props: SidebarProps2D) => {
-  const { polygons, addRandomPolygon, clearPolygons, showIoUs, savePolygons, loadPolygons } = props;
+  const { polygons, addPolygon: addPolygon, clearPolygons, showIoUs, savePolygons, loadPolygons } = props;
 
   return (
       <aside className="sidebar-2d">
@@ -47,7 +47,7 @@ const Sidebar2D = (props: SidebarProps2D) => {
       <div className="section-2d">
           <h2>Canvas</h2>
           <div className="canvas-buttons-2d">
-              <button className="twod-button-2d" onClick={addRandomPolygon}>Add Shape</button>
+              <button className="twod-button-2d" onClick={addPolygon}>Add Shape</button>
               <button className="twod-button-2d" onClick={clearPolygons}>Clear Canvas</button>
           </div>
           <div className="canvas-buttons-2d">

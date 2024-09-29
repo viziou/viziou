@@ -334,7 +334,7 @@ const Polygon = ({
         ) : null}
 
         {/* Boxes on each corner: */}
-        {["topLeft", "topRight", "bottomLeft", "bottomRight"].map(
+        {!rotating ? ["topLeft", "topRight", "bottomLeft", "bottomRight"].map(
           (corner, i) => (
             <mesh
               key={corner}
@@ -365,10 +365,10 @@ const Polygon = ({
               <meshBasicMaterial color="blue" />
             </mesh>
           )
-        )}
+        ) : null}
 
         {/* Rotate circle: */}
-        <mesh
+        {!rotating && !resizing ? <mesh
           position={[0, size.y / 2 + 0.5, 0]}
           onPointerDown={handleRotateStart}
           onPointerEnter={() => setMousePointer("move")}
@@ -377,7 +377,7 @@ const Polygon = ({
         >
           <circleGeometry args={[0.1, 16]} />
           <meshBasicMaterial color="green" />
-        </mesh>
+        </mesh> : null}
 
         {/* Line to Rotate circle: */}
         {!resizing && !rotating ? (

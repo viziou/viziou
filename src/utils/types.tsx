@@ -54,7 +54,7 @@ export type Polyhedron3DAction =
 
 export type SidebarProps2D = {
   polygons: PolygonData[];
-  addRandomPolygon: () => void;
+  addPolygon: () => void;
   clearPolygons: () => void;
   showIoUs: () => void;
   savePolygons: () => void;

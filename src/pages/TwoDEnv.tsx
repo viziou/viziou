@@ -6,6 +6,7 @@ import Scene2D from "../components/Scene2D";
 import { PolygonData } from "../utils/types";
 import { PolygonContext } from "../contexts/PolygonContext";
 import "../styles/TwoDEnv.css";
+import Sidebar from '../components/Sidebar2D';
 
 import { Backend2D, Storage } from "../backend/Interface";
 import AddPolygonModal from "../modals/AddPolygonModal";
@@ -13,39 +14,35 @@ import AddPolygonModal from "../modals/AddPolygonModal";
 import { generatePairs } from "../utils/Generic";
 import EditPolygonModal from "../modals/EditPolygonModal";
 
-const getSquare = (): THREE.PlaneGeometry => {
-  return new THREE.PlaneGeometry(1, 1);
-};
+// const getSquare = (): THREE.PlaneGeometry => {
+//   return new THREE.PlaneGeometry(1, 1);
+// };
 
-const getRandomGeometry =
-  (): THREE.BufferGeometry<THREE.NormalBufferAttributes> => {
-    // random number of vertices between 5 and 12
-    const numVertices = Math.floor(Math.random() * 8) + 5;
-    const points = [];
+// const getRandomGeometry =
+//   (): THREE.BufferGeometry<THREE.NormalBufferAttributes> => {
+//     // random number of vertices between 5 and 12
+//     const numVertices = Math.floor(Math.random() * 8) + 5;
+//     const points = [];
 
-    for (let i = 0; i < numVertices; i++) {
-      points.push(
-        new THREE.Vector3(Math.random() * 4 - 2, Math.random() * 4 - 2, 0)
-      );
-    }
-
-    //console.log('number of points: ' + points.length)
-    //console.log('added points: ', points)
-
-    return ConvexGeometry.fromPoints(points);
-  };
+//     for (let i = 0; i < numVertices; i++) {
+//       points.push(
+//         new THREE.Vector3(Math.random() * 4 - 2, Math.random() * 4 - 2, 0)
+//       );
+//     }
+//     return ConvexGeometry.fromPoints(points);
+//   };
 
 // generate random hex colours
-const getRandomColour = (): string => {
-  const letters = "0123456789ABCDEF";
-  let colour = "#";
+// const getRandomColour = (): string => {
+//   const letters = "0123456789ABCDEF";
+//   let colour = "#";
 
-  for (let i = 0; i < 6; i++) {
-    colour += letters[Math.floor(Math.random() * 16)];
-  }
+//   for (let i = 0; i < 6; i++) {
+//     colour += letters[Math.floor(Math.random() * 16)];
+//   }
 
-  return colour;
-};
+//   return colour;
+// };
 
 const TwoDEnv = () => {
   const context = useContext(PolygonContext);
@@ -79,62 +76,62 @@ const TwoDEnv = () => {
     handleModalClose();
   };
 
-  const addSquare = () => {
-    const newPolygon: PolygonData = {
-      geometry: getSquare(),
-      position: [
-        Math.random() * 4 - 2, // x coordinate
-        Math.random() * 4 - 2, // y coordinate
-      ],
-      colour: getRandomColour(),
-    };
+  // const addSquare = () => {
+  //   const newPolygon: PolygonData = {
+  //     geometry: getSquare(),
+  //     position: [
+  //       Math.random() * 4 - 2, // x coordinate
+  //       Math.random() * 4 - 2, // y coordinate
+  //     ],
+  //     colour: getRandomColour(),
+  //   };
 
-    console.log("Dispatching ADD_SQUARE:", newPolygon);
-    dispatch({ type: "ADD_SQUARE", payload: newPolygon });
-  };
+  //   console.log("Dispatching ADD_SQUARE:", newPolygon);
+  //   dispatch({ type: "ADD_SQUARE", payload: newPolygon });
+  // };
 
-  const addRandomPolygon = () => {
-    const newPolygon: PolygonData = {
-      geometry: getRandomGeometry(),
-      position: [
-        0, 0,
-        //    Math.random() * 4 - 2, // x coordinate
-        //    Math.random() * 4 - 2, // y coordinate
-      ],
-      colour: getRandomColour(),
-    };
+  // const addRandomPolygon = () => {
+  //   const newPolygon: PolygonData = {
+  //     geometry: getRandomGeometry(),
+  //     position: [
+  //       0, 0,
+  //       //    Math.random() * 4 - 2, // x coordinate
+  //       //    Math.random() * 4 - 2, // y coordinate
+  //     ],
+  //     colour: getRandomColour(),
+  //   };
 
-    console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
-    dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
-    // const geometryPosition = newPolygon.geometry.getAttribute('position');
-    // for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
-    //   const newPoint: PolygonData = {
-    //     geometry: new THREE.CircleGeometry(0.02, 50),
-    //     position: [geometryPosition.array[i], geometryPosition.array[i + 1]],
-    //     colour: '#C81400'
-    //   }
-    //   console.log("Dispatching ADD_POINT:")
-    //   //dispatch({ type: "ADD_POINT", payload: newPoint });
-    // }
-    console.time("Calculating Area of Polygon");
-    console.log("Area of new random polygon: ", Backend2D.area(newPolygon));
-    console.timeEnd("Calculating Area of Polygon");
-    console.time("Calculating Centroid");
-    const { x, y } = Backend2D.centreOfMass(newPolygon);
-    console.log("Centroid: (", x, ", ", y, ")");
-    console.time("Calculating Centroid");
-    console.log("Reducing polygon...");
-    const result = Backend2D.reduceThreeGeometry(newPolygon);
-    console.log("reduced polygon: ", result);
-    // for (const vertex of result.vertices) {
-    //   const newPoint: PolygonData = {
-    //     geometry: new THREE.CircleGeometry(0.02, 50),
-    //     position: [vertex.x, vertex.y],
-    //     colour: '#0dc800'
-    //   }
-    //   //dispatch({ type: "ADD_POINT", payload: newPoint })
-    // }
-  };
+  //   console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
+  //   dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
+  //   // const geometryPosition = newPolygon.geometry.getAttribute('position');
+  //   // for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
+  //   //   const newPoint: PolygonData = {
+  //   //     geometry: new THREE.CircleGeometry(0.02, 50),
+  //   //     position: [geometryPosition.array[i], geometryPosition.array[i + 1]],
+  //   //     colour: '#C81400'
+  //   //   }
+  //   //   console.log("Dispatching ADD_POINT:")
+  //   //   //dispatch({ type: "ADD_POINT", payload: newPoint });
+  //   // }
+  //   console.time("Calculating Area of Polygon");
+  //   console.log("Area of new random polygon: ", Backend2D.area(newPolygon));
+  //   console.timeEnd("Calculating Area of Polygon");
+  //   console.time("Calculating Centroid");
+  //   const { x, y } = Backend2D.centreOfMass(newPolygon);
+  //   console.log("Centroid: (", x, ", ", y, ")");
+  //   console.time("Calculating Centroid");
+  //   console.log("Reducing polygon...");
+  //   const result = Backend2D.reduceThreeGeometry(newPolygon);
+  //   console.log("reduced polygon: ", result);
+  //   // for (const vertex of result.vertices) {
+  //   //   const newPoint: PolygonData = {
+  //   //     geometry: new THREE.CircleGeometry(0.02, 50),
+  //   //     position: [vertex.x, vertex.y],
+  //   //     colour: '#0dc800'
+  //   //   }
+  //   //   //dispatch({ type: "ADD_POINT", payload: newPoint })
+  //   // }
+  // };
 
   const clearPolygons = () => {
     console.log("Dispatching CLEAR_POLYGONS");
@@ -196,112 +193,62 @@ const TwoDEnv = () => {
     }
   };
 
-  const [overflowVisible, setOverflowVisible] = useState(false);
-
-  const toggleOverflowMenu = () => {
-    setOverflowVisible(!overflowVisible);
-  };
-
-  const closeOverflowMenu = () => {
-    setOverflowVisible(false);
-  };
-
+ 
   return (
     <div className="TwoDEnv">
-      <main>
-        <div className="twod-canvas-container">
-          <Scene2D polygons={polygons} />
-        </div>
-      </main>
-
-      <div className="twod-button-container">
-        <button className="twod-button" onClick={addRandomPolygon}>
-          Add Random Polygon
-        </button>
-        <button className="twod-button" onClick={addSquare}>
-          Add Square
-        </button>
-        <button className="twod-button" onClick={clearPolygons}>
-          Clear Shapes
-        </button>
-        <button className="twod-button" onClick={showIoUs}>
-          Show IoUs
-        </button>
-
-        <button className="overflow-button" onClick={toggleOverflowMenu}>
-          ⋮
-        </button>
-        <div className={`overflow-menu ${overflowVisible ? "show" : ""}`}>
-          <button
-            className="twod-button"
-            onClick={() => {
-              closeOverflowMenu();
-              handleAddShapeModalOpen();
-            }}
-          >
-            Add Custom Shape
-          </button>
-          <button
-            className="twod-button"
-            onClick={() => {
-              closeOverflowMenu();
-              savePolygons();
-            }}
-          >
-            Export Scene
-          </button>
-          <button
-            className="twod-button"
-            onClick={() => {
-              closeOverflowMenu();
-              loadPolygons();
-            }}
-          >
-            Import Scene
-          </button>
-        </div>
-      </div>
-      <AddPolygonModal
-        isOpen={isAddShapeModalOpen}
-        onClose={handleModalClose}
-        onSubmit={handleAddShapeModalSubmit}
-      />
-      {editingShape ? (
-        <EditPolygonModal
-          isOpen={editingShape !== null}
-          onClose={() => {
-            if (dispatch) dispatch({ type: "SET_EDIT", index: null });
-          }}
-          onSave={(newPoints, newColour) => {
-            // todo: make a dispatch here
-            console.log("Updated points:", newPoints);
-            console.log("Updated color:", newColour);
-            if (dispatch) {
-              console.log(polygons);
-              dispatch({
-                type: "EDIT_POLYGON",
-                geometry: ConvexGeometry.fromPoints(
-                  newPoints.map((p) => new THREE.Vector3(p[0], p[1], 0))
-                ),
-                colour: newColour,
-                index: selectedPolygonIndex!,
-              });
-              console.log(polygons);
-              dispatch({ type: "SET_EDIT", index: null });
-            }
-          }}
-          // temp initial state for now:
-          initialPoints={[
-            [0, 0],
-            [0, 1],
-            [1, 0],
-            [1, 1],
-          ]}
-          initialColour={"green"}
+        <Sidebar 
+          polygons={polygons}
+          addPolygon={handleAddShapeModalOpen}
+          clearPolygons={clearPolygons}
+          showIoUs={showIoUs}
+          savePolygons={savePolygons}
+          loadPolygons={loadPolygons}
         />
-      ) : (
-        <></>
-      )}
+        <AddPolygonModal
+          isOpen={isAddShapeModalOpen}
+          onClose={handleModalClose}
+          onSubmit={handleAddShapeModalSubmit}
+        />
+        {editingShape ? (
+          <EditPolygonModal
+            isOpen={editingShape !== null}
+            onClose={() => {
+              if (dispatch) dispatch({ type: "SET_EDIT", index: null });
+            }}
+            onSave={(newPoints, newColour) => {
+              // todo: make a dispatch here
+              console.log("Updated points:", newPoints);
+              console.log("Updated color:", newColour);
+              if (dispatch) {
+                console.log(polygons);
+                dispatch({
+                  type: "EDIT_POLYGON",
+                  geometry: ConvexGeometry.fromPoints(
+                    newPoints.map((p) => new THREE.Vector3(p[0], p[1], 0))
+                  ),
+                  colour: newColour,
+                  index: selectedPolygonIndex!,
+                });
+                console.log(polygons);
+                dispatch({ type: "SET_EDIT", index: null });
+              }
+            }}
+            // temp initial state for now:
+            initialPoints={[
+              [0, 0],
+              [0, 1],
+              [1, 0],
+              [1, 1],
+            ]}
+            initialColour={"green"}
+          />
+        ) : (
+          <></>
+        )}
+
+        <main className="twod-canvas-container">
+            <Scene2D polygons={polygons} />
+        </main>
     </div>
   );
 };
