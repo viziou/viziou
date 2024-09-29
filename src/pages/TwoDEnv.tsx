@@ -154,11 +154,10 @@ const TwoDEnv = () => {
   const showIoUs = () => {
     const IoUs: IOUPolygonData[] = [];
     for (const [a, b] of generatePairs(Array.from(polygons.values()))) {
-      const { area, shape } = Backend2D.IoU(a, b);
-      console.log(
-        "IoU between " + a.geometry.id + " and " + b.geometry.id + ": " + area
-      );
-      console.log("IoU shape: ", shape);
+      const {area, shape} = Backend2D.IoU(a, b);
+      console.log("IoU between " + a.id + " and " + b.id + ": " + area);
+      console.log("IoU shape: ", shape)
+      // TODO: don't push an IoU polygon if area is 0?
       const IoUPolygon: IOUPolygonData = {
         parentIDa: a.id,
         parentIDb: b.id,
@@ -167,22 +166,23 @@ const TwoDEnv = () => {
         colour: '#ce206b',
         id: generateId(),
         opacity: 1.0,
-      };
+      }
       IoUs.push(IoUPolygon);
     }
     //console.log("Clearing canvas...");
     //dispatch({type: "CLEAR_POLYGONS"});
     for (const polygon of IoUs) {
-      console.log("Dispatching IoU Polygon via ADD_RANDOM_POLYGON...", polygon);
-      dispatch({ type: "ADD_RANDOM_POLYGON", payload: polygon });
-      // const geomPos = polygon.geometry.getAttribute("position");
+      console.log("Dispatching IoU Polygon via SET_POLYGON...", polygon);
+      iouDispatch({ type: 'SET_POLYGON', payload: polygon });
+      //const geomPos = polygon.geometry.getAttribute('position')
       // for (let i = 0, l = geomPos.count; i < l; i += 3) {
       //   const newPoint: PolygonData = {
       //     geometry: new THREE.CircleGeometry(0.02, 50),
       //     position: [geomPos.array[i], geomPos.array[i + 1]],
-      //     colour: "#2bc800",
-      //   };
-      //   console.log("Placing IoU vertex:");
+      //     colour: '#2bc800',
+      //     id: this.geometry.id // dirty hack since we don't have an ID generator
+      //   }
+      //   console.log("Placing IoU vertex:")
       //   dispatch({ type: "ADD_POINT", payload: newPoint });
       // }
     }
