@@ -1,5 +1,6 @@
 import { createContext, useReducer, ReactNode } from 'react';
 import { IOUPolygon2DAction, IOUPolygonData } from '../utils/types';
+import { Backend2D } from '../backend/Interface';
 
 const initialState: IOUPolygonContextInterface = {
     polygonMap: new Map<string, IOUPolygonData>,
@@ -20,12 +21,12 @@ function key(IOUPolygon: IOUPolygonData): string {
     return `${low}+${high}`;
 }
 
-function updateParents(state: IOUPolygonContextInterface, IOUPolygon: IOUPolygonData): void {
+function updateParents(state: IOUPolygonContextInterface, IOUPolygon: IOUPolygonData, create = true): void {
     const parentsA = state.parentsMap.get(`${IOUPolygon.parentIDa}`);
     const parentsB = state.parentsMap.get(`${IOUPolygon.parentIDb}`);
     // If there already is a parent set here then add to it. Otherwise, we have to initialise a new set.
-    parentsA ? parentsA.add(key(IOUPolygon)) : state.parentsMap.set(`${IOUPolygon.parentIDa}`, new Set([key(IOUPolygon)]));
-    parentsB ? parentsB.add(key(IOUPolygon)) : state.parentsMap.set(`${IOUPolygon.parentIDb}`, new Set([key(IOUPolygon)]));
+    parentsA ? parentsA.add(key(IOUPolygon)) : (create || state.parentsMap.set(`${IOUPolygon.parentIDa}`, new Set([key(IOUPolygon)])));
+    parentsB ? parentsB.add(key(IOUPolygon)) : (create || state.parentsMap.set(`${IOUPolygon.parentIDb}`, new Set([key(IOUPolygon)])));
 }
 
 export const IOUPolygonContext = createContext<IOUPolygonContextInterface | undefined>(undefined);
@@ -54,6 +55,84 @@ function IOUPolygonReducer(state: IOUPolygonContextInterface, action: IOUPolygon
 
             // TODO: Hide polygons associated with a *single* parent
             // consider a
+
+      case "UPDATE_POLYGON":
+        // only update if the IoU polygon already exists
+        if (!state.polygonMap.has(key(action.payload))) {
+          return {
+            ...state,
+            polygonMap: state.polygonMap,
+            parentsMap: state.parentsMap,
+          }
+        }
+        // otherwise we have an update to handle
+        updateParents(state, action.payload, false);
+          return {
+            ...state,
+            polygonMap: state.polygonMap.set(key(action.payload), action.payload),
+            parentsMap: state.parentsMap,
+          }
+
+      case "RECALCULATE_CHILD_IOUS_USING_ID":
+        state.parentsMap.get(`${action.payload.id}`)?.
+        forEach((key) => {
+          const polygon = state.polygonMap.get(key);
+          if (polygon) {
+            polygon.geometry = Backend2D.IoU()
+            state.polygonMap.set(key, polygon); // this set probably isn't necessary but might as well be safe
+          }
+        });
+        return {
+          ...state,
+          polygonMap: state.polygonMap,
+          parentsMap: state.parentsMap
+        }
+
+      case "HIDE_CHILD_IOUS":
+          state.parentsMap.get(`${action.payload.id}`)?.
+          forEach((key) => {
+            const polygon = state.polygonMap.get(key);
+            if (polygon) {
+              polygon.opacity = 0.0;
+              state.polygonMap.set(key, polygon); // this set probably isn't necessary but might as well be safe
+            }
+          });
+          return {
+            ...state,
+            polygonMap: state.polygonMap,
+            parentsMap: state.parentsMap
+          }
+
+      case "HIDE_CHILD_IOUS_USING_ID":
+          state.parentsMap.get(`${action.payload}`)?.
+          forEach((key) => {
+            const polygon = state.polygonMap.get(key);
+            if (polygon) {
+              polygon.opacity = 0.0;
+              state.polygonMap.set(key, polygon); // this set probably isn't necessary but might as well be safe
+            }
+          });
+          return {
+            ...state,
+            polygonMap: state.polygonMap,
+            parentsMap: state.parentsMap
+          }
+
+      case "SHOW_CHILD_IOUS_USING_ID":
+        state.parentsMap.get(`${action.payload}`)?.
+        forEach((key) => {
+          const polygon = state.polygonMap.get(key);
+          if (polygon) {
+            polygon.opacity = 1.0;
+            state.polygonMap.set(key, polygon); // this set probably isn't necessary but might as well be safe
+          }
+        });
+        return {
+          ...state,
+          polygonMap: state.polygonMap,
+          parentsMap: state.parentsMap
+        }
+
 
       case "DELETE_CHILD_IOUS":
             state.parentsMap.get(`${action.payload.id}`)?.

@@ -7,7 +7,7 @@ type PolygonProps = PolygonData & { index: number };
 
 // TODO: Make information on top of the polygon as a child instead?
 
-const IOUPolygon = ({ position, geometry, colour, index }: PolygonProps) => {
+const IOUPolygon = ({ position, geometry, colour, index, opacity }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
   const { dispatch } = useContext(IOUPolygonContext)!;
 
@@ -46,7 +46,11 @@ const IOUPolygon = ({ position, geometry, colour, index }: PolygonProps) => {
             geometry={geometry}
             ref={mesh}
           >
-            <meshBasicMaterial color={colour} />
+            <meshBasicMaterial
+              color={colour}
+              transparent={true}
+              opacity={opacity}
+            />
           </mesh>
           {/* renderVertices(geometry) */}
         </group>

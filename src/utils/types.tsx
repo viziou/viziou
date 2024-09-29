@@ -6,6 +6,7 @@ export type PolygonData = {
   position: [number, number];
   geometry: THREE.BufferGeometry;
   colour: string;
+  opacity: number;
 };
 
 export type IOUPolygonData = PolygonData & {
@@ -15,11 +16,16 @@ export type IOUPolygonData = PolygonData & {
 
 export type IOUPolygon2DAction =
   | { type: "SET_POLYGON", payload: IOUPolygonData }
+  | { type: "UPDATE_POLYGON", payload: IOUPolygonData }
   | { type: "SHOW_POLYGON", payload: [number, number] }
   | { type: "HIDE_POLYGON", payload: [number, number] }
   | { type: "DELETE_POLYGON", payload: [number, number] }
   | { type: "DELETE_CHILD_IOUS", payload: PolygonData }
   | { type: "DELETE_CHILD_IOUS_USING_ID", payload: number }
+  | { type: "HIDE_CHILD_IOUS", payload: PolygonData}
+  | { type: "HIDE_CHILD_IOUS_USING_ID", payload: number}
+  | { type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: number, parentGeometry: THREE.BufferGeometry}}
+  | { type: "SHOW_CHILD_IOUS_USING_ID", payload: number }
   | { type: "CLEAR_POLYGONS" };
 
 export type Scene2DProps = {

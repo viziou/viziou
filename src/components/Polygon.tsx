@@ -8,7 +8,7 @@ type PolygonProps = PolygonData & { index: number } & {iouDispatch: React.Dispat
 
 // TODO: Make information on top of the polygon as a child instead?
 
-const Polygon = ({id, position, geometry, colour, index, iouDispatch }: PolygonProps) => {
+const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
   const { dispatch } = useContext(PolygonContext)!;
   const originalPosition = useRef<[number, number]>([0, 0]);
@@ -18,6 +18,9 @@ const Polygon = ({id, position, geometry, colour, index, iouDispatch }: PolygonP
 
   const handleDragEnd = () => {
     /* Could trigger updates to IoU or something here maybe */
+    if (iouDispatch) {
+
+    }
   };
 
   const handleDragStart = () => {
@@ -29,8 +32,9 @@ const Polygon = ({id, position, geometry, colour, index, iouDispatch }: PolygonP
       // test clearing all IoU polygons
       console.log("dispatch: ", iouDispatch)
       if (iouDispatch) {
-        console.log("trying to clear child IoUs that have ID ", id)
-        iouDispatch({type: "DELETE_CHILD_IOUS_USING_ID", payload: id});
+        console.log("trying to hide child IoUs that have ID ", id)
+        //iouDispatch({type: "DELETE_CHILD_IOUS_USING_ID", payload: id});
+        iouDispatch({type: "HIDE_CHILD_IOUS_USING_ID", payload: id})
       }
     }
   };
@@ -96,7 +100,11 @@ const Polygon = ({id, position, geometry, colour, index, iouDispatch }: PolygonP
             geometry={geometry}
             ref={mesh}
           >
-            <meshBasicMaterial color={colour} />
+            <meshBasicMaterial
+              color={colour}
+              transparent={true}
+              opacity={opacity}
+            />
           </mesh>
           {/* {renderVertices(geometry)} */}
         </group>

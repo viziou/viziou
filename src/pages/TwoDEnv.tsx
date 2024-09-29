@@ -69,7 +69,8 @@ const TwoDEnv = () => {
                 Math.random() * 4 - 2 // y coordinate
             ],
             colour: getRandomColour(),
-            id: generateId()
+            id: generateId(),
+            opacity: 1.0
         };
 
         console.log("Dispatching ADD_SQUARE:", newPolygon);
@@ -84,7 +85,8 @@ const TwoDEnv = () => {
             //    Math.random() * 4 - 2, // y coordinate
             ],
             colour: getRandomColour(),
-            id: generateId()
+            id: generateId(),
+            opacity: 1,
         };
 
         console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
@@ -137,7 +139,8 @@ const TwoDEnv = () => {
               geometry: shape,
               position: [0, 0],
               colour: '#ce206b',
-              id: generateId()
+              id: generateId(),
+              opacity: 1.0,
             }
             IoUs.push(IoUPolygon);
         }
