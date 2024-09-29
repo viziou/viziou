@@ -14,6 +14,7 @@ import AddPolygonModal from "../modals/AddPolygonModal";
 import { generatePairs } from "../utils/Generic";
 import EditPolygonModal from "../modals/EditPolygonModal";
 import { IOUPolygonContext } from '../contexts/IOUPolygonContext.tsx'
+import ConfirmationModal from "../modals/ConfirmationModal";
 
 const TwoDEnv = () => {
     const context = useContext(PolygonContext);
@@ -158,10 +159,11 @@ const TwoDEnv = () => {
           />
           ) : null}
 
-          <main className="twod-canvas-container">
-              <Scene2D polygons={polygons} iouPolygons={iouPolygons} iouDispatch={iouDispatch} />
-          </main>
-      </div>
+        <main className="twod-canvas-container">
+            <Scene2D polygons={polygons} iouPolygons={iouPolygons} iouDispatch={iouDispatch} />
+        </main>
+        <ConfirmationModal isOpen={true}  message="Are you sure you want to delete?" onConfirm={() => console.log("oh boy")}/>
+    </div>
   );
 };
 
