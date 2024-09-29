@@ -17,7 +17,7 @@ const duplicateIconTexture = new THREE.TextureLoader().load(duplicate);
 
 // TODO: Make information on top of the polygon as a child instead?
 
-const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity, selectable }: PolygonProps) => {
+const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectable }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
   const { dispatch, selectedPolygonID, currentlyMousedOverPolygons, selectability, polygons } = useContext(PolygonContext)!;
   const originalPosition = useRef<[number, number]>([0, 0]);
@@ -452,32 +452,32 @@ const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity, s
     );
   }, [boundingBox, isPolygonSelected, scene, polygons]);
 
-  const renderPoint = ({x, y}: {x: number, y: number}, size = 0.03, smoothness = 50) => {
-    return (
-      <mesh
-        position={[x, y, 0]}
-        geometry={new THREE.CircleGeometry(size, smoothness)}
-      >
-        <meshStandardMaterial color={'#000000'} />
-      </mesh>);
-  }
+  // const renderPoint = ({x, y}: {x: number, y: number}, size = 0.03, smoothness = 50) => {
+  //   return (
+  //     <mesh
+  //       position={[x, y, 0]}
+  //       geometry={new THREE.CircleGeometry(size, smoothness)}
+  //     >
+  //       <meshStandardMaterial color={'#000000'} />
+  //     </mesh>);
+  // }
 
-  const renderVertices = (geometry: THREE.BufferGeometry) => {
-    /* Dynamically generate the vertices of a polygon. */
-    const pos = geometry.getAttribute('position')
-    const idx: {x: number, y: number, z:number}[] = [];
-    for (let i = 0; i < pos.count; i += 3) {
-      idx.push({x: pos.array[i], y: pos.array[i+1], z: pos.array[i+2]});
-    }
-
-    return (
-      <>
-        {idx.map((args) => {
-          return renderPoint(args)
-        })}
-    </>
-    )
-  }
+  // const renderVertices = (geometry: THREE.BufferGeometry) => {
+  //   /* Dynamically generate the vertices of a polygon. */
+  //   const pos = geometry.getAttribute('position')
+  //   const idx: {x: number, y: number, z:number}[] = [];
+  //   for (let i = 0; i < pos.count; i += 3) {
+  //     idx.push({x: pos.array[i], y: pos.array[i+1], z: pos.array[i+2]});
+  //   }
+  //
+  //   return (
+  //     <>
+  //       {idx.map((args) => {
+  //         return renderPoint(args)
+  //       })}
+  //   </>
+  //   )
+  // }
 
   return (
     <>

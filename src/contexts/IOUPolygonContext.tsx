@@ -21,11 +21,11 @@ function key(IOUPolygon: IOUPolygonData): string {
     return `${low}+${high}`;
 }
 
-function extractParents(key: string): [string, string] {
-  /* From an IoU key, returns the two parent polygon's IDs. */
-  const [a, b] = key.split('+', 2);
-  return [a, b];
-}
+// function extractParents(key: string): [string, string] {
+//   /* From an IoU key, returns the two parent polygon's IDs. */
+//   const [a, b] = key.split('+', 2);
+//   return [a, b];
+// }
 
 function updateParents(state: IOUPolygonContextInterface, IOUPolygon: IOUPolygonData, create = true): void {
     const parentsA = state.parentsMap.get(`${IOUPolygon.parentIDa}`);
