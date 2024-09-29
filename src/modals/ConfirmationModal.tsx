@@ -27,8 +27,12 @@ const ConfirmationModal = ({
         <h2>{message}</h2>
         <p>{description}</p>
         <div className="modal-actions">
-          <button className="modal-button cancel-button" onClick={onClose}>{cancelText}</button>
-          <button className="modal-button confirm-button" onClick={onConfirm}>{confirmText}</button>
+          <button className="modal-button cancel-button" onClick={onClose}>
+            {cancelText}
+          </button>
+          <button className="modal-button confirm-button" onClick={onConfirm}>
+            {confirmText}
+          </button>
         </div>
       </div>
     </div>
