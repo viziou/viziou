@@ -44,7 +44,7 @@ describe("Fuzzing Tests", () => {
 
     it("should follow f(x) = x^2 curve", () => {
     for (const {polygon, expectedArea} of generator) {
-      const calculated = polygon.calculateArea();
+      const calculated = polygon.area();
       calculated.should.be.equal(expectedArea);
       }
     });
@@ -70,7 +70,7 @@ describe("Fuzzing Tests", () => {
 
     it("should follow f(x) = (x^2)/2 curve", () => {
       for (const {polygon, expectedArea} of generator) {
-        const calculated = polygon.calculateArea();
+        const calculated = polygon.area();
         calculated.should.be.equal(expectedArea);
       }
     });
@@ -92,7 +92,7 @@ describe("Fuzzing Tests", () => {
     const approximateCircle = new Polygon2D(points);
 
     it("should approximately equal pi", () => {
-      approximateCircle.calculateArea().should.be.closeTo(Math.PI, 1e-5)
+      approximateCircle.area().should.be.closeTo(Math.PI, 1e-5)
     })
 
   })

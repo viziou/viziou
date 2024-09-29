@@ -58,11 +58,12 @@ function findIntersectionPoint(edge1: Edge2D, edge2: Edge2D): Point2D | null {
 
 
 function IoU(polygon1: Polygon2D, polygon2: Polygon2D): number {
-    const areaOfIntersection: number = getIntersectionPolygon(polygon1, polygon2).calculateArea();
-    if (polygon1.calculateArea() + polygon2.calculateArea() - areaOfIntersection == 0) {
+    const areaOfIntersection: number = getIntersectionPolygon(polygon1, polygon2).area();
+    const areaOfUnion = polygon1.area() + polygon2.area() - areaOfIntersection;
+    if (areaOfUnion == 0) {
         return 0;
     } else {
-        return areaOfIntersection / (polygon1.calculateArea() + polygon2.calculateArea() - areaOfIntersection);
+        return areaOfIntersection / areaOfUnion;
     }
 }
 

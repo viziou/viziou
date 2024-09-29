@@ -53,7 +53,7 @@ class ConvexGeometry {
 class Backend2D {
 
   public static area( { geometry }: PolygonData ) {
-    return this._threeGeometryToPolygon2D(geometry).calculateArea();
+    return this._threeGeometryToPolygon2D(geometry).area();
   }
 
   public static pointInPolygon({x, y}: { x: number; y: number }, { geometry, position }: PolygonData) {
@@ -75,7 +75,7 @@ class Backend2D {
 
   public static centreOfMass({geometry, position}: PolygonData): {x: number; y: number} {
     const offset = new Point2D(position[0], position[1]);
-    return this._threeGeometryToPolygon2D(geometry).getCentroid().translate(offset).xy;
+    return this._threeGeometryToPolygon2D(geometry).centroid().translate(offset).xy;
   }
 
   private static _threeGeometryToPolygon2D( geometry: BufferGeometry ): Polygon2D {
@@ -201,14 +201,14 @@ class Backend2D {
     if (onRight.length === 0) {
       angles = above.map(({point, orig_idx}) => {
         const vector = point.sub(reducedVertices[0])
-        return { angle: (Math.acos(vector.y / vector.distanceToOrigin())), orig_idx: orig_idx };
+        return { angle: (Math.acos(vector.y / vector.magnitude())), orig_idx: orig_idx };
       })
     }
     else {
       angles = onRight.map(({ point, orig_idx }) => {
         const vector = point.sub(reducedVertices[0]); // vector from extreme to this point
         //console.log(vector.x / vector.distanceToOrigin())
-        return { angle: (Math.acos(vector.x / vector.distanceToOrigin())), orig_idx: orig_idx };
+        return { angle: (Math.acos(vector.x / vector.magnitude())), orig_idx: orig_idx };
       })
     }
     //console.log('angles on the right: ', angles);
@@ -232,7 +232,7 @@ class Backend2D {
         const vector_behind = reducedVertices[reducedVertices.length - 1].sub(reducedVertices[reducedVertices.length - 2]) // recover previous vector
         const vector = reducedVertices[reducedVertices.length - 1].sub(point) // calculate this vector
         //console.log('inside next angle: ', vector.x / vector.distanceToOrigin());
-        return {angle: Math.acos(vector_behind.dot(vector) / (vector_behind.distanceToOrigin() * vector.distanceToOrigin())), orig_idx: index}
+        return {angle: Math.acos(vector_behind.dot(vector) / (vector_behind.magnitude() * vector.magnitude())), orig_idx: index}
       });
       //console.log('current wrap: ', reducedVertices);
       //console.log('next angles: ', angles);
