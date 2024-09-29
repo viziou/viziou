@@ -6,7 +6,7 @@ import Scene2D from "../components/Scene2D";
 import { IOUPolygonData, PolygonData } from "../utils/types";
 import { PolygonContext } from "../contexts/PolygonContext";
 import "../styles/TwoDEnv.css";
-import Sidebar from '../components/Sidebar2D';
+import Sidebar from "../components/Sidebar2D";
 
 import { Backend2D, Storage } from "../backend/Interface";
 import AddPolygonModal from "../modals/AddPolygonModal";
@@ -61,8 +61,9 @@ const TwoDEnv = () => {
     throw new Error("TwoDEnv must be used within a PolygonProvider");
   }
 
-  const { polygons, dispatch, selectedPolygonID, editingShape } = context;
+  const { polygons, dispatch, selectedPolygonID, editingShape, confirmationInfo } = context;
     const { polygonMap: iouPolygons, dispatch: iouDispatch } = IoUcontext;
+
 
   const [isAddShapeModalOpen, setIsAddShapeModalOpen] = useState(false);
 
@@ -146,12 +147,27 @@ const TwoDEnv = () => {
   //   // }
   // };
 
-    const clearPolygons = () => {
-        console.log("Dispatching CLEAR_POLYGONS");
-        dispatch({ type: "CLEAR_POLYGONS" });
-        iouDispatch({ type: "CLEAR_POLYGONS" }); // clear IoUs as well
+  const clearPolygons = () => {
+    const onSubmit = () => {
+      console.log("Dispatching CLEAR_POLYGONS");
+      dispatch({ type: "CLEAR_POLYGONS" });
+      iouDispatch({ type: "CLEAR_POLYGONS" }); // clear IoUs as well
+      dispatch( {type: "CLOSE_CONFIRMATION_MODAL"})
     };
 
+    console.log("Opening clear confirmation modal");
+    dispatch({
+      type: "OPEN_CONFIRMATION_MODAL",
+      info: {
+        isOpen: true,
+        onClose: () => {dispatch( {type: "CLOSE_CONFIRMATION_MODAL"})},
+        onConfirm: onSubmit,
+        message: "Are you sure you want to clear the canvas?",
+        description: "This action cannot be undone.",
+      },
+    });
+  };
+  
   const showIoUs = () => {
     const IoUs: IOUPolygonData[] = [];
     for (const [a, b] of generatePairs(Array.from(polygons.values()))) {
@@ -273,7 +289,13 @@ const TwoDEnv = () => {
         <main className="twod-canvas-container">
             <Scene2D polygons={polygons} iouPolygons={iouPolygons} iouDispatch={iouDispatch} />
         </main>
-        <ConfirmationModal isOpen={true}  message="Are you sure you want to delete?" onConfirm={() => console.log("Fuck")}/>
+        <ConfirmationModal
+        isOpen={confirmationInfo.isOpen}
+        message={confirmationInfo.message}
+        description={confirmationInfo.description}
+        onConfirm={confirmationInfo.onConfirm}
+        onClose={confirmationInfo.onClose}
+      />
     </div>
   );
 };

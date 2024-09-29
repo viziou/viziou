@@ -52,7 +52,9 @@ export type Polygon2DAction =
   | { type: "SET_EDIT"; id: number | null}
   | { type: "EDIT_POLYGON"; id: number, geometry: THREE.BufferGeometry; colour: string}
   | { type: "SELECTABILITY"; payload: boolean}
-  | { type: "SET_DECIMAL_PRECISION"; precision: number};
+  | { type: "SET_DECIMAL_PRECISION"; precision: number}
+  | { type: "OPEN_CONFIRMATION_MODAL"; info: ConfirmationModalInfo}
+  | { type: "CLOSE_CONFIRMATION_MODAL"; };
 
 export interface PolyhedronData {
   geometry: THREE.BufferGeometry;
@@ -93,4 +95,14 @@ export type SidebarProps3D = {
   // showIoUs: () => void;
   savePolyhedrons: () => void;
   loadPolyhedrons: () => void;
+}
+
+export type ConfirmationModalInfo = {
+  isOpen: boolean;
+  onClose?: () => void;
+  onConfirm: () => void;
+  message: string;
+  description?: string;
+  confirmText?: string;
+  cancelText?: string;
 }
