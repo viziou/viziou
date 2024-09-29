@@ -17,10 +17,16 @@ function App() {
   return (
       <BrowserRouter>
           <div>
-              <Navbar />
               <Routes>
-                  <Route index element={<Hero />} />
-                  <Route path="/" element={<Hero />} />
+                    <Route
+                            path="/"
+                            element={
+                            <>
+                                <Navbar />
+                                <Hero />
+                            </>
+                            }
+                    />
 
                   <Route path="/2D-Environment" element={
                       <PolygonProvider>
@@ -38,7 +44,15 @@ function App() {
                       }
                   />
 
-                  <Route path="/about" element={<About />} />
+                  <Route
+                            path="/about"
+                            element={
+                            <>
+                                <Navbar />
+                                <About />
+                            </>
+                            }
+                    />
 
                   <Route path="*" element={<PageNotFound />} />
 

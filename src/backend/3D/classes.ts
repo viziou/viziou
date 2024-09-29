@@ -37,23 +37,23 @@ class Point3D {
 		return this._z;
 	}
 
-    public translate(x: number, y: number, z: number): this;
-    public translate(p: Point3D): this;
-    public translate(x: unknown, y: unknown = null, z: unknown = null): this {
+    public translate(x: number, y: number, z: number): Point3D;
+    public translate(p: Point3D): Point3D;
+    public translate(x: unknown, y: unknown = null, z: unknown = null): Point3D {
         if (typeof x === 'number' && typeof y === 'number' && typeof z === 'number') {
-            this._x += x; this._y += y; this._z += z;
+            return new Point3D(this._x + x, this._y + y, this._z + z);
         } else if (x instanceof Point3D) {
-            this._x += x.x; this._y += x.y; this._z += x.z;
+            return new Point3D(this._x + x.x, this._y + x.y, this._z + x.z);
         }
-            // should probably throw exception if both failed
-            return this;
+        // should probably throw exception if both failed
+        return new Point3D(0, 0, 0);
     }
 
     public add(p: Point3D): Point3D {
         return new Point3D(this.x + p.x, this.y + p.y, this.z + p.z);
     }
 
-    public subtract(p: Point3D): Point3D {
+    public sub(p: Point3D): Point3D {
         return new Point3D(this.x - p.x, this.y - p.y, this.z - p.z);
     }
 
@@ -117,9 +117,11 @@ function dot(p: Point3D, q: Point3D): number {
 
 class Face3D {
     private _vertices: Point3D[];
+    private _normal: Point3D;
 
     constructor(vertices: Point3D[], requiresValidation?: boolean, requiresSort?: boolean) {
         this._vertices = [...vertices];
+        this._normal = this.calculateNormal();
 
         // Validate if required
         if (requiresValidation) {
@@ -130,7 +132,7 @@ class Face3D {
 
         // Sort CCW order if required
         if (requiresSort) {
-            this._vertices = this._sortCCW();
+            this._sortCCW();
         }
     }
 
@@ -142,29 +144,47 @@ class Face3D {
 		return [...this._vertices];
 	}
 
+    /**
+     * Getter normal
+     * @return {Point3D[]}
+     */
+	public get normal(): Point3D {
+		return new Point3D(this._normal.x, this._normal.y, this._normal.z);
+	}
+
+    public invertNormal() {
+        this._normal = new Point3D(-this.normal.x, -this.normal.y, -this.normal.z);
+        this._sortCCW();
+    }
+
     public get numVertices(): number {
         return this._vertices.length;
     }
 
-    public normal(): Point3D {
+    public calculateNormal(): Point3D {
+        // Edge case of less than 3 vertex Face
+        if (this.numVertices < 3) {
+            return new Point3D(0, 0, 0);
+        }
+        
         // Establish points to use
         const Point1 = this._vertices[0];
         const Point2 = this._vertices[1];
         const Point3 = this._vertices[2];
 
         // Get parallel plane vectors
-        const vec12 = Point2.subtract(Point1);
-        const vec13 = Point3.subtract(Point1);
+        const vec12 = Point2.sub(Point1);
+        const vec13 = Point3.sub(Point1);
 
         // Get normal vector to plane
         const n = cross(vec12, vec13);
 
-        return n;
+        return n.normalise();
     }
 
     public planeCoefficients(): number[] {
         // Get normal vector to plane
-        const n = this.normal()
+        const n = this.normal;
 
         // Create coefficients
         const A = n.x;
@@ -198,7 +218,7 @@ class Face3D {
         return true;
     }
 
-    public getCentroid(): Point3D {
+    public centroid(): Point3D {
         let x: number = 0;
         let y: number = 0;
         let z: number = 0;
@@ -213,47 +233,31 @@ class Face3D {
         return new Point3D(x/numVertices, y/numVertices, z/numVertices);
     }
 
-    public translate(x: number, y: number, z: number): this;
-    public translate(p: Point3D): this;
-    public translate(x: number | Point3D, y?: number, z?: number): this {
-        if (!(x instanceof Point3D) && (y) && (z)) {
-            x = new Point3D(x, y, z);
-        }
-
-        // this is necessary to keep TypeScript happy since we're doing funky things with types
-        if (typeof x !== 'number') {
-            this._vertices.map((point: Point3D) => {
-            return point.translate(x);
-            })
-        }
-        return this;
-    }
-
     private _sortCCW() {
-        // Sorting is meaningless
         if (this._vertices.length < 3) {
+            // Sorting is meaningless
             return this._vertices;
         }
 
         // Obtain centre point to reference from
-        const meanVertex: Point3D = this.getCentroid();
+        const meanVertex: Point3D = this.centroid();
 
         // Redefine coordinate system to put face on 2D x-y plane
         const coordinates: Pair<number, number>[] = [[1, 0]];
 
         // Set new x-direction component vector
-        const x = this._vertices[0].subtract(meanVertex);
+        const x = this._vertices[0].sub(meanVertex);
         const x_mag = x.magnitude();
         const x_hat = x.normalise();
 
-        // Set new y-direction component vector by taking cross product of x and face normal
-        const y = cross(x, this.normal());
+        // Set new y-direction component vector by taking cross product face normal and x. This order ensures anticlockwise x and y 
+        const y = cross(this.normal, x);
         const y_mag = y.magnitude();
         const y_hat = y.normalise();
 
         // Redefine all centroid vectors in terms of x and y via scalar resolute
         for (let i = 1; i < this.numVertices; i++) {
-            let a = this._vertices[i].subtract(meanVertex);
+            let a = this._vertices[i].sub(meanVertex);
             let u_mag = dot(a, x_hat);
             let w_mag = dot(a, y_hat);
             coordinates.push([u_mag/x_mag, w_mag/y_mag]);
@@ -289,20 +293,34 @@ class Face3D {
             }
         });
 
-        // Return an array only consisting of the points
-        return sortedCollection.map((value) => {
+        // Set an array only consisting of the points
+        this._vertices = sortedCollection.map((value) => {
             return value[0];
         })
     }
 
-    public calculateArea(): number {
+    public translate(x: number, y: number, z: number): Face3D;
+    public translate(p: Point3D): Face3D;
+    public translate(x: number | Point3D, y?: number, z?: number): Face3D {
+        if (!(x instanceof Point3D) && (y) && (z)) {
+            x = new Point3D(x, y, z);
+        }
+
+        // this is necessary to keep TypeScript happy since we're doing funky things with types
+        if (typeof x !== 'number') {
+            return new Face3D(this.vertices.map((point: Point3D) => {return point.translate(x)}));
+        }
+        return this;
+    }
+
+    public area(): number {
         let sum: number = 0;
         let p: Point3D;
         let q: Point3D;
         let edge: Edge3D;
         let side1: Point3D;
         let side2: Point3D;
-        let meanVertex = this.getCentroid();
+        let meanVertex = this.centroid();
 
         // Loop over every edge counterclockwise
         for (var i = 0; i < this._vertices.length; i++) {
@@ -312,11 +330,27 @@ class Face3D {
             q = edge.q;
 
             // Get side vectors of the triangle created with the centroid
-            side1 = p.subtract(meanVertex);
-            side2 = q.subtract(meanVertex);
+            side1 = p.sub(meanVertex);
+            side2 = q.sub(meanVertex);
 
             // Get area of triangle of the two vectors
             sum += cross(side1, side2).magnitude()/2;
+        }
+        return sum;
+    }
+
+    public perimeter(): number {
+        let sum: number = 0;
+        let p: Point3D;
+        let q: Point3D;
+        let edge: Edge3D;
+
+        // Loop over every edge counterclockwise
+        for (var i = 0; i < this._vertices.length; i++) {
+            edge = this.getEdge(i)
+            p = edge.p;
+            q = edge.q;
+            sum += p.sub(q).magnitude();
         }
         return sum;
     }
@@ -326,6 +360,47 @@ class Face3D {
             p: this._vertices[idx],
             q: this._vertices[(idx + 1) % this._vertices.length]
         };
+    }
+
+    public equals(face: Face3D): boolean {
+        // Handle edge cases of null faces
+        if (face.numVertices < 3 && this.numVertices < 3) {
+            return true;
+        }
+
+        // Check if same size
+        if (face.numVertices != this.numVertices) {
+            return false;
+        }
+
+        // Check if same plane and orientation
+        if (!face.normal.equals(this._normal)) {
+            return false;
+        }
+
+        // Check if first point in face exists here
+        let initial_idx = -1;
+        for (let i = 0; i < this.numVertices; i++) {
+            if (this._vertices[i].equals(face.vertices[0])) {
+                initial_idx = i;
+                break;
+            }
+        }
+        if (initial_idx == -1) {
+            // Could not find first point
+            return false;
+        }
+
+        // Since same origin, do linear scan from 0 and initial_idx mod numVertices
+        for (let i = 0, j = initial_idx; i < this.numVertices; i++) {
+            if (!face.vertices[i].equals(this._vertices[j])) {
+                return false;
+            }
+            j = (j + 1) % this.numVertices;
+        }
+
+        // Since same exact points in same orientation, must be same face
+        return true
     }
 
     public map(callbackfn: (point: Point3D) => Point3D): Face3D {
@@ -351,7 +426,11 @@ class Polyhedra3D {
     private _faces: Face3D[];
 
     constructor(faces: Face3D[]) {
+        // Save a copy of the faces
         this._faces = [...faces];
+
+        // Renormalise faces to all have outward normals
+        this.renormalise();
     }
 
     /**
@@ -370,12 +449,45 @@ class Polyhedra3D {
         return 1;   // TODO FIGURE THIS OUT
     }
 
+    public translate(x: number, y: number, z: number): Polyhedra3D;
+    public translate(p: Point3D): Polyhedra3D;
+    public translate(x: number | Point3D, y?: number, z?: number): Polyhedra3D {
+        if (!(x instanceof Point3D) && (y) && (z)) {
+            x = new Point3D(x, y, z);
+        }
+
+        // this is necessary to keep TypeScript happy since we're doing funky things with types
+        if (typeof x !== 'number') {
+            return new Polyhedra3D(this.faces.map((face: Face3D) => {return face.translate(x)}));
+        }
+        return this;
+    }
+
     public centroid(): Point3D {
         let sumPoint = new Point3D(0, 0, 0);
         for (let i = 0; i < this.numFaces; i++) {
-            sumPoint = sumPoint.add(this.faces[i].getCentroid());
+            sumPoint = sumPoint.add(this.faces[i].centroid());
         }
         return new Point3D(sumPoint.x/this.numFaces, sumPoint.y/this.numFaces, sumPoint.z/this.numFaces);
+    }
+
+    public renormalise() {
+        // Get centroid
+        const polyhedraCentroid = this.centroid();
+
+        // Go over every face
+        this._faces.forEach((face) => {
+            // Get face centroid to polyhedra centroid vector
+            let centreVector = polyhedraCentroid.sub(face.centroid())
+
+            // Compute scalar product of centre vector with respect to the normal
+            let scalarProduct = dot(centreVector, face.normal);
+
+            // If positive, means the normal is facing inwards
+            if (scalarProduct > 0) {
+                face.invertNormal();
+            }
+        });
     }
 
     public volume(): number {
@@ -390,23 +502,73 @@ class Polyhedra3D {
             let face = this.faces[i];
 
             // Get base area
-            let baseArea = face.calculateArea();
+            let baseArea = face.area();
 
             // Get perpendicular height to apex by getting normal vector of face and 
             // doing scalar resolute with any slant vector
-            let n = face.normal();
-            let slantVector = meanVertex.subtract(face.vertices[0]);
-            let height = Math.abs(dot(slantVector, n.normalise()));
+            let n = face.normal;
+            let slantVector = meanVertex.sub(face.vertices[0]);
+            let height = Math.abs(dot(slantVector, n));
 
             // Add volume to total
             sum += 1/3 * baseArea * height;
         }
-
         return sum;
+    }
+
+    public surfaceArea(): number {
+        let sum = 0;
+        for (let face of this._faces) {
+            sum += face.area();
+        }
+        return sum;
+    }
+
+    public perimeter(): number {
+        let sum = 0;
+        for (let face of this._faces) {
+            sum += face.perimeter();
+        }
+        return sum/2;
     }
 
     public map(callbackfn: (point: Point3D) => Point3D): Polyhedra3D {
         return new Polyhedra3D(this._faces.map((face) => face.map(callbackfn)));
+    }
+
+    public equals(polyhedra: Polyhedra3D): boolean {
+        // Handle edge cases of null polyhedra
+        if (this.numFaces < 4 && polyhedra.numFaces < 4) {
+            return true;
+        }
+
+        // Check if number of faces matches
+        if (this.numFaces != polyhedra.numFaces) {
+            return false;
+        }
+
+        // Check if number of vertices matches
+        if (this.numVertices != polyhedra.numVertices) {
+            return false;
+        }
+
+        // Check if each face on given polyhedra exists here
+        for (let face1 of polyhedra.faces) {
+            let match = false;
+            for (let face2 of this.faces) {
+                if (face1.equals(face2)) {
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) {
+                // No matching face found
+                return false;
+            }
+        }
+
+        // All faces matches, hence must be same
+        return true;
     }
 
     public toString(): string {

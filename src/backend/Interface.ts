@@ -6,10 +6,54 @@ import { BufferGeometry, Vector3 } from 'three';
 import { Handler as Handler2D, vLatest as vLatest2D } from './2D/PolygonFile.ts';
 import { Handler as Handler3D, vLatest as vLatest3D } from './3D/PolyhedronFile.ts';
 
+class ConvexGeometry {
+
+  public static fromPoints(points: Vector3[]) {
+    // TODO: Allow skipping the convex hull reduction process by passing in a boolean flag.
+    // First reduce the points to a convex hull.
+    points = this.reducePointsToConvexHull(points);
+
+    // Naive triangulation method, our vertices are already sorted so these should be CCW mini-triangles already.
+    const vertices: Vector3[] = [];
+    const baseVertex = points[0];
+
+    for (let i = 1, j = 2; j < points.length; i++, j++) {
+      vertices.push(baseVertex);
+      vertices.push(points[i]);
+      vertices.push(points[j]);
+      //vertices.push(new Vector3(baseVertex.x, baseVertex.y, 0));
+      //vertices.push(new Vector3(points[i].x, points[i].y, 0));
+      //vertices.push(new Vector3(points[j].x, points[j].y, 0));
+    }
+
+    const convexGeom = new BufferGeometry();
+    convexGeom.setFromPoints(vertices);
+    return convexGeom;
+  }
+
+  public static reducePointsToConvexHull(points: Vector3[]): Vector3[] {
+    // TODO: Don't convert to Point2D, just do the convex hull directly.
+    // TODO: Make it so convex hull reduction can be done directly with Vector3
+    const pointsTemp: Point2D[] = [];
+    for (const point of points) {
+      pointsTemp.push(new Point2D(point.x, point.y));
+    }
+
+    const reduced = Backend2D._reducePointsToConvexHull(pointsTemp);
+
+    const reproduced: Vector3[] = [];
+    for (const point of reduced) {
+      reproduced.push(new Vector3(point.x, point.y, 0));
+    }
+
+    return reproduced;
+  }
+}
+
 class Backend2D {
 
   public static area( { geometry }: PolygonData ) {
-    return this._threeGeometryToPolygon2D(geometry).calculateArea();
+    return this._threeGeometryToPolygon2D(geometry).area();
   }
 
   public static pointInPolygon({x, y}: { x: number; y: number }, { geometry, position }: PolygonData) {
@@ -31,7 +75,7 @@ class Backend2D {
 
   public static centreOfMass({geometry, position}: PolygonData): {x: number; y: number} {
     const offset = new Point2D(position[0], position[1]);
-    return this._threeGeometryToPolygon2D(geometry).getCentroid().translate(offset).xy;
+    return this._threeGeometryToPolygon2D(geometry).centroid().translate(offset).xy;
   }
 
   private static _threeGeometryToPolygon2D( geometry: BufferGeometry ): Polygon2D {
@@ -111,7 +155,7 @@ class Backend2D {
     return new Polygon2D(vertices, true);
   }
 
-  private static _reducePointsToConvexHull(points: Point2D[]) {
+  public static _reducePointsToConvexHull(points: Point2D[]) {
     // This code is ugly as hell since there was so much debugging involved to get it working.
     //console.log('initial points: ', points);
     // Step 0: If you have a triangle (or less), there's nothing to do.
@@ -157,14 +201,14 @@ class Backend2D {
     if (onRight.length === 0) {
       angles = above.map(({point, orig_idx}) => {
         const vector = point.sub(reducedVertices[0])
-        return { angle: (Math.acos(vector.y / vector.distanceToOrigin())), orig_idx: orig_idx };
+        return { angle: (Math.acos(vector.y / vector.magnitude())), orig_idx: orig_idx };
       })
     }
     else {
       angles = onRight.map(({ point, orig_idx }) => {
         const vector = point.sub(reducedVertices[0]); // vector from extreme to this point
         //console.log(vector.x / vector.distanceToOrigin())
-        return { angle: (Math.acos(vector.x / vector.distanceToOrigin())), orig_idx: orig_idx };
+        return { angle: (Math.acos(vector.x / vector.magnitude())), orig_idx: orig_idx };
       })
     }
     //console.log('angles on the right: ', angles);
@@ -188,7 +232,7 @@ class Backend2D {
         const vector_behind = reducedVertices[reducedVertices.length - 1].sub(reducedVertices[reducedVertices.length - 2]) // recover previous vector
         const vector = reducedVertices[reducedVertices.length - 1].sub(point) // calculate this vector
         //console.log('inside next angle: ', vector.x / vector.distanceToOrigin());
-        return {angle: Math.acos(vector_behind.dot(vector) / (vector_behind.distanceToOrigin() * vector.distanceToOrigin())), orig_idx: index}
+        return {angle: Math.acos(vector_behind.dot(vector) / (vector_behind.magnitude() * vector.magnitude())), orig_idx: index}
       });
       //console.log('current wrap: ', reducedVertices);
       //console.log('next angles: ', angles);
@@ -337,4 +381,4 @@ class Storage {
   }
 }
 
-export { Backend2D, Storage };
+export { Backend2D, ConvexGeometry, Storage };
