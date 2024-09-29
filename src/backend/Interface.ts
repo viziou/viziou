@@ -265,6 +265,23 @@ class Backend2D {
   }
 }
 
+class Backend3D {
+
+  public static volume();
+
+  public static pointInPolyhedra();
+
+  public static centreOfMass();
+
+  public static IoU();
+
+  public static _reduceThreeGeometry();
+
+  public static _reducePointsToConvexHull();
+
+
+}
+
 class Storage {
 
   public static save2D(polygons: PolygonData[], name: string) {
