@@ -4,7 +4,7 @@ import * as THREE from "three";
 
 const initialState: PolygonContextInterface = {
   polygons: new Map<string, PolygonData>,
-  selectedPolygonIndex: null,
+  selectedPolygonID: null,
   currentlyMousedOverPolygons: [],
   editingShape: null,
   selectability: true,
@@ -14,7 +14,7 @@ const initialState: PolygonContextInterface = {
 interface PolygonContextInterface {
   polygons: Map<string, PolygonData>;
   dispatch?: React.Dispatch<Polygon2DAction>;
-  selectedPolygonIndex: number | null;
+  selectedPolygonID: number | null;
   currentlyMousedOverPolygons: number[];
   editingShape: number | null;
   selectability: boolean;
@@ -96,48 +96,54 @@ function PolygonReducer(
       return {
         ...state,
         // polygons: splicedPolygons,
-        selectedPolygonIndex: action.index,
+        selectedPolygonID: action.id
       };
 
     case "DELETE_POLYGON":
-      const remainingPolygons = [...state.polygons];
-      remainingPolygons.splice(action.index, 1);
+      // TODO: You can actually delete using the entire Polygon object which is technically safer
+      // const remainingPolygons = [...state.polygons];
+      // remainingPolygons.splice(action.index, 1);
+      state.polygons.delete(`${action.id}`);
       return {
         ...state,
-        polygons: remainingPolygons,
+        polygons: state.polygons,
       };
 
-    case "DUPLICATE_POLYGON":
-      const currentPolygons = [...state.polygons];
-      const duplicatePolygon: PolygonData = {
-        position: [
-          currentPolygons[action.index].position[0],
-          currentPolygons[action.index].position[1],
-        ],
-        geometry: currentPolygons[action.index].geometry.clone(),
-        colour: currentPolygons[action.index].colour.slice(),
-      };
+    case "DUPLICATE_POLYGON": {
+      const polygon = state.polygons.get(`${action.id}`);
+      if (polygon) {
+        const duplicatePolygon: PolygonData = {
+          id: action.newId,
+          position: [
+            polygon.position[0],
+            polygon.position[1]
+          ],
+          geometry: polygon.geometry.clone(),
+          colour: polygon.colour.slice(),
+          opacity: 1
+        };
 
-      // Get bbox to figure out optimal placement of clone
-      duplicatePolygon.geometry.computeBoundingBox();
-      const box = duplicatePolygon.geometry.boundingBox;
-      if (box) {
-        const size = box.getSize(new THREE.Vector3());
-        duplicatePolygon.position[0] += size.x / 2;
-        duplicatePolygon.position[1] -= size.y / 2;
-        currentPolygons.push(duplicatePolygon);
+        // Get bbox to figure out optimal placement of clone
+        duplicatePolygon.geometry.computeBoundingBox();
+        const box = duplicatePolygon.geometry.boundingBox;
+        if (box) {
+          const size = box.getSize(new THREE.Vector3());
+          duplicatePolygon.position[0] += size.x / 2;
+          duplicatePolygon.position[1] -= size.y / 2;
+          state.polygons.set(key(duplicatePolygon), duplicatePolygon);
+        }
       }
-
       return {
         ...state,
-        polygons: currentPolygons,
-        selectedPolygonIndex: currentPolygons.length - 1,
+        polygons: state.polygons,
+        selectedPolygonID: action.newId,
       };
+    }
 
     case "ADD_MOUSED_OVER_POLYGON":
       const mousedOver = state.currentlyMousedOverPolygons.slice();
-      if (!mousedOver.includes(action.index)) {
-        mousedOver.push(action.index);
+      if (!mousedOver.includes(action.id)) {
+        mousedOver.push(action.id);
       }
       return {
         ...state,
@@ -146,8 +152,8 @@ function PolygonReducer(
 
     case "REMOVE_MOUSED_OVER_POLYGON":
       const mousedOverArr = state.currentlyMousedOverPolygons.slice();
-      if (mousedOverArr.includes(action.index)) {
-        const index = mousedOverArr.indexOf(action.index);
+      if (mousedOverArr.includes(action.id)) {
+        const index = mousedOverArr.indexOf(action.id);
         if (index > -1) {
           mousedOverArr.splice(index, 1);
         }
@@ -157,39 +163,58 @@ function PolygonReducer(
         currentlyMousedOverPolygons: mousedOverArr.slice(),
       };
 
-    case "UPDATE_GEOMETRY":
+    case "UPDATE_GEOMETRY": {
+      const polygon = state.polygons.get(`${action.id}`);
+      if (polygon) {
+        polygon.geometry = action.geometry;
+        polygon.position = action.position || polygon.position;
+      }
       return {
         ...state,
-        polygons: state.polygons.map((polygon, i) =>
-          i === action.index
-            ? {
-                ...polygon,
-                geometry: action.geometry,
-                position: action.position || polygon.position,
-              }
-            : polygon
-        ),
+        polygons: state.polygons
       };
+    }
+      // return {
+      //   ...state,
+      //   polygons: state.polygons.map((polygon, i) =>
+      //     i === action.index
+      //       ? {
+      //           ...polygon,
+      //           geometry: action.geometry,
+      //           position: action.position || polygon.position,
+      //         }
+      //       : polygon
+      //   ),
+      // };
 
     case "SET_EDIT":
       return {
         ...state,
-        editingShape: action.index,
+        editingShape: action.id,
       };
 
     case "EDIT_POLYGON":
+      const polygon = state.polygons.get(`${action.id}`);
+      if (polygon) {
+        polygon.geometry = action.geometry;
+        polygon.colour = action.colour;
+      }
       return {
         ...state,
-        polygons: state.polygons.map((polygon, i) =>
-          i === action.index
-            ? {
-                ...polygon,
-                geometry: action.geometry,
-                colour: action.colour,
-              }
-            : polygon
-        ),
+        polygons: state.polygons
       };
+      // return {
+      //   ...state,
+      //   polygons: state.polygons.map((polygon, i) =>
+      //     i === action.index
+      //       ? {
+      //           ...polygon,
+      //           geometry: action.geometry,
+      //           colour: action.colour,
+      //         }
+      //       : polygon
+      //   ),
+      //}
 
     case "SELECTABILITY":
       return {
@@ -220,7 +245,7 @@ export function PolygonProvider(props: PolygonProviderProps) {
       value={{
         polygons: state.polygons,
         dispatch,
-        selectedPolygonIndex: state.selectedPolygonIndex,
+        selectedPolygonID: state.selectedPolygonID,
         currentlyMousedOverPolygons: state.currentlyMousedOverPolygons,
         editingShape: state.editingShape,
         selectability: state.selectability,

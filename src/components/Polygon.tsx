@@ -9,7 +9,7 @@ import bin from '../assets/new_bin.png';
 import duplicate from '../assets/new_duplicate.png';
 // import Infographic from "./Infographic";
 
-type PolygonProps = PolygonData & { index: number; selectable: boolean } & {iouDispatch: React.Dispatch<IOUPolygon2DAction>} & {polygons: Map<string, PolygonData>;};
+type PolygonProps = PolygonData & { index: number; selectable: boolean } & {iouDispatch?: React.Dispatch<IOUPolygon2DAction>} & {polygons?: Map<string, PolygonData>;};
 // Load texture icons
 const editIconTexture = new THREE.TextureLoader().load(edit);
 const deleteIconTexture = new THREE.TextureLoader().load(bin);
@@ -19,7 +19,7 @@ const duplicateIconTexture = new THREE.TextureLoader().load(duplicate);
 
 const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity, selectable }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
-  const { dispatch, selectedPolygonIndex, currentlyMousedOverPolygons, selectability, polygons } = useContext(PolygonContext)!;
+  const { dispatch, selectedPolygonID, currentlyMousedOverPolygons, selectability, polygons } = useContext(PolygonContext)!;
   const originalPosition = useRef<[number, number]>([0, 0]);
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
@@ -39,14 +39,14 @@ const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity, s
 
   const selectPolygon = () => {
     if (!selectability || !selectable) return;
-    if ((selectedPolygonIndex === null || Math.max(...currentlyMousedOverPolygons) === index) && dispatch) {
+    if ((selectedPolygonID === null || Math.max(...currentlyMousedOverPolygons) === id) && dispatch) {
       // only select the largest polygon index
-      dispatch({ type: "SELECT_POLYGON", index: index });
+      dispatch({ type: "SELECT_POLYGON", id: id });
     }
   };
 
   const isPolygonSelected = () => {
-    return selectedPolygonIndex === index;
+    return selectedPolygonID === id;
   };
 
   /**********************************/
@@ -180,7 +180,7 @@ const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity, s
     const translationY = center.y - position[1];
 
     // Translate from position to bbox center
-    let newGeometry = geometry.clone();
+    const newGeometry = geometry.clone();
     newGeometry.translate(-translationX, -translationY, 0);
     newGeometry.scale(scaleX, scaleY, 1);
     newGeometry.translate(translationX, translationY, 0);
@@ -189,7 +189,7 @@ const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity, s
       dispatch({
         type: "UPDATE_GEOMETRY",
         geometry: newGeometry,
-        index: index,
+        id: id,
       });
     }
   };
@@ -241,7 +241,7 @@ const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity, s
       dispatch({
         type: "UPDATE_GEOMETRY",
         geometry: newGeometry,
-        index: index,
+        id: id,
       });
     }
 
@@ -261,20 +261,21 @@ const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity, s
   const deleteSelectedPolygon = () => {
     document.body.style.cursor = "auto";
     if (dispatch) {
-      dispatch({type: "DELETE_POLYGON", index: index})
-      dispatch({ type: "SELECT_POLYGON", index: null });
+      dispatch({type: "DELETE_POLYGON", id: id})
+      dispatch({ type: "SELECT_POLYGON", id: null });
     }
   }
 
   const duplicateSelectedPolygon = () => {
     if (dispatch) {
-      dispatch({type: "DUPLICATE_POLYGON", index: index})
+      // TODO: pass down a reference to the nonce generator. THIS MUST BE FIXED BEFORE PRODUCTION
+      dispatch({type: "DUPLICATE_POLYGON", id: id, newId: id*100000})
     }
   }
 
   const editSelectedPolygon = () => {
     if (dispatch) {
-      dispatch({type: "SET_EDIT", index: index})
+      dispatch({type: "SET_EDIT", id: id})
     }
   }
 
@@ -493,11 +494,11 @@ const Polygon = ({id, position, geometry, colour, index, iouDispatch, opacity, s
           ref={mesh}
           onPointerEnter={() => {
             if (dispatch)
-              dispatch({ type: "ADD_MOUSED_OVER_POLYGON", index: index });
+              dispatch({ type: "ADD_MOUSED_OVER_POLYGON", id: id });
           }}
           onPointerLeave={() => {
             if (dispatch)
-              dispatch({ type: "REMOVE_MOUSED_OVER_POLYGON", index: index });
+              dispatch({ type: "REMOVE_MOUSED_OVER_POLYGON", id: id });
           }}
           onClick={selectPolygon}
           // TEsting:

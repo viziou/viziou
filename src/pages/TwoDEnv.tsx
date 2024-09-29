@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { ConvexGeometry } from "../backend/Interface";
 
 import Scene2D from "../components/Scene2D";
-import { IOUPolygonData PolygonData } from "../utils/types";
+import { IOUPolygonData, PolygonData } from "../utils/types";
 import { PolygonContext } from "../contexts/PolygonContext";
 import "../styles/TwoDEnv.css";
 import Sidebar from '../components/Sidebar2D';
@@ -60,7 +60,7 @@ const TwoDEnv = () => {
     throw new Error("TwoDEnv must be used within a PolygonProvider");
   }
 
-  const { polygons, dispatch, selectedPolygonIndex, editingShape } = context;
+  const { polygons, dispatch, selectedPolygonID, editingShape } = context;
     const { polygonMap: iouPolygons, dispatch: iouDispatch } = IoUcontext;
 
   const [isAddShapeModalOpen, setIsAddShapeModalOpen] = useState(false);
@@ -80,6 +80,8 @@ const TwoDEnv = () => {
         ),
         position: [0, 0],
         colour: colour,
+        id: generateId(),
+        opacity: 1,
       };
       dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
     }
@@ -228,7 +230,7 @@ const TwoDEnv = () => {
           <EditPolygonModal
             isOpen={editingShape !== null}
             onClose={() => {
-              if (dispatch) dispatch({ type: "SET_EDIT", index: null });
+              if (dispatch) dispatch({ type: "SET_EDIT", id: null });
             }}
             onSave={(newPoints, newColour) => {
               // todo: make a dispatch here
@@ -242,10 +244,10 @@ const TwoDEnv = () => {
                     newPoints.map((p) => new THREE.Vector3(p[0], p[1], 0))
                   ),
                   colour: newColour,
-                  index: selectedPolygonIndex!,
+                  id: selectedPolygonID!,
                 });
                 console.log(polygons);
-                dispatch({ type: "SET_EDIT", index: null });
+                dispatch({ type: "SET_EDIT", id: null });
               }
             }}
             // temp initial state for now:

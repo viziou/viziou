@@ -1,7 +1,6 @@
 import { createContext, useReducer, ReactNode } from 'react';
 import { IOUPolygon2DAction, IOUPolygonData } from '../utils/types';
 import { Backend2D } from '../backend/Interface';
-import { key as parentKey } from './PolygonContext.tsx'
 
 const initialState: IOUPolygonContextInterface = {
     polygonMap: new Map<string, IOUPolygonData>,

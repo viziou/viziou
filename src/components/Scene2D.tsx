@@ -13,7 +13,7 @@ const Scene2D = ({ polygons, iouPolygons, iouDispatch }: Scene2DProps) => {
     // if no polygons are moused over when clicking, deselect polygon if one is selected
     if (dispatch) {
       if (currentlyMousedOverPolygons.length === 0) {
-        dispatch({ type: "SELECT_POLYGON", index: null });
+        dispatch({ type: "SELECT_POLYGON", id: null });
       }
     }
   };

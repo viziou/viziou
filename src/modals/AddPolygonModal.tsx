@@ -128,11 +128,13 @@ const PointsCreator = ({
       </mesh>
       {geometry ? (
         <Polygon
+          id={0}
           geometry={geometry}
           colour={displayColour}
           position={[0, 0]}
           index={points.length + 2}
           selectable={false}
+          opacity={1}
         ></Polygon>
       ) : (
         <></>
