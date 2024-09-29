@@ -5,6 +5,11 @@ import { ThreeEvent, useThree, useFrame } from '@react-three/fiber';
 import { PolyhedronData } from '../utils/types';
 import { PolyhedronContext } from '../contexts/PolyhedronContext';
 
+// Load texture icons
+const editIconTexture = new THREE.TextureLoader().load("src/assets/edit.jpg")
+const deleteIconTexture = new THREE.TextureLoader().load("src/assets/delete.jpg")
+const duplicateIconTexture = new THREE.TextureLoader().load("src/assets/duplicate.jpg")
+
 interface PolyhedronProps extends PolyhedronData {
     index: number;
     position: [number, number, number];
@@ -19,9 +24,10 @@ interface PolyhedronProps extends PolyhedronData {
     onDoubleClick?: () => void;
 }
 
-const Polyhedron = ({ index, position, rotation, scale, geometry, colour, onClick, isSelected, onPointerOver, onPointerOut }: PolyhedronProps) => {
+const Polyhedron = ({ index, position, rotation, scale, geometry, colour, onClick, onDoubleClick, isSelected, onPointerOver, onPointerOut }: PolyhedronProps) => {
     const mesh = useRef<THREE.Mesh>(null);
     const boundingBoxRef = useRef<THREE.BoxHelper | null>(null);
+    const spriteRef = useRef<THREE.Sprite | null>(null);
     const { scene } = useThree();
 
     const context = useContext(PolyhedronContext);
@@ -56,18 +62,29 @@ const Polyhedron = ({ index, position, rotation, scale, geometry, colour, onClic
                 transformedVertices: transformedVertices,
             });
 
-            console.log("Transformed vertices:", transformedVertices);
-
 
             if (isSelected) {
                 if (!boundingBoxRef.current) {
                     boundingBoxRef.current = new THREE.BoxHelper(mesh.current, 0xffff00);
+                    const box = new THREE.Box3().setFromObject(mesh.current);
+                    console.log(box.getSize(new THREE.Vector3()));
                     scene.add(boundingBoxRef.current); 
+
+                    const material = new THREE.SpriteMaterial( { map: editIconTexture } );
+                    spriteRef.current = new THREE.Sprite( material );
+                    // spriteRef.current.scale.set(5, 5, 1)
+                    spriteRef.current.position.set(6, 6, 6)
+                    scene.add(spriteRef.current);
                 }
+                
             } else {
                 if (boundingBoxRef.current) {
                     scene.remove(boundingBoxRef.current);
                     boundingBoxRef.current = null;
+                }
+                if (spriteRef.current) {
+                    scene.remove(spriteRef.current);
+                    spriteRef.current = null;
                 }
             }
         }
@@ -93,11 +110,12 @@ const Polyhedron = ({ index, position, rotation, scale, geometry, colour, onClic
             scale={scale}
             geometry={geometry}
             onClick={onClick}
+            onDoubleClick={onDoubleClick}
             onPointerOver={onPointerOver}
             onPointerOut={onPointerOut}
         >
-            <meshStandardMaterial color={colour} />
-            <Edges geometry={geometry} scale={1} color="white" />
+        <meshStandardMaterial color={colour} />
+        <Edges geometry={geometry} scale={1} color="white" />
         </mesh>
     );
 };

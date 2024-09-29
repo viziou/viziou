@@ -21,7 +21,6 @@ const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) =
 
     const [controlsEnabled, setControlsEnabled] = useState(true);
     const [mode, setMode] = useState<"translate" | "rotate" | "scale">("translate");
-    const [lastClickTime, setLastClickTime] = useState<number>(0);
 
     // deselect all polyhedra when clicking outside
     const handlePointerMissed = (): void => {
@@ -29,28 +28,16 @@ const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) =
         selectedObject.current = null;
     };
 
-    // toggle selection of polyhedron (single vs double-click)
+    // toggle selection of polyhedron
     const handleObjectClick = (event: ThreeEvent<MouseEvent>, index: number): void => {
-        const currentTime = Date.now();
-        const timeDiff = currentTime - lastClickTime;
-
-        if (timeDiff < 250) {
-            handleDoubleClick();
-        } 
-        
-        else {
-            const clickedObject = event.object as THREE.Object3D;
-
-            if (selectedIndex === index) {
-                setSelectedIndex(null);
-                selectedObject.current = null;
-            } else {
-                setSelectedIndex(index);
-                selectedObject.current = clickedObject;
-            }
+        const clickedObject = event.object as THREE.Object3D;
+        if (selectedIndex === index) {
+            setSelectedIndex(null);
+            selectedObject.current = null;
+        } else {
+            setSelectedIndex(index);
+            selectedObject.current = clickedObject;
         }
-
-        setLastClickTime(currentTime);
     };
 
     const handleTransformStart = (): void => {
@@ -119,6 +106,7 @@ const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) =
                     geometry={polyhedron.geometry}
                     colour={polyhedron.colour}
                     onClick={(event) => handleObjectClick(event, index)}
+                    onDoubleClick={handleDoubleClick}
                     isSelected={selectedIndex === index}
                 />
             ))}
