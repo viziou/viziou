@@ -16,6 +16,36 @@ import EditPolygonModal from "../modals/EditPolygonModal";
 import { IOUPolygonContext } from '../contexts/IOUPolygonContext.tsx'
 import ConfirmationModal from "../modals/ConfirmationModal";
 
+const getSquare = (): THREE.PlaneGeometry => {
+  return new THREE.PlaneGeometry(1, 1);
+};
+
+const getRandomGeometry =
+  (): THREE.BufferGeometry<THREE.NormalBufferAttributes> => {
+    // random number of vertices between 5 and 12
+    const numVertices = Math.floor(Math.random() * 8) + 5;
+    const points = [];
+
+    for (let i = 0; i < numVertices; i++) {
+      points.push(
+        new THREE.Vector3(Math.random() * 4 - 2, Math.random() * 4 - 2, 0)
+      );
+    }
+    return ConvexGeometry.fromPoints(points);
+  };
+
+// generate random hex colours
+const getRandomColour = (): string => {
+  const letters = "0123456789ABCDEF";
+  let colour = "#";
+
+  for (let i = 0; i < 6; i++) {
+    colour += letters[Math.floor(Math.random() * 16)];
+  }
+
+  return colour;
+};
+
 const TwoDEnv = () => {
     const context = useContext(PolygonContext);
     const IoUcontext = useContext(IOUPolygonContext);
@@ -60,62 +90,66 @@ const TwoDEnv = () => {
     handleModalClose();
   };
 
-  // const addSquare = () => {
-  //   const newPolygon: PolygonData = {
-  //     geometry: getSquare(),
-  //     position: [
-  //       Math.random() * 4 - 2, // x coordinate
-  //       Math.random() * 4 - 2, // y coordinate
-  //     ],
-  //     colour: getRandomColour(),
-  //   };
+  const addSquare = () => {
+    const newPolygon: PolygonData = {
+      geometry: getSquare(),
+      position: [
+        Math.random() * 4 - 2, // x coordinate
+        Math.random() * 4 - 2, // y coordinate
+      ],
+      colour: getRandomColour(),
+      id: generateId(),
+      opacity: 1
+    };
 
-  //   console.log("Dispatching ADD_SQUARE:", newPolygon);
-  //   dispatch({ type: "ADD_SQUARE", payload: newPolygon });
-  // };
+    console.log("Dispatching ADD_SQUARE:", newPolygon);
+    dispatch({ type: "ADD_SQUARE", payload: newPolygon });
+  };
 
-  // const addRandomPolygon = () => {
-  //   const newPolygon: PolygonData = {
-  //     geometry: getRandomGeometry(),
-  //     position: [
-  //       0, 0,
-  //       //    Math.random() * 4 - 2, // x coordinate
-  //       //    Math.random() * 4 - 2, // y coordinate
-  //     ],
-  //     colour: getRandomColour(),
-  //   };
+  const addRandomPolygon = () => {
+    const newPolygon: PolygonData = {
+      geometry: getRandomGeometry(),
+      position: [
+        0, 0,
+        //    Math.random() * 4 - 2, // x coordinate
+        //    Math.random() * 4 - 2, // y coordinate
+      ],
+      colour: getRandomColour(),
+      opacity: 1,
+      id: generateId()
+    };
 
-  //   console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
-  //   dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
-  //   // const geometryPosition = newPolygon.geometry.getAttribute('position');
-  //   // for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
-  //   //   const newPoint: PolygonData = {
-  //   //     geometry: new THREE.CircleGeometry(0.02, 50),
-  //   //     position: [geometryPosition.array[i], geometryPosition.array[i + 1]],
-  //   //     colour: '#C81400'
-  //   //   }
-  //   //   console.log("Dispatching ADD_POINT:")
-  //   //   //dispatch({ type: "ADD_POINT", payload: newPoint });
-  //   // }
-  //   console.time("Calculating Area of Polygon");
-  //   console.log("Area of new random polygon: ", Backend2D.area(newPolygon));
-  //   console.timeEnd("Calculating Area of Polygon");
-  //   console.time("Calculating Centroid");
-  //   const { x, y } = Backend2D.centreOfMass(newPolygon);
-  //   console.log("Centroid: (", x, ", ", y, ")");
-  //   console.time("Calculating Centroid");
-  //   console.log("Reducing polygon...");
-  //   const result = Backend2D.reduceThreeGeometry(newPolygon);
-  //   console.log("reduced polygon: ", result);
-  //   // for (const vertex of result.vertices) {
-  //   //   const newPoint: PolygonData = {
-  //   //     geometry: new THREE.CircleGeometry(0.02, 50),
-  //   //     position: [vertex.x, vertex.y],
-  //   //     colour: '#0dc800'
-  //   //   }
-  //   //   //dispatch({ type: "ADD_POINT", payload: newPoint })
-  //   // }
-  // };
+    console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
+    dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
+    // const geometryPosition = newPolygon.geometry.getAttribute('position');
+    // for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
+    //   const newPoint: PolygonData = {
+    //     geometry: new THREE.CircleGeometry(0.02, 50),
+    //     position: [geometryPosition.array[i], geometryPosition.array[i + 1]],
+    //     colour: '#C81400'
+    //   }
+    //   console.log("Dispatching ADD_POINT:")
+    //   //dispatch({ type: "ADD_POINT", payload: newPoint });
+    // }
+    // console.time("Calculating Area of Polygon");
+    // console.log("Area of new random polygon: ", Backend2D.area(newPolygon));
+    // console.timeEnd("Calculating Area of Polygon");
+    // console.time("Calculating Centroid");
+    // const { x, y } = Backend2D.centreOfMass(newPolygon);
+    // console.log("Centroid: (", x, ", ", y, ")");
+    // console.time("Calculating Centroid");
+    // console.log("Reducing polygon...");
+    // const result = Backend2D.reduceThreeGeometry(newPolygon);
+    // console.log("reduced polygon: ", result);
+    // for (const vertex of result.vertices) {
+    //   const newPoint: PolygonData = {
+    //     geometry: new THREE.CircleGeometry(0.02, 50),
+    //     position: [vertex.x, vertex.y],
+    //     colour: '#0dc800'
+    //   }
+    //   //dispatch({ type: "ADD_POINT", payload: newPoint })
+    // }
+  };
 
   const clearPolygons = () => {
     const onSubmit = () => {
@@ -196,6 +230,8 @@ const TwoDEnv = () => {
           isOpen={isAddShapeModalOpen}
           onClose={handleModalClose}
           onSubmit={handleAddShapeModalSubmit}
+        addRandomShape={() => { addRandomPolygon(); handleModalClose();}}
+        addSquare={() => {addSquare(); handleModalClose();}}
         />
         {editingShape ? (
           <EditPolygonModal
