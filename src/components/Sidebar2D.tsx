@@ -2,6 +2,7 @@ import { useContext, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { SidebarProps2D } from '../utils/types';
 import logo from '../assets/favicon.png';
+import info from '../assets/info.png';
 import '../styles/Sidebar2D.css';
 import { PolygonContext } from '../contexts/PolygonContext';
 
@@ -12,7 +13,7 @@ const Sidebar2D = (props: SidebarProps2D) => {
     const { dispatch, currentDecimalPlaces } = useContext(PolygonContext)!;
 
     const [isCollapsed, setIsCollapsed] = useState(false);
-
+  
     const handleCollapseToggle = () => {
         setIsCollapsed(!isCollapsed);
     };
@@ -28,9 +29,27 @@ const Sidebar2D = (props: SidebarProps2D) => {
 
             {!isCollapsed && (
                 <div className="nav-2d">
-                <NavLink to="/about" className={({ isActive }) => isActive ? "nav-link-2d active-link-2d" : "nav-link-2d"}>
-                    About
-                </NavLink>
+                    <div className="about-icon-2d">
+                    <NavLink to="/about" className={({ isActive }) => isActive ? "nav-link-2d active-link-2d" : "nav-link-2d"}>
+                        About
+                    </NavLink>
+                    <div className="tooltip">
+                        <img src={info} alt="info" className="info-icon-2d" />
+                        <span className="tooltiptext">
+                            <p>Welcome to the 2D Environment page of <i><b>viziou</b></i>.</p>
+                            <br/>
+                            <p>In this page, users can freely create <b>convex</b> polygons and visualise the <b>Intersection over Union</b> metric between
+                            pairs of polygons on a simplistic and minimalist canvas.</p>
+                            <br/>
+                            <p>To get started, click on the <b>Add Shape</b> button to bring your convex polygon to life!</p>
+                            <br/>
+                            <p>Once the polygons are created, click the <b>Show IoU</b> button to visualise all intersections and <b>hover</b> over them to see their geometric information.</p>
+                            <br/>
+                            <p>You can select polygons on the canvas by <b>left clicking</b>. This will provide a control interface to drag, resize, and 
+                            rotate the polygons. Navigate the canvas via translating by <b>right-click drag</b> and zoom by <b>scrolling</b>.</p>
+                        </span>
+                    </div>
+                </div>
                 <div className="env-buttons-2d">
                     <NavLink to="/2D-Environment" className={({ isActive }) => isActive ? "nav-link-2d active-link-2d" : "nav-link-2d"}>
                     2D Environment

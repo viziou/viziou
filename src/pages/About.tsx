@@ -9,13 +9,17 @@ function About() {
               <h1>About</h1>
                   <div className="about-description">
                       <p>
-                      Viziou is an innovative software platform designed to help users explore, visualize, and interact with 2D and 3D shapes while calculating the Intersection over Union (IoU) metric—a crucial measure in computer vision used for evaluating object detection models.
+                      <i><b>viziou</b></i> is an innovative software platform designed to help users explore, visualise, and interact with 2D and 3D convex 
+                      polytopes. The application allows for visualising and calculating the <b>Intersection over Union</b> (IoU) metric — a crucial 
+                      measure in modern day computer vision for evaluating object detection models.
                       </p>
 
                       <br></br>
 
                       <p>
-                      Our mission is to make complex geometric analysis accessible to all users, providing an interactive space to visualise shape overlaps, compare geometric data, and dive into the world of 2D and 3D space interaction. Whether you're testing models for object detection, learning about IoU, or working on spatial analysis projects, Viziou is the perfect tool to support your work
+                      Our mission is to make complex geometric analysis accessible to all users, providing an interactive space to visualise polytope 
+                      overlaps and dive into the world of 2D and 3D space interaction. Whether you're testing models for object detection, learning 
+                      about IoU, or working on spatial analysis projects, <b><i>viziou</i></b> is the perfect tool to support your work.
                       </p>
                   </div>
           </section>
@@ -47,9 +51,9 @@ function About() {
                   <img className="developer-photo mubasshir-photo" src={mub} alt="Mubasshir" />
                   <h3>Mubasshir</h3>
                   <ul>
-                      <li>Who we are</li>
-                      <li>What we do</li>
-                      <li>What we enjoy</li>
+                      <li>Hey, I'm Mub, I am a electrical engineering and computer science student at Monash University.</li>
+                      <li>I primarily work with deep learning models and teach algorithms at Monash University.</li>
+                      <li>I am very passionate about building elegant software and enjoy playing badminton, chess, and Pokemon in my spare time.</li>
                   </ul>
               </div>
 
