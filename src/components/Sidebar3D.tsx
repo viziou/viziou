@@ -61,16 +61,23 @@ const Sidebar3D = (props: SidebarProps3D) => {
                 {!isCollapsed && (
                     <div className="section-3d">
                     <h2>Settings</h2>
-                    <div className="settings-3d">
-                        <label className="checkbox-label-3d">
-                        Disable save warnings
-                        <input type="checkbox" id="save-warnings-3d" />
-                        </label>
-                        <label htmlFor="decimal-places-3d">
-                        Decimal places:
-                        <input type="number" id="decimal-places-3d" min="0" max="5" value="2" />
-                        </label>
-                    </div>
+                        <div className="settings-3d">
+
+                            <div className="setting-row-3d">
+                                <label className="checkbox-label-3d">
+                                    Disable save warnings
+                                    <input type="checkbox" id="save-warnings-3d" />
+                                </label>
+                            </div>
+
+                            <div className="setting-row-3d">
+                                <label htmlFor="decimal-places-3d">
+                                    Decimal places:
+                                    <input type="number" id="decimal-places-3d" min="0" max="5" value="2" />
+                                </label>
+                            </div>
+
+                        </div>
                     </div>
                 )}
 
