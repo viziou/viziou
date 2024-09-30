@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import * as THREE from 'three';
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
 
@@ -44,8 +44,6 @@ const ThreeDEnv = () => {
 
     const { polyhedra, dispatch } = context;
 
-    const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-
 
     // const addCube = () => {
     //     const newPolyhedron: PolyhedronData = {
@@ -83,7 +81,7 @@ const ThreeDEnv = () => {
 
     const clearPolyhedra = () => {
         console.log("Dispatching CLEAR_POLYHEDRA");
-        setSelectedIndex(null);
+        dispatch({ type: "SELECT_POLYHEDRON", index: null });
         dispatch({ type: "CLEAR_POLYHEDRA" });
     };
 
@@ -116,9 +114,7 @@ const ThreeDEnv = () => {
 
             <main className="threed-canvas-container">
                 <Scene3D 
-                polyhedra={polyhedra} 
-                selectedIndex={selectedIndex} 
-                setSelectedIndex={setSelectedIndex} 
+                polyhedra={polyhedra}
                 />
             </main>
 

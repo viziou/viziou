@@ -6,8 +6,8 @@ import '../styles/Sidebar2D.css';
 import { PolygonContext } from '../contexts/PolygonContext';
 
 const Sidebar2D = (props: SidebarProps2D) => {
-    const { polygons, addPolygon, clearPolygons, showIoUs, savePolygons, loadPolygons } = props;
-    const { dispatch, currentDecimalPlaces } = useContext(PolygonContext)!;
+
+  const { polygons, addPolygon: addPolygon, clearPolygons, showIoUs, clearIoUs, savePolygons, loadPolygons } = props;
 
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -66,12 +66,12 @@ const Sidebar2D = (props: SidebarProps2D) => {
             <div className="section-2d">
                 {!isCollapsed && <h2>Canvas</h2>}
                 <div className="canvas-buttons-2d">
-                <button className="twod-button-2d" onClick={addPolygon}>Add Shape</button>
-                <button className="twod-button-2d" onClick={clearPolygons}>Clear Canvas</button>
+                    <button className="twod-button-2d" onClick={addPolygon}>Add Shape</button>
+                    <button className="twod-button-2d" onClick={clearPolygons}>Clear Canvas</button>
                 </div>
                 <div className="canvas-buttons-2d">
-                <button className="twod-button-2d" onClick={showIoUs}>Show IoU</button>
-                <button className="twod-button-2d">Clear IoU</button>
+                    <button className="twod-button-2d" onClick={showIoUs}>Show IoU</button>
+                    <button className="twod-button-2d" onClick={clearIoUs}>Clear IoU</button>
                 </div>
             </div>
 

@@ -87,6 +87,11 @@ const TwoDEnv = () => {
       }
   };
 
+  const clearIoUs = () => {
+    console.log("Clearing IoU polygons...");
+    iouDispatch({ type: "CLEAR_POLYGONS" });
+  }
+
   const savePolygons = () => {
       console.log("Saving canvas...");
       Storage.save2D(Array.from(polygons.values()), "export");
@@ -103,47 +108,54 @@ const TwoDEnv = () => {
   };
 
   return (
-      <div className="TwoDEnv">
-
-          <Sidebar2D
-              polygons={Array.from(polygons.values())}
-              addPolygon={handleAddShapeModalOpen}
-              clearPolygons={clearPolygons}
-              showIoUs={showIoUs}
-              savePolygons={savePolygons}
-              loadPolygons={loadPolygons}
+    <div className="TwoDEnv">
+        <Sidebar
+          polygons={Array.from(polygons.values())}
+          addPolygon={handleAddShapeModalOpen}
+          clearPolygons={clearPolygons}
+          showIoUs={showIoUs}
+          clearIoUs={clearIoUs}
+          savePolygons={savePolygons}
+          loadPolygons={loadPolygons}
+        />
+        <AddPolygonModal
+          isOpen={isAddShapeModalOpen}
+          onClose={handleModalClose}
+          onSubmit={handleAddShapeModalSubmit}
+        />
+        {editingShape ? (
+          <EditPolygonModal
+            isOpen={editingShape !== null}
+            onClose={() => {
+              if (dispatch) dispatch({ type: "SET_EDIT", id: null });
+            }}
+            onSave={(newPoints, newColour) => {
+              // todo: make a dispatch here
+              console.log("Updated points:", newPoints);
+              console.log("Updated color:", newColour);
+              if (dispatch) {
+                console.log(polygons);
+                dispatch({
+                  type: "EDIT_POLYGON",
+                  geometry: ConvexGeometry.fromPoints(
+                    newPoints.map((p) => new THREE.Vector3(p[0], p[1], 0))
+                  ),
+                  colour: newColour,
+                  id: selectedPolygonID!,
+                });
+                console.log(polygons);
+                dispatch({ type: "SET_EDIT", id: null });
+              }
+            }}
+            // temp initial state for now:
+            initialPoints={[
+              [0, 0],
+              [0, 1],
+              [1, 0],
+              [1, 1],
+            ]}
+            initialColour={"green"}
           />
-
-          <AddPolygonModal
-              isOpen={isAddShapeModalOpen}
-              onClose={handleModalClose}
-              onSubmit={handleAddShapeModalSubmit}
-          />
-
-          {editingShape ? (
-              <EditPolygonModal
-                  isOpen={editingShape !== null}
-                  onClose={() => {
-                      if (dispatch) dispatch({ type: "SET_EDIT", id: null });
-                  }}
-                  onSave={(newPoints, newColour) => {
-                      console.log("Updated points:", newPoints);
-                      console.log("Updated color:", newColour);
-                      if (dispatch) {
-                          dispatch({
-                            type: "EDIT_POLYGON",
-                            geometry: ConvexGeometry.fromPoints(
-                              newPoints.map((p) => new THREE.Vector3(p[0], p[1], 0))
-                            ),
-                            colour: newColour,
-                            id: selectedPolygonID!,
-                          });
-                          dispatch({ type: "SET_EDIT", id: null });
-                      }
-                  }}
-                  initialPoints={[[0, 0], [0, 1], [1, 0], [1, 1]]}
-                  initialColour={"green"}
-              />
           ) : null}
 
           <main className="twod-canvas-container">

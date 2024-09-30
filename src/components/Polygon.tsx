@@ -7,7 +7,8 @@ import { useThree } from "@react-three/fiber";
 import edit from '../assets/new_edit.png';
 import bin from '../assets/new_bin.png';
 import duplicate from '../assets/new_duplicate.png';
-// import Infographic from "./Infographic";
+//import Infographic from './Infographic'
+//import { Backend2D } from '../backend/Interface.ts'
 
 type PolygonProps = PolygonData & { index: number; selectable: boolean } & {iouDispatch?: React.Dispatch<IOUPolygon2DAction>} & {polygons?: Map<string, PolygonData>;};
 // Load texture icons
@@ -132,6 +133,9 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
     setCorner(corner);
     if (dispatch)
       dispatch({ type: "SELECTABILITY",  payload: false});
+    if (iouDispatch) {
+      iouDispatch({type: "HIDE_CHILD_IOUS_USING_ID", payload: id})
+    }
   };
 
   const handleResizeDrag = () => {
@@ -197,6 +201,9 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
   const handleResizeEnd = () => {
     setResizing(false);
     setCorner(null);
+    if (iouDispatch) {
+      iouDispatch({type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: id, polygons: polygons}})
+    }
   };
   /**********************************/
 
@@ -204,8 +211,12 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
   const handleRotateStart = () => {
     setRotating(true);
     setOrientation(0);
-    if (dispatch)
-      dispatch({ type: "SELECTABILITY",  payload: false});
+    if (dispatch) {
+      dispatch({ type: "SELECTABILITY", payload: false });
+    }
+    if (iouDispatch) {
+      iouDispatch({type: "HIDE_CHILD_IOUS_USING_ID", payload: id})
+    }
   };
 
   const handleRotateDrag = () => {
@@ -254,6 +265,9 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
     setMousePointer(null);
     if (dispatch) {
       dispatch({ type: "SELECTABILITY",  payload: true});
+    }
+    if (iouDispatch) {
+      iouDispatch({type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: id, polygons: polygons}})
     }
   };
   /**********************************/
@@ -511,11 +525,12 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
           />
         </mesh>
         {/* Example infographic: */}
-        {/* {Math.max(...currentlyMousedOverPolygons) === index && (
+        {/*Math.max(...currentlyMousedOverPolygons) === id && (
           <Infographic
           position={!boundingBox ? new THREE.Vector3(position[0], position[1], 0) : boundingBox.getCenter(new THREE.Vector3).sub(boundingBox.getSize(new THREE.Vector3).multiplyScalar(0.5))
-          } info={{"hi": "yeah", "hello": 12.345678.toPrecision(currentDecimalPlaces+2)}} />
-        )} */}
+          } info={{"Area": Backend2D.area(geometry).toPrecision(currentDecimalPlaces+2),
+                   "Perimeter": Backend2D.perimeter(geometry).toPrecision(currentDecimalPlaces+2)}} />
+        ) */}
       </DragControls>
       {BoundingBox}
     </>

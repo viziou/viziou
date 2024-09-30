@@ -26,6 +26,8 @@ export type IOUPolygon2DAction =
   | { type: "HIDE_CHILD_IOUS_USING_ID", payload: number}
   | { type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: number, polygons: Map<string, PolygonData>}}
   | { type: "SHOW_CHILD_IOUS_USING_ID", payload: number }
+  | { type: "ADD_MOUSED_OVER_POLYGON", id: number }
+  | { type: "REMOVE_MOUSED_OVER_POLYGON", id: number }
   | { type: "CLEAR_POLYGONS" };
 
 export type Scene2DProps = {
@@ -58,13 +60,10 @@ export interface PolyhedronData {
   rotation: [number, number, number];
   scale: [number, number, number];
   colour: string;
-  transformedVertices?: THREE.Vector3[];
 }
 
 export type Scene3DProps = {
   polyhedra: PolyhedronData[];
-  setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
-  selectedIndex: number | null;
 };
 
 export type Polyhedron3DAction =
@@ -73,15 +72,16 @@ export type Polyhedron3DAction =
   | { type: "SET_POLYHEDRONS"; payload: PolyhedronData[] }
   | { type: "CLEAR_POLYHEDRA" }
   | { type: "UPDATE_POLYHEDRON"; index: number; position: [number, number, number]; rotation: [number, number, number]; scale: [number, number, number] }
-  | { type: "STORE_TRANSFORMED_VERTICES"; index: number; transformedVertices: THREE.Vector3[];
-
-  };
+  | { type: "DELETE_POLYHEDRON"; index: number }
+  | { type: "DUPLICATE_POLYHEDRON"; index: number }
+  | { type: "SELECT_POLYHEDRON"; index: number | null };
 
 export type SidebarProps2D = {
   polygons: PolygonData[];
   addPolygon: () => void;
   clearPolygons: () => void;
   showIoUs: () => void;
+  clearIoUs: () => void;
   savePolygons: () => void;
   loadPolygons: () => Promise<void>;
 }

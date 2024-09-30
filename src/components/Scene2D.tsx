@@ -44,6 +44,8 @@ const Scene2D = ({ polygons, iouPolygons, iouDispatch }: Scene2DProps) => {
           geometry={polygon.geometry}
           colour={polygon.colour}
           opacity={polygon.opacity}
+          parentIDa={polygon.parentIDa}
+          parentIDb={polygon.parentIDb}
         />
       ))}
 

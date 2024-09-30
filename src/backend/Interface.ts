@@ -52,8 +52,12 @@ class ConvexGeometry {
 
 class Backend2D {
 
-  public static area( { geometry }: PolygonData ) {
+  public static area( geometry: BufferGeometry ) {
     return this._threeGeometryToPolygon2D(geometry).area();
+  }
+
+  public static perimeter( geometry: BufferGeometry ) {
+    return this._threeGeometryToPolygon2D(geometry).perimeter();
   }
 
   public static pointInPolygon({x, y}: { x: number; y: number }, { geometry, position }: PolygonData) {
