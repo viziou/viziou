@@ -22,7 +22,7 @@ const Sidebar2D = (props: SidebarProps2D) => {
             <NavLink to="/" className="logo-link">
                 <div className="logo-container-2d">
                     <img src={logo} alt="Logo" className="logo-image-2d" />
-                    {!isCollapsed && <div className="logo-text-2d">Viziou</div>}
+                    {!isCollapsed && <div className="logo-text-2d">viziou</div>}
                 </div>
             </NavLink>
 
