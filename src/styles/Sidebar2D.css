@@ -35,11 +35,14 @@
 
 .nav-link-2d {
   color: white;
+  background-color: rgba(0, 0, 0, 0);
   text-decoration: none;
   font-size: 16px;
   margin-bottom: 10px;
   padding: 5px 0;
   position: relative;
+  border: none;
+  cursor: pointer;
 }
 
 .nav-link-2d::after {

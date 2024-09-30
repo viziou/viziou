@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { SidebarProps2D } from '../utils/types';
 import logo from '../assets/favicon.png';
 import '../styles/Sidebar2D.css';
@@ -7,8 +7,8 @@ import { useContext } from 'react';
 
 const Sidebar2D = (props: SidebarProps2D) => {
   const { polygons, addPolygon: addPolygon, clearPolygons, showIoUs, clearIoUs, savePolygons, loadPolygons } = props;
-
   const { dispatch, currentDecimalPlaces } = useContext(PolygonContext)!;
+  const navigate = useNavigate();
 
   return (
       <aside className="sidebar-2d">
@@ -25,12 +25,14 @@ const Sidebar2D = (props: SidebarProps2D) => {
           </NavLink>
 
           <div className="env-buttons-2d">
-              <NavLink to="/2D-Environment" className={({ isActive }) => isActive ? "nav-link-2d active-link-2d" : "nav-link-2d"}>
-                  2D Environment
-              </NavLink>
-              <NavLink to="/3D-Environment" className={({ isActive }) => isActive ? "nav-link-2d active-link-2d" : "nav-link-2d"}>
-                  3D Environment
-              </NavLink>
+              <button 
+                className={`nav-link-2d ${window.location.pathname === '/2D-Environment' ? 'active-link-2d' : ''}`} 
+                onClick={() => navigate("/2D-Environment")}
+                >2D Environment</button>
+              <button 
+                    className={`nav-link-2d ${window.location.pathname === '/3D-Environment' ? 'active-link-2d' : ''}`} 
+                    onClick={() => navigate("/3D-Environment")}
+                >3D Environment</button>
           </div>
       </div>
 
