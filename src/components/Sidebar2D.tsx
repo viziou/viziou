@@ -25,37 +25,7 @@ const Sidebar2D = (props: SidebarProps2D) => {
                     {!isCollapsed && <div className="logo-text-2d">Viziou</div>}
                 </div>
             </NavLink>
-            <div className="env-buttons-2d">
-                <button
-                    className={`nav-link-2d ${window.location.pathname === '/2D-Environment' ? 'active-link-2d' : ''}`}
-                    onClick={() => navigate("/2D-Environment")}
-                >2D Environment</button>
-                <button
-                    className={`nav-link-2d ${window.location.pathname === '/3D-Environment' ? 'active-link-2d' : ''}`}
-                    onClick={() => {
-                        const changePage = () => navigate("/3D-Environment");
 
-                        if (!displayWarnings) {
-                            dispatch!({
-                                type: "OPEN_CONFIRMATION_MODAL",
-                                info: {
-                                    isOpen: true,
-                                    onClose: () => {
-                                        dispatch!({ type: "CLOSE_CONFIRMATION_MODAL" });
-                                    },
-                                    onConfirm: changePage,
-                                    message:
-                                        "Are you sure you want to leave this page?",
-                                    description:
-                                        "Your current shapes may not be saved.",
-                                },
-                            });
-                        } else {
-                            changePage();
-                        }
-                    }}
-                >3D Environment</button>
-            </div>
 
             {!isCollapsed && (
                 <div className="nav-2d">
@@ -81,12 +51,35 @@ const Sidebar2D = (props: SidebarProps2D) => {
                         </div>
                     </div>
                     <div className="env-buttons-2d">
-                        <NavLink to="/2D-Environment" className={({ isActive }) => isActive ? "nav-link-2d active-link-2d" : "nav-link-2d"}>
-                            2D Environment
-                        </NavLink>
-                        <NavLink to="/3D-Environment" className={({ isActive }) => isActive ? "nav-link-2d active-link-2d" : "nav-link-2d"}>
-                            3D Environment
-                        </NavLink>
+                        <button
+                            className={`nav-link-2d ${window.location.pathname === '/2D-Environment' ? 'active-link-2d' : ''}`}
+                            onClick={() => navigate("/2D-Environment")}
+                        >2D Environment</button>
+                        <button
+                            className={`nav-link-2d ${window.location.pathname === '/3D-Environment' ? 'active-link-2d' : ''}`}
+                            onClick={() => {
+                                const changePage = () => navigate("/3D-Environment");
+
+                                if (!displayWarnings) {
+                                    dispatch!({
+                                        type: "OPEN_CONFIRMATION_MODAL",
+                                        info: {
+                                            isOpen: true,
+                                            onClose: () => {
+                                                dispatch!({ type: "CLOSE_CONFIRMATION_MODAL" });
+                                            },
+                                            onConfirm: changePage,
+                                            message:
+                                                "Are you sure you want to leave this page?",
+                                            description:
+                                                "Your current shapes may not be saved.",
+                                        },
+                                    });
+                                } else {
+                                    changePage();
+                                }
+                            }}
+                        >3D Environment</button>
                     </div>
                 </div>
             )}

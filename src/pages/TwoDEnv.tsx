@@ -6,7 +6,7 @@ import Scene2D from "../components/Scene2D";
 import { IOUPolygonData, PolygonData } from "../utils/types";
 import { PolygonContext } from "../contexts/PolygonContext";
 import "../styles/TwoDEnv.css";
-import Sidebar from "../components/Sidebar2D";
+import Sidebar2D from "../components/Sidebar2D";
 
 import { Backend2D, Storage } from "../backend/Interface";
 import AddPolygonModal from "../modals/AddPolygonModal";
