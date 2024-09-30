@@ -149,6 +149,18 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
     // Get mouse position relative to the box center
     const mousePosition = getCanvasMousePosition().sub(center);
 
+    // Set corner based on where mousePosition is
+    if (mousePosition.x > 0 && mousePosition.y > 0) {
+      setCorner("topRight")
+    } else if (mousePosition.x < 0 && mousePosition.y > 0) {
+      setCorner("topLeft")
+    } else if (mousePosition.x < 0 && mousePosition.y < 0) {
+      setCorner("bottomLeft")
+    } else if (mousePosition.x > 0 && mousePosition.y < 0) {
+      setCorner("bottomRight")
+    }
+    console.log(corner)
+
     // Initialise corner position
     let cornerPosition = new THREE.Vector3(0, 0, 0);
 
@@ -172,29 +184,33 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
         cornerPosition.y *= -1;
         break;
     }
+    console.log(cornerPosition)
+    console.log(mousePosition)
 
     // Calculate the multiplier needed to bring the corner box to the current mouse position
-    const scaleX = mousePosition.x / cornerPosition.x;
-    const scaleY = mousePosition.y / cornerPosition.y;
+    if (cornerPosition.x != 0 && cornerPosition.y != 0 && mousePosition.x != 0 && mousePosition.y != 0) {
+      const scaleX = mousePosition.x / cornerPosition.x;
+      const scaleY = mousePosition.y / cornerPosition.y;
 
-    // Create the translations to anchor all scaling to opposite corner
-    // const translationX = center.x - position[0] - cornerPosition.x;
-    // const translationY = center.y - position[1] - cornerPosition.y;
-    const translationX = center.x - position[0];
-    const translationY = center.y - position[1];
+      // Create the translations to anchor all scaling to opposite corner
+      // const translationX = center.x - position[0] - cornerPosition.x;
+      // const translationY = center.y - position[1] - cornerPosition.y;
+      const translationX = center.x - position[0];
+      const translationY = center.y - position[1];
 
-    // Translate from position to bbox center
-    const newGeometry = geometry.clone();
-    newGeometry.translate(-translationX, -translationY, 0);
-    newGeometry.scale(scaleX, scaleY, 1);
-    newGeometry.translate(translationX, translationY, 0);
+      // Translate from position to bbox center
+      const newGeometry = geometry.clone();
+      newGeometry.translate(-translationX, -translationY, 0);
+      newGeometry.scale(scaleX, scaleY, 1);
+      newGeometry.translate(translationX, translationY, 0);
 
-    if (dispatch) {
-      dispatch({
-        type: "UPDATE_GEOMETRY",
-        geometry: newGeometry,
-        id: id,
-      });
+      if (dispatch) {
+        dispatch({
+          type: "UPDATE_GEOMETRY",
+          geometry: newGeometry,
+          id: id,
+        });
+      }
     }
   };
 
