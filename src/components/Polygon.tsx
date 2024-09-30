@@ -481,7 +481,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
         ) : null}
       </group>
     );
-  }, [boundingBox, isPolygonSelected, scene, polygons]);
+  }, [boundingBox, isPolygonSelected, scene, polygons, geometry, position]);
 
   // const renderPoint = ({x, y}: {x: number, y: number}, size = 0.03, smoothness = 50) => {
   //   return (

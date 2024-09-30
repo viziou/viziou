@@ -98,9 +98,18 @@ const Sidebar2D = (props: SidebarProps2D) => {
 
             {!isCollapsed && (
                 <div className="polygon-list-2d scrollable">
-                {polygons.map((_, index) => (
+                {polygons.map((polygon, index) => (
                     <div key={index} className="polygon-item-2d small-polygon">
-                    <p>{`Polygon ${index + 1}`}</p>
+                        <button onClick={() => dispatch!({ type: 'SELECT_POLYGON', id: polygon.id})}>{`Polygon ${index + 1}`}</button>
+
+                        <button onClick={() => dispatch!({type: "SET_EDIT", id: polygon.id})}>{`Edit`}</button>
+
+                        <button onClick={() => dispatch!({type: "DUPLICATE_POLYGON", id: polygon.id, newId: polygon.id*100000})}>{`Duplicate`}</button>
+
+                        <button onClick={() => {
+                            dispatch!({type: "DELETE_POLYGON", id: polygon.id})
+                            dispatch!({ type: "SELECT_POLYGON", id: null });
+                        }}>{`Delete`}</button>
                     </div>
                 ))}
                 </div>

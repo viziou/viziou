@@ -3,10 +3,13 @@ import { SidebarProps3D } from '../utils/types';
 import logo from '../assets/favicon.png';
 import info from '../assets/info.png';
 import '../styles/Sidebar3D.css';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { PolyhedronContext } from '../contexts/PolyhedronContext';
 
 const Sidebar3D = (props: SidebarProps3D) => {
     const { polyhedrons, addRandomPolyhedron, clearPolyhedrons, savePolyhedrons, loadPolyhedrons } = props;
+
+    const { dispatch } = useContext(PolyhedronContext)!;
 
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -89,7 +92,16 @@ const Sidebar3D = (props: SidebarProps3D) => {
                     <div className="polyhedron-list-3d scrollable">
                     {polyhedrons.map((_, index) => (
                         <div key={index} className="polyhedron-item-3d">
-                        <p>{`Polyhedron ${index + 1}`}</p>
+                            <button onClick={() => dispatch!({ type: 'SELECT_POLYHEDRON', index: index})}>{`Polyhedron ${index + 1}`}</button>
+                            
+                            {/* <button onClick={() => dispatch!({ type: "SET_EDIT", index: index})}>{`Edit`}</button> */}
+
+                            <button onClick={() => dispatch!({type: "DUPLICATE_POLYHEDRON", index: index})}>{`Duplicate`}</button>
+
+                            <button onClick={() => {
+                                dispatch!({type: "DELETE_POLYHEDRON", index: index})
+                                dispatch!({ type: "SELECT_POLYHEDRON", index: null });
+                            }}>{`Delete`}</button>
                         </div>
                     ))}
                     </div>
