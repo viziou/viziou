@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { SidebarProps3D } from '../utils/types';
 import logo from '../assets/favicon.png';
+import info from '../assets/info.png';
 import '../styles/Sidebar3D.css';
 import { useState } from 'react';
 
@@ -24,9 +25,28 @@ const Sidebar3D = (props: SidebarProps3D) => {
 
                 {!isCollapsed && (
                     <div className="nav-3d">
-                    <NavLink to="/about" className={({ isActive }) => isActive ? "nav-link-3d active-link-3d" : "nav-link-3d"}>
-                        About
-                    </NavLink>
+                    <div className="about-icon-3d">
+                        <NavLink to="/about" className={({ isActive }) => isActive ? "nav-link-3d active-link-3d" : "nav-link-3d"}>
+                            About
+                        </NavLink>
+                        <div className="tooltip">
+                            <img src={info} alt="info" className="info-icon-3d" />
+                            <span className="tooltiptext">
+                                <p>Welcome to the 3D Environment page of <i><b>viziou</b></i>.</p>
+                                <br/>
+                                <p>In this page, users can freely create <b>convex</b> polyhedra and visualise the <b>Intersection over Union</b> metric between
+                                pairs of polyhedra on a simplistic and minimalist canvas.</p>
+                                <br/>
+                                <p>To get started, click on the <b>Add Shape</b> button to bring your convex polyhedra to life!</p>
+                                <br/>
+                                <p>Once the polyhedra are created, click the <b>Show IoU</b> button to visualise all intersections and <b>hover</b> over them to see their geometric information.</p>
+                                <br/>
+                                <p>You can select polyhedra on the canvas by <b>left clicking</b>. This will provide a control interface to drag, resize, and 
+                                rotate the polygons. Simply <b>double-click</b> to change between translation, rotation, and scaling options. Navigate the canvas via translating 
+                                by <b>right-click drag</b>, rotating by <b>left-click drag</b>, and zoom by <b>scrolling</b>.</p>
+                            </span>
+                        </div>
+                    </div>
                     <div className="env-buttons-3d">
                         <NavLink to="/2D-Environment" className={({ isActive }) => isActive ? "nav-link-3d active-link-3d" : "nav-link-3d"}>
                         2D Environment

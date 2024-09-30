@@ -27,10 +27,10 @@ const Hero = () => {
                     
             </div>
 
-            <div className="hero-info">
+            {/* <div className="hero-info">
                 <p>Developed for FIT3161/FIT3162</p>
                 <p>Computer Science Project</p>
-            </div>
+            </div> */}
 
         </div>
 
