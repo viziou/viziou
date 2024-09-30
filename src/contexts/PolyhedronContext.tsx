@@ -122,7 +122,7 @@ function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron
             return {
                 ...state,
                 polyhedra: currentPolyhedra,
-                selectedPolyhedronID: state.polyhedra.length - 1,
+                selectedPolyhedronID: currentPolyhedra.length - 1,
             };
 
         case "OPEN_CONFIRMATION_MODAL":

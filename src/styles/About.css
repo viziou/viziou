@@ -1,8 +1,10 @@
 .about-container {
   color: white;
-  min-height: 100vh;
+  height: 100vh;
   padding: 2rem;
   position: relative;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .about-header {
@@ -37,8 +39,8 @@
 
 .developers-grid {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-around;
+  align-items: flex-start; 
   gap: 2rem;
   flex-wrap: wrap;
 }
@@ -48,6 +50,9 @@
   min-width: 180px;
   max-width: 220px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .developer-photo {
@@ -58,7 +63,7 @@
   background-color: #004466;
 }
 
-.mubasshir-photo, .satya-photo {
+.mubasshir-photo, .satya-photo, .kachun-photo {
   object-fit: cover;
   width: 140px;
   height: 140px;
@@ -69,16 +74,20 @@ ul {
   list-style-type: none;
   padding: 0;
   font-size: 1rem;
+  margin: 0; 
 }
 
 ul li {
   margin-bottom: 0.5rem;
 }
 
+.developer h3, .developer p {
+  margin: 0; 
+}
+
 @media only screen and (max-width: 1280px) {
   .about-header h1 {
     font-size: 2.2rem;
-    overflow-y: auto;
   }
 
   .about-description h2,
@@ -110,10 +119,6 @@ ul li {
 }
 
 @media only screen and (max-width: 480px) {
-  a {
-    overflow-y: auto;
-  }
-
   .about-container {
     padding: 1rem;
   }

@@ -24,6 +24,7 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
   const originalPosition = useRef<[number, number]>([0, 0]);
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
+  const [initialBBox, setInitialBBox] = useState<THREE.Box3 | null>(null);
   const { scene, camera, pointer } = useThree();
   const [mousePointer, setMousePointer] = useState<string | null>(null);
   const [resizing, setResizing] = useState(false);
@@ -149,6 +150,17 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
     // Get mouse position relative to the box center
     const mousePosition = getCanvasMousePosition().sub(center);
 
+    // Set corner based on where mousePosition is
+    if (mousePosition.x > 0 && mousePosition.y > 0) {
+      setCorner("topRight")
+    } else if (mousePosition.x < 0 && mousePosition.y > 0) {
+      setCorner("topLeft")
+    } else if (mousePosition.x < 0 && mousePosition.y < 0) {
+      setCorner("bottomLeft")
+    } else if (mousePosition.x > 0 && mousePosition.y < 0) {
+      setCorner("bottomRight")
+    }
+
     // Initialise corner position
     let cornerPosition = new THREE.Vector3(0, 0, 0);
 
@@ -174,27 +186,29 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
     }
 
     // Calculate the multiplier needed to bring the corner box to the current mouse position
-    const scaleX = mousePosition.x / cornerPosition.x;
-    const scaleY = mousePosition.y / cornerPosition.y;
+    if (cornerPosition.x != 0 && cornerPosition.y != 0 && mousePosition.x != 0 && mousePosition.y != 0) {
+      const scaleX = mousePosition.x / cornerPosition.x;
+      const scaleY = mousePosition.y / cornerPosition.y;
 
-    // Create the translations to anchor all scaling to opposite corner
-    // const translationX = center.x - position[0] - cornerPosition.x;
-    // const translationY = center.y - position[1] - cornerPosition.y;
-    const translationX = center.x - position[0];
-    const translationY = center.y - position[1];
+      // Create the translations to anchor all scaling to opposite corner
+      // const translationX = center.x - position[0] - cornerPosition.x;
+      // const translationY = center.y - position[1] - cornerPosition.y;
+      const translationX = center.x - position[0];
+      const translationY = center.y - position[1];
 
-    // Translate from position to bbox center
-    const newGeometry = geometry.clone();
-    newGeometry.translate(-translationX, -translationY, 0);
-    newGeometry.scale(scaleX, scaleY, 1);
-    newGeometry.translate(translationX, translationY, 0);
+      // Translate from position to bbox center
+      const newGeometry = geometry.clone();
+      newGeometry.translate(-translationX, -translationY, 0);
+      newGeometry.scale(scaleX, scaleY, 1);
+      newGeometry.translate(translationX, translationY, 0);
 
-    if (dispatch) {
-      dispatch({
-        type: "UPDATE_GEOMETRY",
-        geometry: newGeometry,
-        id: id,
-      });
+      if (dispatch) {
+        dispatch({
+          type: "UPDATE_GEOMETRY",
+          geometry: newGeometry,
+          id: id,
+        });
+      }
     }
   };
 
@@ -217,15 +231,16 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
     if (iouDispatch) {
       iouDispatch({ type: "HIDE_CHILD_IOUS_USING_ID", payload: id })
     }
+    setInitialBBox(boundingBox);
   };
 
   const handleRotateDrag = () => {
-    if (!rotating || !boundingBox)
+    if (!rotating || !initialBBox)
       return;
     setMousePointer("move")
 
     // Obtain bounding box center
-    const center = boundingBox.getCenter(new THREE.Vector3());
+    const center = initialBBox.getCenter(new THREE.Vector3());
 
     // Get mouse position relative to the box center
     const mousePosition = getCanvasMousePosition().sub(center);
@@ -257,11 +272,13 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
     }
 
     setOrientation(newOrientation);
+  
   };
 
   const handleRotateEnd = () => {
     setRotating(false);
     setOrientation(0);
+    setInitialBBox(null);
     setMousePointer(null);
     if (dispatch) {
       dispatch({ type: "SELECTABILITY", payload: true });
@@ -354,7 +371,7 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
                 itemSize={3}
               />
             </bufferGeometry>
-            <lineBasicMaterial color="red" />
+            <lineBasicMaterial color="red" side={THREE.DoubleSide}/>
           </line>
         ) : null}
 
@@ -387,7 +404,7 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
               }}
             >
               <boxGeometry args={[0.2, 0.2, 0]} />
-              <meshBasicMaterial color="blue" />
+              <meshBasicMaterial color="blue" side={THREE.DoubleSide} />
             </mesh>
           )
         ) : null}
@@ -401,7 +418,7 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
           onPointerLeave={() => setMousePointer(null)}
         >
           <circleGeometry args={[0.1, 16]} />
-          <meshBasicMaterial color="green" />
+          <meshBasicMaterial color="green" side={THREE.DoubleSide}/>
         </mesh> : null}
 
         {/* Line to Rotate circle: */}
@@ -417,7 +434,7 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
                 itemSize={3}
               />
             </bufferGeometry>
-            <lineBasicMaterial color="red" />
+            <lineBasicMaterial color="red" side={THREE.DoubleSide}/>
           </line>
         ) : null}
 
@@ -464,7 +481,7 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
         ) : null}
       </group>
     );
-  }, [boundingBox, isPolygonSelected, scene, polygons]);
+  }, [boundingBox, isPolygonSelected, scene, polygons, geometry, position]);
 
   // const renderPoint = ({x, y}: {x: number, y: number}, size = 0.03, smoothness = 50) => {
   //   return (
@@ -522,6 +539,7 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
             color={colour}
             transparent={true}
             opacity={opacity}
+            side={THREE.DoubleSide}
           />
         </mesh>
         {/* Example infographic: */}

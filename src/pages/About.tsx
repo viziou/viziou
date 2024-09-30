@@ -1,5 +1,6 @@
 import '../styles/About.css';
 import mub from '../assets/mub.png';
+import kc from '../assets/kachun.png';
 import placeholder from '../assets/placeholder_avatar.png';
 
 function About() {
@@ -38,12 +39,12 @@ function About() {
                   </div>
 
               <div className="developer">
-                  <img className="developer-photo kachun-photo" src={placeholder} alt="KaChun" />
+                  <img className="developer-photo kachun-photo" src={kc} alt="KaChun" />
                   <h3>Ka Chun</h3>
                   <ul>
-                      <li>Who we are</li>
-                      <li>What we do</li>
-                      <li>What we enjoy</li>
+                      <li>Hello, I'm Ka Chun! I am currently pursuing a degree in Computer Science at Monash University. </li>
+                      <li>I enjoy building software solutions and exploring efficient ways to solve complex problems.</li>
+                      <li>Beyond my academic pursuits, I enjoy playing tennis and video games.</li>
                   </ul>
               </div>
 
