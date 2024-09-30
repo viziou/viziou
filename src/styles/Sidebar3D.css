@@ -20,7 +20,7 @@
 .sidebar-3d.collapsed .logo-text-3d,
 .sidebar-3d.collapsed .nav-3d,
 .sidebar-3d.collapsed .section-3d,
-.sidebar-3d.collapsed .polygon-list-3d,
+.sidebar-3d.collapsed .polyhedron-list-3d,
 .sidebar-3d.collapsed .footer-buttons-3d {
   display: none;
 }
@@ -212,13 +212,13 @@ select {
   font-size: 12px;
 }
 
-.polygon-list-3d {
+.polyhedron-list-3d {
   margin-bottom: 10px;
   height: 200px;
   overflow-y: auto;
 }
 
-.polygon-item-3d {
+.polyhedron-item-3d {
   background-color: #4a4a6a;
   padding: 5px;
   margin-bottom: 5px;
@@ -331,7 +331,7 @@ select {
     padding: 4px; 
   }
 
-  .polygon-item-3d {
+  .polyhedron-item-3d {
     font-size: 10px; 
   }
 
