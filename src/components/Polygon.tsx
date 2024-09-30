@@ -516,7 +516,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
           }}
           onClick={selectPolygon}
           // TEsting:
-          onDoubleClick={editSelectedPolygon}
+          // onDoubleClick={editSelectedPolygon}
         >
           <meshBasicMaterial
             color={colour}
