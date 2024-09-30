@@ -38,6 +38,8 @@ const PointsCreator = ({
     useState<BufferGeometry<NormalBufferAttributes> | null>(null);
   const [draggedPoint, setDraggedPoint] = useState<number | null>(null);
   const { camera, gl } = useThree();
+  const [isRightMouseDown, setIsRightMouseDown] = useState(false);
+  const rightClickStartPosition = useRef<Vector3 | null>(null);
 
   const updatePoints = (newPoints: Point[]) => {
     const newConvexHullPoints = ConvexGeometry.reducePointsToConvexHull(
@@ -59,13 +61,50 @@ const PointsCreator = ({
     }
   };
 
+  const removeNearestPoint = (clickPosition: Vector3) => {
+    if (points.length === 0) return;
+
+    let nearestIndex = 0;
+    let nearestDistance = clickPosition.distanceTo(points[0].position);
+
+    for (let i = 1; i < points.length; i++) {
+      const distance = clickPosition.distanceTo(points[i].position);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = i;
+      }
+    }
+
+    const newPoints = points.filter((_, index) => index !== nearestIndex);
+    updatePoints(newPoints);
+  };
+
   // add a point at the position where the user clicked:
   const handleCanvasClick = (event: ThreeEvent<MouseEvent>) => {
-    if (draggedPoint !== null) return;
+    if (draggedPoint !== null || event.button !== 0) return;
 
     const pos = getWorldPosition(event);
     const newPoints = [...points, { position: pos }];
     updatePoints(newPoints);
+  };
+
+  const handleRightMouseDown = (event: ThreeEvent<MouseEvent>) => {
+    if (event.button === 2) {
+      setIsRightMouseDown(true);
+      rightClickStartPosition.current = getWorldPosition(event);
+    }
+  };
+
+  const handleRightMouseUp = (event: ThreeEvent<MouseEvent>) => {
+    if (event.button === 2 && isRightMouseDown) {
+      const endPosition = getWorldPosition(event);
+      if (rightClickStartPosition.current && 
+          endPosition.distanceTo(rightClickStartPosition.current) < 0.1) {
+        removeNearestPoint(endPosition);
+      }
+      setIsRightMouseDown(false);
+      rightClickStartPosition.current = null;
+    }
   };
 
   // set the index of the currently dragged shape:
@@ -120,9 +159,14 @@ const PointsCreator = ({
     <>
       <mesh
         onClick={handleCanvasClick}
+        onPointerDown={handleRightMouseDown}
+        onPointerUp={handleRightMouseUp}
         onPointerMove={handleDrag}
-        onPointerUp={handleDragEnd}
-        onPointerLeave={handleDragEnd}
+        onPointerLeave={() => {
+          handleDragEnd();
+          setIsRightMouseDown(false);
+          rightClickStartPosition.current = null;
+        }}
       >
         {/* TODO: fix, currently the size of this plane defines the maximum location the user can place points */}
         <planeGeometry args={[100, 100]} />
