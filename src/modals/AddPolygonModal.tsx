@@ -16,6 +16,8 @@ interface AddPolygonProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (points: [number, number][], colour: string) => void;
+  addSquare: () => void;
+  addRandomShape: () => void;
 }
 
 interface Point {
@@ -36,6 +38,8 @@ const PointsCreator = ({
     useState<BufferGeometry<NormalBufferAttributes> | null>(null);
   const [draggedPoint, setDraggedPoint] = useState<number | null>(null);
   const { camera, gl } = useThree();
+  const [isRightMouseDown, setIsRightMouseDown] = useState(false);
+  const rightClickStartPosition = useRef<Vector3 | null>(null);
 
   const updatePoints = (newPoints: Point[]) => {
     const newConvexHullPoints = ConvexGeometry.reducePointsToConvexHull(
@@ -57,13 +61,50 @@ const PointsCreator = ({
     }
   };
 
+  const removeNearestPoint = (clickPosition: Vector3) => {
+    if (points.length === 0) return;
+
+    let nearestIndex = 0;
+    let nearestDistance = clickPosition.distanceTo(points[0].position);
+
+    for (let i = 1; i < points.length; i++) {
+      const distance = clickPosition.distanceTo(points[i].position);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = i;
+      }
+    }
+
+    const newPoints = points.filter((_, index) => index !== nearestIndex);
+    updatePoints(newPoints);
+  };
+
   // add a point at the position where the user clicked:
   const handleCanvasClick = (event: ThreeEvent<MouseEvent>) => {
-    if (draggedPoint !== null) return;
+    if (draggedPoint !== null || event.button !== 0) return;
 
     const pos = getWorldPosition(event);
     const newPoints = [...points, { position: pos }];
     updatePoints(newPoints);
+  };
+
+  const handleRightMouseDown = (event: ThreeEvent<MouseEvent>) => {
+    if (event.button === 2) {
+      setIsRightMouseDown(true);
+      rightClickStartPosition.current = getWorldPosition(event);
+    }
+  };
+
+  const handleRightMouseUp = (event: ThreeEvent<MouseEvent>) => {
+    if (event.button === 2 && isRightMouseDown) {
+      const endPosition = getWorldPosition(event);
+      if (rightClickStartPosition.current && 
+          endPosition.distanceTo(rightClickStartPosition.current) < 0.1) {
+        removeNearestPoint(endPosition);
+      }
+      setIsRightMouseDown(false);
+      rightClickStartPosition.current = null;
+    }
   };
 
   // set the index of the currently dragged shape:
@@ -118,9 +159,14 @@ const PointsCreator = ({
     <>
       <mesh
         onClick={handleCanvasClick}
+        onPointerDown={handleRightMouseDown}
+        onPointerUp={(e) => {handleRightMouseUp(e); handleDragEnd();}}
         onPointerMove={handleDrag}
-        onPointerUp={handleDragEnd}
-        onPointerLeave={handleDragEnd}
+        onPointerLeave={() => {
+          handleDragEnd();
+          setIsRightMouseDown(false);
+          rightClickStartPosition.current = null;
+        }}
       >
         {/* TODO: fix, currently the size of this plane defines the maximum location the user can place points */}
         <planeGeometry args={[100, 100]} />
@@ -155,7 +201,7 @@ const PointsCreator = ({
   );
 };
 
-const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
+const AddPolygonModal = ({ isOpen, onClose, onSubmit, addRandomShape, addSquare }: AddPolygonProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [points, setPoints] = useState<Point[]>([]);
   const [showColourPicker, setShowColourPicker] = useState(false);
@@ -180,7 +226,7 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2>Create Custom Shape</h2>
+        <h2>Add Shape</h2>
         <div className="canvas-container">
           <Canvas
             style={{ background: "#cccccc" }}
@@ -196,24 +242,33 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
           </Canvas>
         </div>
         <div className="modal-actions">
-          <button className="modal-button" onClick={handleSubmit}>
-            Submit
-          </button>
-          <button className="modal-button" onClick={onClose}>
-            Close
-          </button>
-          <div className="colour-picker-container">
-            <button className="modal-button" onClick={toggleColourPicker}>
-              {showColourPicker ? "Hide Colour Picker" : "Show Colour Picker"}
+          <div className="modal-actions-left">
+            <button className="modal-button" onClick={addSquare}>Add Square</button>
+            <button className="modal-button" onClick={addRandomShape}>Add Random Polygon</button>
+          </div>
+          <div className="modal-actions-right">
+            <button
+              className="modal-button modal-button-green"
+              onClick={(e) => {setPoints([]); handleSubmit(e);}}
+            >
+              Submit
             </button>
-            {showColourPicker && (
-              <div className="colour-picker-popup">
-                <HexColorPicker
-                  color={displayColour}
-                  onChange={setDisplayColour}
-                />
-              </div>
-            )}
+            <button className="modal-button modal-button-red" onClick={() => { setPoints([]); onClose();}}>
+              Close
+            </button>
+            <div className="colour-picker-container">
+              <button className="modal-button" onClick={toggleColourPicker}>
+                {showColourPicker ? "Hide Colour Picker" : "Show Colour Picker"}
+              </button>
+              {showColourPicker && (
+                <div className="colour-picker-popup">
+                  <HexColorPicker
+                    color={displayColour}
+                    onChange={setDisplayColour}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

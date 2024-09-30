@@ -46,6 +46,8 @@ const PolygonEditor = ({
     );
   const [draggedPoint, setDraggedPoint] = useState<number | null>(null);
   const { camera, gl } = useThree();
+  const [isRightMouseDown, setIsRightMouseDown] = useState(false);
+  const rightClickStartPosition = useRef<Vector3 | null>(null);
 
   useEffect(() => {
     updatePoints(initialPoints);
@@ -72,11 +74,49 @@ const PolygonEditor = ({
   };
 
   // add a point at the position where the user clicked:
+  
   const handleCanvasClick = (event: ThreeEvent<MouseEvent>) => {
-    if (draggedPoint !== null) return;
+    if (draggedPoint !== null || event.button !== 0) return;
 
     const pos = getWorldPosition(event);
     const newPoints = [...points, { position: pos }];
+    updatePoints(newPoints);
+  };
+
+  const handleRightMouseDown = (event: ThreeEvent<MouseEvent>) => {
+    if (event.button === 2) {
+      setIsRightMouseDown(true);
+      rightClickStartPosition.current = getWorldPosition(event);
+    }
+  };
+
+  const handleRightMouseUp = (event: ThreeEvent<MouseEvent>) => {
+    if (event.button === 2 && isRightMouseDown) {
+      const endPosition = getWorldPosition(event);
+      if (rightClickStartPosition.current && 
+          endPosition.distanceTo(rightClickStartPosition.current) < 0.1) {
+        removeNearestPoint(endPosition);
+      }
+      setIsRightMouseDown(false);
+      rightClickStartPosition.current = null;
+    }
+  };
+
+  const removeNearestPoint = (clickPosition: Vector3) => {
+    if (points.length === 0) return;
+
+    let nearestIndex = 0;
+    let nearestDistance = clickPosition.distanceTo(points[0].position);
+
+    for (let i = 1; i < points.length; i++) {
+      const distance = clickPosition.distanceTo(points[i].position);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = i;
+      }
+    }
+
+    const newPoints = points.filter((_, index) => index !== nearestIndex);
     updatePoints(newPoints);
   };
 
@@ -84,6 +124,7 @@ const PolygonEditor = ({
     event: ThreeEvent<MouseEvent>,
     index: number
   ) => {
+    if (event.button !== 0) return;
     event.stopPropagation();
     setDraggedPoint(index);
     setHovered(true);
@@ -126,9 +167,14 @@ const PolygonEditor = ({
     <>
       <mesh
         onClick={handleCanvasClick}
+        onPointerDown={handleRightMouseDown}
+        onPointerUp={(e) => {handleRightMouseUp(e); handleDragEnd();}}
         onPointerMove={handleDrag}
-        onPointerUp={handleDragEnd}
-        onPointerLeave={handleDragEnd}
+        onPointerLeave={() => {
+          handleDragEnd();
+          setIsRightMouseDown(false);
+          rightClickStartPosition.current = null;
+        }}
       >
         <planeGeometry args={[100, 100]} />
         <meshBasicMaterial visible={false} />
@@ -170,16 +216,9 @@ const EditPolygonModal = ({
   initialColour,
 }: EditPolygonProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [points, setPoints] = useState<Point[]>([]);
+  const [points, setPoints] = useState<Point[]>(initialPoints.length ? initialPoints.map(v => {return {position: new Vector3(v[0], v[1], 0)}})  : []);
   const [displayColour, setDisplayColour] = useState<string>(initialColour);
   const [showColourPicker, setShowColourPicker] = useState(false);
-
-  useEffect(() => {
-    const initialPointObjects = initialPoints.map(([x, y]) => ({
-      position: new Vector3(x, y, 0),
-    }));
-    setPoints(initialPointObjects);
-  }, [initialPoints]);
 
   const handleSave = () => {
     const pts: [number, number][] = points.map((p) => [
@@ -215,10 +254,10 @@ const EditPolygonModal = ({
           </Canvas>
         </div>
         <div className="modal-actions">
-          <button className="modal-button" onClick={handleSave}>
+          <button className="modal-button modal-button-green" onClick={() => {setPoints([]); handleSave();}}>
             Save
           </button>
-          <button className="modal-button" onClick={onClose}>
+          <button className="modal-button modal-button-red" onClick={() => {setPoints([]); onClose();}}>
             Cancel
           </button>
           <div className="colour-picker-container">

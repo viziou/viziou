@@ -82,13 +82,13 @@ class Backend2D {
     return this._threeGeometryToPolygon2D(geometry).centroid().translate(offset).xy;
   }
 
-  private static _threeGeometryToPolygon2D( geometry: BufferGeometry ): Polygon2D {
+  public static _threeGeometryToPolygon2D( geometry: BufferGeometry ): Polygon2D {
     function key({x, y}: {x: number; y: number}) {
       return `${x},${y}`;
     }
 
     const geometryPosition = geometry.getAttribute('position');
-    console.log('geometryPosition: ', geometryPosition)
+    // console.log('geometryPosition: ', geometryPosition)
     let vertices: Point2D[] = [];
     const vertexMap: Map<string, {x: number, y: number}> = new Map();
     for (let i = 0; i < geometryPosition.array.length; i+=3 ) {
@@ -99,13 +99,13 @@ class Backend2D {
     vertexMap.forEach(({x, y}) => {
       vertices.push(new Point2D(x, y))
     })
-    console.log('vertexMap: ', vertexMap);
-    console.log('vertices: ', vertices)
-    console.log('number of vertices parsed: ', geometryPosition.count / 3);
-    console.log('number of vertices included: ', vertices.length)
+    // console.log('vertexMap: ', vertexMap);
+    // console.log('vertices: ', vertices)
+    // console.log('number of vertices parsed: ', geometryPosition.count / 3);
+    // console.log('number of vertices included: ', vertices.length)
     vertices = this._reducePointsToConvexHull(vertices);
-    console.log('vertices after convex hull reduction: ', vertices);
-    console.log('number of vertices on hull: ', vertices.length)
+    // console.log('vertices after convex hull reduction: ', vertices);
+    // console.log('number of vertices on hull: ', vertices.length)
     return new Polygon2D(vertices, true);
   }
 

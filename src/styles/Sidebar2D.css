@@ -60,11 +60,14 @@
 
 .nav-link-2d {
   color: white;
+  background-color: rgba(0, 0, 0, 0);
   text-decoration: none;
   font-size: 16px;
   margin-bottom: 10px;
   padding: 5px 0;
   position: relative;
+  border: none;
+  cursor: pointer;
 }
 
 .nav-link-2d::after {
@@ -146,9 +149,27 @@
 }
 
 .settings-2d {
-  display: flex;
+  display: flex; 
   flex-direction: column;
   gap: 10px;
+}
+
+.setting-row-2d {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-2d label {
+  font-size: 16px;
+  color: white;
+  white-space: nowrap;
+}
+
+.settings-2d input[type="number"] {
+  width: 30px;
+  text-align: center;
+  margin-left: 75px;
 }
 
 .checkbox-label-2d {
@@ -161,10 +182,6 @@
 
 .checkbox-label-2d input[type="checkbox"] {
   margin-left: 10px;
-}
-
-input[type="number"] {
-  width: 100%;
 }
 
 .canvas-buttons-2d {
@@ -248,83 +265,88 @@ select {
 }
 
 @media only screen and (max-height: 800px) {
-    .sidebar-2d {
-      width: 180px;
+  .sidebar-2d {
+      width: 180px; 
       padding: 10px;
       font-size: 10px;
-    }
-  
-    .twod-button-2d {
-      font-size: 10px;
-      padding: 5px;
-    }
-  
-    .logo-image-2d {
-      width: 20px;
-      height: 20px;
-    }
-  
-    .logo-text-2d {
-      font-size: 14px;
-    }
+  }
 
-    .info-icon-2d {
-      width: 15px;
-      height:15px;
-      margin-right: px;
-    }
-  
-    .nav-link-2d {
+  .twod-button-2d {
+      font-size: 10px; 
+      padding: 5px; 
+  }
+
+  .logo-image-2d {
+      width: 20px; 
+      height: 20px; 
+  }
+
+  .logo-text-2d {
+      font-size: 14px;
+  }
+
+  .info-icon-2d {
+      width: 25px;
+      height: 25px;
+  }
+
+  .nav-link-2d {
       font-size: 11px;
-      padding: 5px 0;
-    }
-  
-    .settings-2d {
+      padding: 5px 0; 
+  }
+
+  .settings-2d {
       gap: 5px;
-    }
-  
-    .settings-2d label {
-      font-size: 10px;
-      display: inline-flex;
-      justify-content: space-between;
+      flex-direction: column;
+  }
+
+  .setting-row-2d {
+      display: flex;
       align-items: center;
-      width: 100%;
-    }
-  
-    .settings-2d input[type="number"] {
-      width: 100%;
-      padding: 4px;
-      font-size: 10px;
-    }
-  
-    .settings-2d input[type="checkbox"] {
+      gap: 10px;
+  }
+
+  .settings-2d label {
+      font-size: 10px; 
+      color: white;
+      white-space: nowrap;
+  }
+
+  .settings-2d input[type="number"] {
+      width: 30px; 
+      margin-left: 60px;
+      font-size: 10px; 
+      text-align: center; 
+  }
+
+  .settings-2d input[type="checkbox"] {
       transform: scale(0.8);
       margin-left: 10px;
-    }
-  
-    .checkbox-label-2d {
-      display: inline-flex;
+  }
+
+  .checkbox-label-2d {
+      display: inline-flex; 
       align-items: center;
-      justify-content: space-between;
-      white-space: nowrap;
-    }
-  
-    input,
-    select {
+      justify-content: space-between; 
+      white-space: nowrap; 
+  }
+
+  input,
+  select {
       font-size: 10px;
-      padding: 4px;
-    }
-  
-    .polygon-item-2d {
+      padding: 4px; 
+  }
+
+  .polygon-item-2d {
+      font-size: 10px; 
+  }
+
+  .footer-buttons-2d {
       font-size: 10px;
-    }
-  
-    .footer-buttons-2d {
-      font-size: 10px;
-    }
-  
-    .collapse-button-2d {
+  }
+
+  .collapse-button-2d {
       font-size: 12px;
       padding: 4px;
-    }
   }
+}
