@@ -248,77 +248,83 @@ select {
 }
 
 @media only screen and (max-height: 800px) {
-  .sidebar-2d {
-    width: 180px;
-    padding: 10px;
-    font-size: 12px;
-  }
+    .sidebar-2d {
+      width: 180px;
+      padding: 10px;
+      font-size: 10px;
+    }
+  
+    .twod-button-2d {
+      font-size: 10px;
+      padding: 5px;
+    }
+  
+    .logo-image-2d {
+      width: 20px;
+      height: 20px;
+    }
+  
+    .logo-text-2d {
+      font-size: 14px;
+    }
 
-  .twod-button-2d {
-    font-size: 12px;
-    padding: 5px;
+    .info-icon-2d {
+      width: 15px;
+      height:15px;
+      margin-right: px;
+    }
+  
+    .nav-link-2d {
+      font-size: 11px;
+      padding: 5px 0;
+    }
+  
+    .settings-2d {
+      gap: 5px;
+    }
+  
+    .settings-2d label {
+      font-size: 10px;
+      display: inline-flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+  
+    .settings-2d input[type="number"] {
+      width: 100%;
+      padding: 4px;
+      font-size: 10px;
+    }
+  
+    .settings-2d input[type="checkbox"] {
+      transform: scale(0.8);
+      margin-left: 10px;
+    }
+  
+    .checkbox-label-2d {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      white-space: nowrap;
+    }
+  
+    input,
+    select {
+      font-size: 10px;
+      padding: 4px;
+    }
+  
+    .polygon-item-2d {
+      font-size: 10px;
+    }
+  
+    .footer-buttons-2d {
+      font-size: 10px;
+    }
+  
+    .collapse-button-2d {
+      font-size: 12px;
+      padding: 4px;
+    }
   }
-
-  .logo-image-2d {
-    width: 20px;
-    height: 20px;
-  }
-
-  .logo-text-2d {
-    font-size: 14px;
-  }
-
-  .nav-link-2d {
-    font-size: 12px;
-    padding: 5px 0;
-  }
-
-  .settings-2d {
-    gap: 5px;
-  }
-
-  .settings-2d label {
-    font-size: 12px;
-    display: inline-flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-  }
-
-  .settings-2d input[type="number"] {
-    width: 100%;
-    padding: 4px;
-    font-size: 12px;
-  }
-
-  .settings-2d input[type="checkbox"] {
-    transform: scale(0.8);
-    margin-left: 10px;
-  }
-
-  .checkbox-label-2d {
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-between;
-    white-space: nowrap;
-  }
-
-  input,
-  select {
-    font-size: 10px;
-    padding: 4px;
-  }
-
-  .polygon-item-2d {
-    font-size: 10px;
-  }
-
-  .footer-buttons-2d {
-    font-size: 10px;
-  }
-
-  .collapse-button-2d {
-    font-size: 12px;
-    padding: 4px;
-  }
-}
