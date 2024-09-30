@@ -54,10 +54,10 @@ function PolygonReducer(
       };
 
         case "SET_POLYGONS":
-                state.polygons.clear();
-                for (const polygon of action.payload) {
-                  state.polygons.set(key(polygon), polygon);
-                }
+              state.polygons.clear();
+              for (const polygon of action.payload) {
+                state.polygons.set(key(polygon), polygon);
+              }
             return {
                 ...state,
                 polygons: state.polygons,

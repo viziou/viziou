@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState } from 'react'
 import * as THREE from 'three';
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
 
@@ -37,6 +37,12 @@ const getRandomColour = (): string => {
 
 const ThreeDEnv = () => {
     const context = useContext(PolyhedronContext);
+    const nonceGenerator = useRef(0);
+
+    const generateId = () => {
+      nonceGenerator.current += 1
+      return nonceGenerator.current
+    }
 
     if (!context?.dispatch) {
         throw new Error("ThreeDEnv must be used within a PolyhedronProvider");
@@ -44,7 +50,7 @@ const ThreeDEnv = () => {
 
     const { polyhedra, dispatch } = context;
 
-    const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
 
 
     // const addCube = () => {
@@ -55,8 +61,8 @@ const ThreeDEnv = () => {
     //             Math.random() * 4 - 2,
     //             Math.random() * 4 - 2
     //         ],
-    //         rotation: [0, 0, 0],   
-    //         scale: [1, 1, 1], 
+    //         rotation: [0, 0, 0],
+    //         scale: [1, 1, 1],
     //         colour: getRandomColour(),
     //     };
 
@@ -66,15 +72,17 @@ const ThreeDEnv = () => {
 
     const addRandomPolyhedron = () => {
         const newPolyhedron: PolyhedronData = {
+            id: generateId(),
             geometry: getRandomGeometry(),
             position: [
                 Math.random() * 4 - 2,
                 Math.random() * 4 - 2,
                 Math.random() * 4 - 2
             ],
-            rotation: [0, 0, 0],  
-            scale: [1, 1, 1], 
+            rotation: [0, 0, 0],
+            scale: [1, 1, 1],
             colour: getRandomColour(),
+            opacity: 1
         };
 
         console.log("Dispatching ADD_RANDOM_POLYHEDRON:", newPolyhedron);
@@ -83,13 +91,13 @@ const ThreeDEnv = () => {
 
     const clearPolyhedra = () => {
         console.log("Dispatching CLEAR_POLYHEDRA");
-        setSelectedIndex(null);
+        setSelectedId(null);
         dispatch({ type: "CLEAR_POLYHEDRA" });
     };
 
     const savePolyhedra = () => {
       console.log("Saving canvas...");
-      Storage.save3D(polyhedra, 'export');
+      Storage.save3D(Array.from(polyhedra.values()), 'export');
     }
 
     const loadPolyhedra = async () => {
@@ -103,11 +111,11 @@ const ThreeDEnv = () => {
     }
 
     return (
-       
+
         <div className="ThreeDEnv">
 
-            <Sidebar3D 
-                polyhedrons={polyhedra}
+            <Sidebar3D
+                polyhedrons={Array.from(polyhedra.values())}
                 addRandomPolyhedron={addRandomPolyhedron}
                 clearPolyhedrons={clearPolyhedra}
                 savePolyhedrons={savePolyhedra}
@@ -115,10 +123,10 @@ const ThreeDEnv = () => {
             />
 
             <main className="threed-canvas-container">
-                <Scene3D 
-                polyhedra={polyhedra} 
-                selectedIndex={selectedIndex} 
-                setSelectedIndex={setSelectedIndex} 
+                <Scene3D
+                polyhedra={Array.from(polyhedra.values())}
+                selectedId={selectedId}
+                setSelectedId={setSelectedId}
                 />
             </main>
 

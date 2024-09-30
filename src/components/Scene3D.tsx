@@ -7,7 +7,7 @@ import Polyhedron from './Polyhedron';
 import { PolyhedronContext } from '../contexts/PolyhedronContext';
 import { Scene3DProps } from '../utils/types';
 
-const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) => {
+const Scene3D = ({ polyhedra, selectedId, setSelectedId }: Scene3DProps) => {
     const context = useContext(PolyhedronContext);
 
     if (!context?.dispatch) {
@@ -25,27 +25,27 @@ const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) =
 
     // deselect all polyhedra when clicking outside
     const handlePointerMissed = (): void => {
-        setSelectedIndex(null);
+        setSelectedId(null);
         selectedObject.current = null;
     };
 
     // toggle selection of polyhedron (single vs double-click)
-    const handleObjectClick = (event: ThreeEvent<MouseEvent>, index: number): void => {
+    const handleObjectClick = (event: ThreeEvent<MouseEvent>, id: number): void => {
         const currentTime = Date.now();
         const timeDiff = currentTime - lastClickTime;
 
         if (timeDiff < 250) {
             handleDoubleClick();
-        } 
-        
+        }
+
         else {
             const clickedObject = event.object as THREE.Object3D;
 
-            if (selectedIndex === index) {
-                setSelectedIndex(null);
+            if (selectedId === id) {
+                setSelectedId(null);
                 selectedObject.current = null;
             } else {
-                setSelectedIndex(index);
+                setSelectedId(id);
                 selectedObject.current = clickedObject;
             }
         }
@@ -62,7 +62,7 @@ const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) =
     };
 
     const handleTransformChange = (): void => {
-        if (selectedIndex !== null && selectedObject.current) {
+        if (selectedId !== null && selectedObject.current) {
             const newPosition: [number, number, number] = [
                 selectedObject.current.position.x,
                 selectedObject.current.position.y,
@@ -83,7 +83,7 @@ const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) =
 
             dispatch({
                 type: "UPDATE_POLYHEDRON",
-                index: selectedIndex,
+                id: selectedId,
                 position: newPosition,
                 rotation: newRotation,
                 scale: newScale,
@@ -94,12 +94,12 @@ const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) =
     const handleDoubleClick = (): void => {
         if (mode === "translate") {
             setMode("rotate");
-        } 
+        }
 
         else if (mode === "rotate") {
             setMode("scale");
         }
-         
+
         else if (mode === "scale") {
             setMode("translate");
         }
@@ -111,15 +111,16 @@ const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) =
 
             {polyhedra.map((polyhedron, index) => (
                 <Polyhedron
+                    id={polyhedron.id}
                     key={index}
-                    index={index}
                     position={polyhedron.position}
                     rotation={polyhedron.rotation}
                     scale={polyhedron.scale}
                     geometry={polyhedron.geometry}
                     colour={polyhedron.colour}
-                    onClick={(event) => handleObjectClick(event, index)}
-                    isSelected={selectedIndex === index}
+                    onClick={(event) => handleObjectClick(event, polyhedron.id)}
+                    isSelected={selectedId === polyhedron.id}
+                    opacity={polyhedron.opacity}
                 />
             ))}
 

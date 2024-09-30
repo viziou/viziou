@@ -2,7 +2,7 @@ import * as THREE from "three";
 import React from 'react'
 
 export type PolygonData = {
-  id: number,
+  id: number;
   position: [number, number];
   geometry: THREE.BufferGeometry;
   colour: string;
@@ -53,18 +53,20 @@ export type Polygon2DAction =
   | { type: "SET_DECIMAL_PRECISION"; precision: number};
 
 export interface PolyhedronData {
+  id: number;
   geometry: THREE.BufferGeometry;
   position: [number, number, number];
   rotation: [number, number, number];
   scale: [number, number, number];
   colour: string;
   transformedVertices?: THREE.Vector3[];
+  opacity: number;
 }
 
 export type Scene3DProps = {
   polyhedra: PolyhedronData[];
-  setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
-  selectedIndex: number | null;
+  setSelectedId: React.Dispatch<React.SetStateAction<number | null>>;
+  selectedId: number | null;
 };
 
 export type Polyhedron3DAction =
@@ -72,8 +74,8 @@ export type Polyhedron3DAction =
   | { type: "ADD_RANDOM_POLYHEDRON"; payload: PolyhedronData }
   | { type: "SET_POLYHEDRONS"; payload: PolyhedronData[] }
   | { type: "CLEAR_POLYHEDRA" }
-  | { type: "UPDATE_POLYHEDRON"; index: number; position: [number, number, number]; rotation: [number, number, number]; scale: [number, number, number] }
-  | { type: "STORE_TRANSFORMED_VERTICES"; index: number; transformedVertices: THREE.Vector3[];
+  | { type: "UPDATE_POLYHEDRON"; id: number; position: [number, number, number]; rotation: [number, number, number]; scale: [number, number, number] }
+  | { type: "STORE_TRANSFORMED_VERTICES"; id: number; transformedVertices: THREE.Vector3[];
 
   };
 

@@ -6,10 +6,10 @@ import { PolyhedronData } from '../utils/types';
 import { PolyhedronContext } from '../contexts/PolyhedronContext';
 
 interface PolyhedronProps extends PolyhedronData {
-    index: number;
+    id: number;
     position: [number, number, number];
-    rotation: [number, number, number];  
-    scale: [number, number, number];  
+    rotation: [number, number, number];
+    scale: [number, number, number];
     geometry: THREE.BufferGeometry;
     colour: string;
     onClick: (event: ThreeEvent<MouseEvent>) => void;
@@ -19,7 +19,7 @@ interface PolyhedronProps extends PolyhedronData {
     onDoubleClick?: () => void;
 }
 
-const Polyhedron = ({ index, position, rotation, scale, geometry, colour, onClick, isSelected, onPointerOver, onPointerOut }: PolyhedronProps) => {
+const Polyhedron = ({ id, position, rotation, scale, geometry, colour, onClick, isSelected, onPointerOver, onPointerOut }: PolyhedronProps) => {
     const mesh = useRef<THREE.Mesh>(null);
     const boundingBoxRef = useRef<THREE.BoxHelper | null>(null);
     const { scene } = useThree();
@@ -28,8 +28,8 @@ const Polyhedron = ({ index, position, rotation, scale, geometry, colour, onClic
 
     if (!context?.dispatch) {
         throw new Error("Scene3D must be used within a PolyhedronProvider");
-    }    
-    
+    }
+
     const { dispatch } = context;
 
     useEffect(() => {
@@ -46,13 +46,13 @@ const Polyhedron = ({ index, position, rotation, scale, geometry, colour, onClic
                 vertex.fromBufferAttribute(positionAttribute, i);
 
                  // apply world transformation (position, rotation, scale)
-                vertex.applyMatrix4(mesh.current.matrixWorld);    
+                vertex.applyMatrix4(mesh.current.matrixWorld);
                 transformedVertices.push(vertex);
             }
 
             dispatch({
                 type: "STORE_TRANSFORMED_VERTICES",
-                index: index,
+                id: id,
                 transformedVertices: transformedVertices,
             });
 
@@ -62,7 +62,7 @@ const Polyhedron = ({ index, position, rotation, scale, geometry, colour, onClic
             if (isSelected) {
                 if (!boundingBoxRef.current) {
                     boundingBoxRef.current = new THREE.BoxHelper(mesh.current, 0xffff00);
-                    scene.add(boundingBoxRef.current); 
+                    scene.add(boundingBoxRef.current);
                 }
             } else {
                 if (boundingBoxRef.current) {
