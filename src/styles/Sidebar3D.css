@@ -20,7 +20,7 @@
 .sidebar-3d.collapsed .logo-text-3d,
 .sidebar-3d.collapsed .nav-3d,
 .sidebar-3d.collapsed .section-3d,
-.sidebar-3d.collapsed .polyhedron-list-3d,
+.sidebar-3d.collapsed .polygon-list-3d,
 .sidebar-3d.collapsed .footer-buttons-3d {
   display: none;
 }
@@ -107,7 +107,7 @@
 
 .about-icon-3d .nav-link-3d {
   margin-right: 20px;
-  margin-top: 8px
+  margin-top: 8px;
 }
 
 .tooltip {
@@ -116,7 +116,6 @@
 }
 
 .tooltip .tooltiptext {
-  /* visibility: visible; */
   visibility: hidden;
   width: 350px;
   background-color: white;
@@ -131,8 +130,6 @@
   border-width: 1.5px;
   border-color: black;
   font-size: 15px;
-
-  /* Position the tooltip */
   position: absolute;
   z-index: 1;
 }
@@ -146,9 +143,27 @@
 }
 
 .settings-3d {
-  display: flex;
+  display: flex; 
   flex-direction: column;
   gap: 10px;
+}
+
+.setting-row-3d {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-3d label {
+  font-size: 16px;
+  color: white;
+  white-space: nowrap;
+}
+
+.settings-3d input[type="number"] {
+  width: 30px; /* Adjust as necessary */
+  text-align: center;
+  margin-left: 75px;
 }
 
 .checkbox-label-3d {
@@ -161,10 +176,6 @@
 
 .checkbox-label-3d input[type="checkbox"] {
   margin-left: 10px;
-}
-
-input[type="number"] {
-  width: 100%;
 }
 
 .canvas-buttons-3d {
@@ -201,13 +212,13 @@ select {
   font-size: 12px;
 }
 
-.polyhedron-list-3d {
+.polygon-list-3d {
   margin-bottom: 10px;
   height: 200px;
   overflow-y: auto;
 }
 
-.polyhedron-item-3d {
+.polygon-item-3d {
   background-color: #4a4a6a;
   padding: 5px;
   margin-bottom: 5px;
@@ -249,46 +260,57 @@ select {
 
 @media only screen and (max-height: 800px) {
   .sidebar-3d {
-    width: 180px;
+    width: 180px; 
     padding: 10px;
-    font-size: 12px;
+    font-size: 10px;
   }
 
   .threed-button-3d {
-    font-size: 12px;
-    padding: 5px;
+    font-size: 10px; 
+    padding: 5px; 
   }
 
   .logo-image-3d {
-    width: 20px;
-    height: 20px;
+    width: 20px; 
+    height: 20px; 
   }
 
   .logo-text-3d {
     font-size: 14px;
   }
 
+  .info-icon-3d {
+    width: 25px;
+    height: 25px;
+  }
+
   .nav-link-3d {
-    font-size: 12px;
-    padding: 5px 0;
+    font-size: 11px;
+    padding: 5px 0; 
   }
 
   .settings-3d {
     gap: 5px;
+    flex-direction: column;
+  }
+
+  .setting-row-3d {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .settings-3d label {
-    font-size: 12px;
-    display: inline-flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
+    font-size: 10px; 
+    color: white;
+    white-space: nowrap;
   }
 
   .settings-3d input[type="number"] {
-    width: 100%;
-    padding: 4px;
-    font-size: 12px;
+    width: 30px; 
+    margin-left: 60px;
+    font-size: 10px; 
+    text-align: center; 
   }
 
   .settings-3d input[type="checkbox"] {
@@ -297,20 +319,20 @@ select {
   }
 
   .checkbox-label-3d {
-    display: inline-flex;
+    display: inline-flex; 
     align-items: center;
-    justify-content: space-between;
-    white-space: nowrap;
+    justify-content: space-between; 
+    white-space: nowrap; 
   }
 
   input,
   select {
     font-size: 10px;
-    padding: 4px;
+    padding: 4px; 
   }
 
-  .polyhedron-item-3d {
-    font-size: 10px;
+  .polygon-item-3d {
+    font-size: 10px; 
   }
 
   .footer-buttons-3d {

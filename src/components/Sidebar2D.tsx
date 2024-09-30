@@ -64,23 +64,29 @@ const Sidebar2D = (props: SidebarProps2D) => {
             {!isCollapsed && (
                 <div className="section-2d">
                 <h2>Settings</h2>
-                <div className="settings-2d">
-                    <label className="checkbox-label-2d">
-                    Disable save warnings
-                    <input type="checkbox" id="save-warnings-2d" />
-                    </label>
-                    <label htmlFor="decimal-places-2d">
-                    Decimal places:
-                    <input 
-                        type="number" 
-                        id="decimal-places-2d" 
-                        min="0" 
-                        max="5" 
-                        value={currentDecimalPlaces} 
-                        onChange={(event) => dispatch!({ type: "SET_DECIMAL_PRECISION", precision: parseInt(event.target.value) })} 
-                    />
-                    </label>
-                </div>
+                    <div className="settings-2d">
+                        <div className="setting-row-2d">
+                            <label className="checkbox-label-2d">
+                                Disable save warnings
+                                <input type="checkbox" id="save-warnings-2d" />
+                            </label>    
+                        </div>
+                    
+                        <div className="setting-row-2d">
+                            <label htmlFor="decimal-places-2d">
+                            Decimal places:
+                            <input 
+                                type="number" 
+                                id="decimal-places-2d" 
+                                min="0" 
+                                max="5" 
+                                value={currentDecimalPlaces} 
+                                onChange={(event) => dispatch!({ type: "SET_DECIMAL_PRECISION", precision: parseInt(event.target.value) })} 
+                            />
+                            </label>
+                        </div>
+
+                    </div>
                 </div>
             )}
 
