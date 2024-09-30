@@ -170,16 +170,9 @@ const EditPolygonModal = ({
   initialColour,
 }: EditPolygonProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [points, setPoints] = useState<Point[]>([]);
+  const [points, setPoints] = useState<Point[]>(initialPoints.length ? initialPoints.map(v => {return {position: new Vector3(v[0], v[1], 0)}})  : []);
   const [displayColour, setDisplayColour] = useState<string>(initialColour);
   const [showColourPicker, setShowColourPicker] = useState(false);
-
-  useEffect(() => {
-    const initialPointObjects = initialPoints.map(([x, y]) => ({
-      position: new Vector3(x, y, 0),
-    }));
-    setPoints(initialPointObjects);
-  }, [initialPoints]);
 
   const handleSave = () => {
     const pts: [number, number][] = points.map((p) => [

@@ -257,14 +257,8 @@ const TwoDEnv = () => {
                 dispatch({ type: "SET_EDIT", id: null });
               }
             }}
-            // temp initial state for now:
-            initialPoints={[
-              [0, 0],
-              [0, 1],
-              [1, 0],
-              [1, 1],
-            ]}
-            initialColour={"green"}
+            initialPoints={Backend2D._threeGeometryToPolygon2D(polygons.get(`${selectedPolygonID}`)!.geometry).vertices.map(v => [v.x, v.y])}
+            initialColour={polygons.get(`${selectedPolygonID}`)!.colour}
           />
           ) : null}
 
