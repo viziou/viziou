@@ -184,11 +184,13 @@
 .hero-floating-shape-1 {
     filter: drop-shadow(0 4px 32px hsla(203, 71%, 60%, .5));
     animation: float-orb 3s ease-in-out infinite;
+    width: 250px;
 }
 
 .hero-floating-shape-2 {
     filter: drop-shadow(0 4px 32px hsla(203, 71%, 60%, .5));
     animation: float-orb 3s ease-in-out infinite;
+    width: 250px;
 }
 
 .hero-floating-shape-3 {
