@@ -19,7 +19,7 @@ const Sidebar3D = (props: SidebarProps3D) => {
                 <NavLink to="/" className="logo-link-3d">
                     <div className="logo-container-3d">
                     <img src={logo} alt="Logo" className="logo-image-3d" />
-                    {!isCollapsed && <div className="logo-text-3d">Viziou</div>}
+                    {!isCollapsed && <div className="logo-text-3d">viziou</div>}
                     </div>
                 </NavLink>
 
@@ -105,7 +105,7 @@ const Sidebar3D = (props: SidebarProps3D) => {
                 )}
 
                 <button className="collapse-button-3d" onClick={handleCollapseToggle}>
-                    {isCollapsed ? ">" : "<"}
+                    {isCollapsed ? ">" : "< Collapse"}
                 </button>
             </aside>
     );
