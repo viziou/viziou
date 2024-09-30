@@ -4,13 +4,17 @@ import { Backend2D } from '../backend/Interface';
 
 const initialState: IOUPolygonContextInterface = {
     polygonMap: new Map<string, IOUPolygonData>,
-    parentsMap: new Map<string, Set<string>>
+    parentsMap: new Map<string, Set<string>>,
+    currentlyMousedOverPolygons: [],
+    currentDecimalPlaces: 2,
 };
 
 interface IOUPolygonContextInterface {
     polygonMap: Map<string, IOUPolygonData>;
     parentsMap: Map<string, Set<string>>; // key-to-key matching for a single parent object
+    currentlyMousedOverPolygons: number[];
     dispatch?: React.Dispatch<IOUPolygon2DAction>;
+    currentDecimalPlaces: number;
 }
 
 function key(IOUPolygon: IOUPolygonData): string {
@@ -191,6 +195,29 @@ function IOUPolygonReducer(state: IOUPolygonContextInterface, action: IOUPolygon
 
         default:
             return state;
+
+      case "ADD_MOUSED_OVER_POLYGON":
+        const mousedOver = state.currentlyMousedOverPolygons.slice();
+        if (!mousedOver.includes(action.id)) {
+          mousedOver.push(action.id);
+        }
+        return {
+          ...state,
+          currentlyMousedOverPolygons: mousedOver.slice(),
+        };
+
+      case "REMOVE_MOUSED_OVER_POLYGON":
+        const mousedOverArr = state.currentlyMousedOverPolygons.slice();
+        if (mousedOverArr.includes(action.id)) {
+          const index = mousedOverArr.indexOf(action.id);
+          if (index > -1) {
+            mousedOverArr.splice(index, 1);
+          }
+        }
+        return {
+          ...state,
+          currentlyMousedOverPolygons: mousedOverArr.slice(),
+        };
     }
 }
 
@@ -202,7 +229,8 @@ export function IOUPolygonProvider(props: PolygonProviderProps) {
     const [state, dispatch] = useReducer(IOUPolygonReducer, initialState);
 
     return (
-        <IOUPolygonContext.Provider value={{ polygonMap: state.polygonMap, parentsMap: state.parentsMap, dispatch }}>
+        <IOUPolygonContext.Provider value={{ polygonMap: state.polygonMap, parentsMap: state.parentsMap,
+          currentlyMousedOverPolygons: state.currentlyMousedOverPolygons, currentDecimalPlaces: state.currentDecimalPlaces, dispatch }}>
             {props.children}
         </IOUPolygonContext.Provider>
     );
