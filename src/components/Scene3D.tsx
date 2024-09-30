@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Canvas, ThreeEvent } from '@react-three/fiber';
-import { ArcballControls, TransformControls } from '@react-three/drei';
+import { OrbitControls, TransformControls } from '@react-three/drei';
 import { useRef, useContext, useState } from 'react';
 
 import Polyhedron from './Polyhedron';
@@ -9,16 +9,13 @@ import { Scene3DProps } from '../utils/types';
 
 const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) => {
     const context = useContext(PolyhedronContext);
-
     if (!context?.dispatch) {
         throw new Error("Scene3D must be used within a PolyhedronProvider");
     }
-
     const { dispatch } = context;
+
     const transformControlRef = useRef(null);
-
     const selectedObject = useRef<THREE.Object3D | null>(null);
-
     const [controlsEnabled, setControlsEnabled] = useState(true);
     const [mode, setMode] = useState<"translate" | "rotate" | "scale">("translate");
 
@@ -31,10 +28,7 @@ const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) =
     // toggle selection of polyhedron
     const handleObjectClick = (event: ThreeEvent<MouseEvent>, index: number): void => {
         const clickedObject = event.object as THREE.Object3D;
-        if (selectedIndex === index) {
-            setSelectedIndex(null);
-            selectedObject.current = null;
-        } else {
+        if (selectedIndex !== index) {
             setSelectedIndex(index);
             selectedObject.current = clickedObject;
         }
@@ -111,7 +105,7 @@ const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) =
                 />
             ))}
 
-            {selectedObject.current && (
+            {selectedObject.current ? (
                 <TransformControls
                     ref={transformControlRef}
                     object={selectedObject.current}
@@ -120,12 +114,13 @@ const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) =
                     onMouseUp={handleTransformEnd}
                     onChange={handleTransformChange}
                 />
-            )}
+            ) : null}
 
-            <ArcballControls
+            <OrbitControls
                 enableZoom={true}
                 enablePan={true}
                 enabled={controlsEnabled}
+                enableDamping={true}
             />
         </Canvas>
     );

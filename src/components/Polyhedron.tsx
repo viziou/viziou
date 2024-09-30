@@ -1,7 +1,7 @@
-import { useRef, useEffect, useContext } from 'react';
+import { useState, useRef, useMemo, useEffect, useContext } from 'react';
 import * as THREE from 'three';
 import { Edges } from '@react-three/drei'; // Ensure Edges is correctly imported
-import { ThreeEvent, useThree, useFrame } from '@react-three/fiber';
+import { ThreeEvent, useThree } from '@react-three/fiber';
 import { PolyhedronData } from '../utils/types';
 import { PolyhedronContext } from '../contexts/PolyhedronContext';
 
@@ -19,107 +19,106 @@ interface PolyhedronProps extends PolyhedronData {
     colour: string;
     onClick: (event: ThreeEvent<MouseEvent>) => void;
     isSelected: boolean;
-    onPointerOver?: () => void;
-    onPointerOut?: () => void;
-    onDoubleClick?: () => void;
+    onDoubleClick: () => void;
 }
 
-const Polyhedron = ({ index, position, rotation, scale, geometry, colour, onClick, onDoubleClick, isSelected, onPointerOver, onPointerOut }: PolyhedronProps) => {
+const Polyhedron = ({ 
+    index, position, rotation, scale, geometry, colour, 
+    onClick, onDoubleClick, isSelected
+}: PolyhedronProps) => {
     const mesh = useRef<THREE.Mesh>(null);
-    const boundingBoxRef = useRef<THREE.BoxHelper | null>(null);
-    const spriteRef = useRef<THREE.Sprite | null>(null);
     const { scene } = useThree();
 
     const context = useContext(PolyhedronContext);
-
     if (!context?.dispatch) {
         throw new Error("Scene3D must be used within a PolyhedronProvider");
-    }    
-    
+    }
     const { dispatch } = context;
 
+    const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
     useEffect(() => {
         if (mesh.current) {
+            const box = new THREE.Box3().setFromObject(mesh.current);
+            setBoundingBox(box);
+        }
+    }, [geometry, position, scene]);
 
-            const transformedVertices: THREE.Vector3[] = [];
-            const positionAttribute = mesh.current.geometry.getAttribute("position");
+    const deleteSelectedPolygon = () => {
+        document.body.style.cursor = "auto";
+        if (dispatch) {
+            dispatch({ type: "DELETE_POLYGON", index: index})
+            // dispatch({ type: "SELECT_POLYGON", index: null });
+        }
+    }
+    
+    const duplicateSelectedPolygon = () => {
+        if (dispatch) {
+            dispatch({type: "DUPLICATE_POLYGON", index: index})
+        }
+    }
+    
+    const editSelectedPolygon = () => {
+        console.log("lol")
+    }
 
-            // iterate over each vertex in the geometry and apply the transformation matrix
-            for (let i = 0; i < positionAttribute.count; i++) {
-                const vertex = new THREE.Vector3();
+    const BoundingBox = useMemo(() => {
+        if (!boundingBox || !isSelected) 
+          return <></>;
+    
+        const size = boundingBox.getSize(new THREE.Vector3());
+        const center = boundingBox.getCenter(new THREE.Vector3());
+    
+        return (
+            <group> 
+                {/* Red Lines to show bounding box: */}
+                <box3Helper args={[boundingBox, "red"]}/>
 
-                // get the vertex in local space
-                vertex.fromBufferAttribute(positionAttribute, i);
+                {/* Edit button */}
+                <sprite
+                    position={[center.x - 0.75, center.y + size.y/2 + 0.5, center.z]}
+                    onClick={editSelectedPolygon}
+                    scale={[0.5, 0.5, 0.5]}
+                >
+                    <spriteMaterial map={editIconTexture}/>
+                </sprite>
 
-                 // apply world transformation (position, rotation, scale)
-                vertex.applyMatrix4(mesh.current.matrixWorld);    
-                transformedVertices.push(vertex);
-            }
-
-            dispatch({
-                type: "STORE_TRANSFORMED_VERTICES",
-                index: index,
-                transformedVertices: transformedVertices,
-            });
-
-
-            if (isSelected) {
-                if (!boundingBoxRef.current) {
-                    boundingBoxRef.current = new THREE.BoxHelper(mesh.current, 0xffff00);
-                    const box = new THREE.Box3().setFromObject(mesh.current);
-                    console.log(box.getSize(new THREE.Vector3()));
-                    scene.add(boundingBoxRef.current); 
-                }
+                {/* Duplicate button */}
+                <sprite
+                    position={[center.x, center.y + size.y/2 + 0.5, center.z]}
+                    onClick={() => {console.log("clicked!")}}
+                    scale={[0.5, 0.5, 0.5]}
+                >
+                    <spriteMaterial map={duplicateIconTexture}/>
+                </sprite>
                 
-            } else {
-                if (boundingBoxRef.current) {
-                    scene.remove(boundingBoxRef.current);
-                    boundingBoxRef.current = null;
-                }
-            }
-        }
-
-        return () => {
-            if (boundingBoxRef.current) {
-                scene.remove(boundingBoxRef.current);
-            }
-        };
-    }, [isSelected, scene]);
-
-    useFrame(() => {
-        if (boundingBoxRef.current) {
-            boundingBoxRef.current.update();
-        }
-    });
+                {/* Delete button */}
+                <sprite
+                    position={[center.x + 0.75, center.y + size.y/2 + 0.5, center.z]}
+                    onClick={() => {console.log("clicked!")}}
+                    scale={[0.5, 0.5, 0.5]}
+                >
+                    <spriteMaterial map={deleteIconTexture}/>
+                </sprite>            
+            </group>
+        );
+    }, [boundingBox, isSelected, scene]);
 
     return (
-        // <group>
-        //     {/* <mesh
-        //         ref={mesh}
-        //         position={position}
-        //         rotation={rotation}
-        //         scale={scale}
-        //         geometry={geometry}
-        //         onClick={onClick}
-        //         onDoubleClick={onDoubleClick}
-        //         onPointerOver={onPointerOver}
-        //         onPointerOut={onPointerOut}
-        //     >
-        //         <meshStandardMaterial color={colour} />
-        //         <Edges geometry={geometry} scale={1} color="white" />
-        //     </mesh> */}
-            
-        // </group>
-        <sprite
-            position={[position[0] + 5, position[1] + 5, position[2] + 5]}
-            // onClick={duplicateSelectedPolygon}
-            // onPointerEnter={() => setMousePointer("pointer")}
-            // onPointerLeave={() => setMousePointer(null)}
-            // onPointerUp={() => setMousePointer(null)}
-            scale={[100, 100, 100]}
-        >
-        <spriteMaterial map={duplicateIconTexture}/>
-    </sprite>
+        <>
+            <mesh
+                ref={mesh}
+                position={position}
+                rotation={rotation}
+                scale={scale}
+                geometry={geometry}
+                onClick={onClick}
+                onDoubleClick={onDoubleClick}
+            >
+                <meshBasicMaterial color={colour} />
+                <Edges scale={1} color="white" />
+            </mesh>
+            {BoundingBox}
+        </>
     );
 };
 

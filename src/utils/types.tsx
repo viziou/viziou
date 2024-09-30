@@ -24,8 +24,8 @@ export type Polygon2DAction =
   | { type: "DELETE_POLYGON"; index: number }
   | { type: "DUPLICATE_POLYGON"; index: number }
   | { type: "SET_EDIT"; index: number | null}
-  | { type: "EDIT_POLYGON"; index: number, geometry: THREE.BufferGeometry; colour: string}
-  | { type: "SELECTABILITY"; payload: boolean};
+  | { type: "EDIT_POLYGON"; index: number, geometry: THREE.BufferGeometry; colour: string }
+  | { type: "SELECTABILITY"; payload: boolean };
 
 export interface PolyhedronData {
   geometry: THREE.BufferGeometry;
@@ -48,9 +48,9 @@ export type Polyhedron3DAction =
   | { type: "SET_POLYHEDRONS"; payload: PolyhedronData[] }
   | { type: "CLEAR_POLYHEDRA" }
   | { type: "UPDATE_POLYHEDRON"; index: number; position: [number, number, number]; rotation: [number, number, number]; scale: [number, number, number] }
-  | { type: "STORE_TRANSFORMED_VERTICES"; index: number; transformedVertices: THREE.Vector3[]; 
-
-  };
+  | { type: "STORE_TRANSFORMED_VERTICES"; index: number; transformedVertices: THREE.Vector3[] }
+  | { type: "DELETE_POLYGON"; index: number }
+  | { type: "DUPLICATE_POLYGON"; index: number };
 
 export type SidebarProps2D = {
   polygons: PolygonData[];
