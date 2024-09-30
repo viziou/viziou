@@ -24,6 +24,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
   const originalPosition = useRef<[number, number]>([0, 0]);
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
+  const [initialBBox, setInitialBBox] = useState<THREE.Box3 | null>(null);
   const { scene, camera, pointer } = useThree();
   const [mousePointer, setMousePointer] = useState<string | null>(null);
   const [resizing, setResizing] = useState(false);
@@ -159,7 +160,6 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
     } else if (mousePosition.x > 0 && mousePosition.y < 0) {
       setCorner("bottomRight")
     }
-    console.log(corner)
 
     // Initialise corner position
     let cornerPosition = new THREE.Vector3(0, 0, 0);
@@ -184,8 +184,6 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
         cornerPosition.y *= -1;
         break;
     }
-    console.log(cornerPosition)
-    console.log(mousePosition)
 
     // Calculate the multiplier needed to bring the corner box to the current mouse position
     if (cornerPosition.x != 0 && cornerPosition.y != 0 && mousePosition.x != 0 && mousePosition.y != 0) {
@@ -233,51 +231,57 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
     if (iouDispatch) {
       iouDispatch({type: "HIDE_CHILD_IOUS_USING_ID", payload: id})
     }
+    setInitialBBox(boundingBox);
   };
 
   const handleRotateDrag = () => {
-    if (!rotating || !boundingBox)
+    if (!rotating || !initialBBox)
       return;
     setMousePointer("move")
 
     // Obtain bounding box center
-    const center = boundingBox.getCenter(new THREE.Vector3());
+    const center = initialBBox.getCenter(new THREE.Vector3());
+    const size = initialBBox.getSize(new THREE.Vector3());
 
     // Get mouse position relative to the box center
     const mousePosition = getCanvasMousePosition().sub(center);
 
-    // Calculate angle of new orientation w.r.t the vertical
-    const vertical = new THREE.Vector3(0, 1, 0);
-    let newOrientation = mousePosition.angleTo(vertical);
-    if (mousePosition.cross(vertical).z > 0) {
-      newOrientation *= -1;
+    // If magnitude of vector larger than threshold, allowed to rotate
+    if (mousePosition.length() > 0.1*Math.min(size.x, size.y)/2) {
+      // Calculate angle of new orientation w.r.t the vertical
+      const vertical = new THREE.Vector3(0, 1, 0);
+      let newOrientation = mousePosition.angleTo(vertical);
+      if (mousePosition.cross(vertical).z > 0) {
+        newOrientation *= -1;
+      }
+
+      // Calculate the angle to rotate
+      const angleDiff = newOrientation - orientation;
+
+      // Apply rotation to geometry
+      const newGeometry = geometry.clone()
+      const translationX = center.x - position[0];
+      const translationY = center.y - position[1];
+      newGeometry.translate(-translationX, -translationY, 0);
+      newGeometry.rotateZ(angleDiff);
+      newGeometry.translate(translationX, translationY, 0);
+
+      if (dispatch) {
+        dispatch({
+          type: "UPDATE_GEOMETRY",
+          geometry: newGeometry,
+          id: id,
+        });
+      }
+
+      setOrientation(newOrientation);
     }
-
-    // Calculate the angle to rotate
-    const angleDiff = newOrientation - orientation;
-
-    // Apply rotation to geometry
-    const newGeometry = geometry.clone()
-    const translationX = center.x - position[0];
-    const translationY = center.y - position[1];
-    newGeometry.translate(-translationX, -translationY, 0);
-    newGeometry.rotateZ(angleDiff);
-    newGeometry.translate(translationX, translationY, 0);
-
-    if (dispatch) {
-      dispatch({
-        type: "UPDATE_GEOMETRY",
-        geometry: newGeometry,
-        id: id,
-      });
-    }
-
-    setOrientation(newOrientation);
   };
 
   const handleRotateEnd = () => {
     setRotating(false);
     setOrientation(0);
+    setInitialBBox(null);
     setMousePointer(null);
     if (dispatch) {
       dispatch({ type: "SELECTABILITY",  payload: true});
@@ -370,7 +374,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
                 itemSize={3}
               />
             </bufferGeometry>
-            <lineBasicMaterial color="red" />
+            <lineBasicMaterial color="red" side={THREE.DoubleSide}/>
           </line>
         ) : null}
 
@@ -403,7 +407,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
               }}
             >
               <boxGeometry args={[0.2, 0.2, 0]} />
-              <meshBasicMaterial color="blue" />
+              <meshBasicMaterial color="blue" side={THREE.DoubleSide} />
             </mesh>
           )
         ) : null}
@@ -417,7 +421,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
           onPointerLeave={() => setMousePointer(null)}
         >
           <circleGeometry args={[0.1, 16]} />
-          <meshBasicMaterial color="green" />
+          <meshBasicMaterial color="green" side={THREE.DoubleSide}/>
         </mesh> : null}
 
         {/* Line to Rotate circle: */}
@@ -433,7 +437,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
                 itemSize={3}
               />
             </bufferGeometry>
-            <lineBasicMaterial color="red" />
+            <lineBasicMaterial color="red" side={THREE.DoubleSide}/>
           </line>
         ) : null}
 
@@ -538,6 +542,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
             color={colour}
             transparent={true}
             opacity={opacity}
+            side={THREE.DoubleSide}
           />
         </mesh>
         {/* Example infographic: */}
