@@ -1,8 +1,10 @@
 .about-container {
   color: white;
-  min-height: 100vh;
+  height: 100vh;
   padding: 2rem;
   position: relative;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .about-header {
