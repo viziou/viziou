@@ -132,6 +132,9 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
     setCorner(corner);
     if (dispatch)
       dispatch({ type: "SELECTABILITY",  payload: false});
+    if (iouDispatch) {
+      iouDispatch({type: "HIDE_CHILD_IOUS_USING_ID", payload: id})
+    }
   };
 
   const handleResizeDrag = () => {
@@ -197,6 +200,9 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
   const handleResizeEnd = () => {
     setResizing(false);
     setCorner(null);
+    if (iouDispatch) {
+      iouDispatch({type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: id, polygons: polygons}})
+    }
   };
   /**********************************/
 
@@ -204,8 +210,12 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
   const handleRotateStart = () => {
     setRotating(true);
     setOrientation(0);
-    if (dispatch)
-      dispatch({ type: "SELECTABILITY",  payload: false});
+    if (dispatch) {
+      dispatch({ type: "SELECTABILITY", payload: false });
+    }
+    if (iouDispatch) {
+      iouDispatch({type: "HIDE_CHILD_IOUS_USING_ID", payload: id})
+    }
   };
 
   const handleRotateDrag = () => {
@@ -254,6 +264,9 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
     setMousePointer(null);
     if (dispatch) {
       dispatch({ type: "SELECTABILITY",  payload: true});
+    }
+    if (iouDispatch) {
+      iouDispatch({type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: id, polygons: polygons}})
     }
   };
   /**********************************/
