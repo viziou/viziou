@@ -8,6 +8,7 @@ import { PolyhedronContext } from '../contexts/PolyhedronContext';
 import '../styles/ThreeDEnv.css';
 import { Storage } from '../backend/Interface.ts'
 import Sidebar3D from '../components/Sidebar3D.tsx';
+import ConfirmationModal from '../modals/ConfirmationModal.tsx';
 
 // const getCube = (): THREE.BoxGeometry => {
 //     return new THREE.BoxGeometry(1, 1, 1);
@@ -42,7 +43,7 @@ const ThreeDEnv = () => {
         throw new Error("ThreeDEnv must be used within a PolyhedronProvider");
     }
 
-    const { polyhedra, dispatch } = context;
+    const { polyhedra, dispatch, confirmationInfo } = context;
 
 
     // const addCube = () => {
@@ -117,7 +118,13 @@ const ThreeDEnv = () => {
                 polyhedra={polyhedra}
                 />
             </main>
-
+            <ConfirmationModal
+                isOpen={confirmationInfo.isOpen}
+                message={confirmationInfo.message}
+                description={confirmationInfo.description}
+                onConfirm={confirmationInfo.onConfirm}
+                onClose={confirmationInfo.onClose}
+            />
         </div>
     );
 };

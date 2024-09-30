@@ -1,6 +1,16 @@
 import { createContext, useReducer, ReactNode } from "react";
-import { PolygonData, Polygon2DAction } from "../utils/types";
+import { PolygonData, Polygon2DAction, ConfirmationModalInfo } from "../utils/types";
 import * as THREE from "three";
+
+const defaultConfirmationInfo = {
+  isOpen: false,
+  onClose: () => {},
+  onConfirm: () => {},
+  message: "",
+  description: "",
+  confirmText: "",
+  cancelText: ""
+}
 
 const initialState: PolygonContextInterface = {
   polygons: new Map<string, PolygonData>,
@@ -9,6 +19,8 @@ const initialState: PolygonContextInterface = {
   editingShape: null,
   selectability: true,
   currentDecimalPlaces: 2,
+  confirmationInfo: defaultConfirmationInfo,
+  displayWarnings: false
 };
 
 interface PolygonContextInterface {
@@ -19,6 +31,8 @@ interface PolygonContextInterface {
   editingShape: number | null;
   selectability: boolean;
   currentDecimalPlaces: number;
+  confirmationInfo: ConfirmationModalInfo;
+  displayWarnings: boolean
 }
 
 export const PolygonContext = createContext<
@@ -228,6 +242,24 @@ function PolygonReducer(
         currentDecimalPlaces: action.precision,
       }
 
+    case "OPEN_CONFIRMATION_MODAL":
+      return {
+        ...state,
+        confirmationInfo: action.info
+      }
+
+    case "CLOSE_CONFIRMATION_MODAL":
+      return {
+        ...state,
+        confirmationInfo: defaultConfirmationInfo
+      }
+    
+    case "SET_DISPLAY_WARNINGS":
+      return {
+        ... state,
+        displayWarnings: action.display
+      }
+
     default:
       return state;
   }
@@ -249,7 +281,9 @@ export function PolygonProvider(props: PolygonProviderProps) {
         currentlyMousedOverPolygons: state.currentlyMousedOverPolygons,
         editingShape: state.editingShape,
         selectability: state.selectability,
-        currentDecimalPlaces: state.currentDecimalPlaces
+        currentDecimalPlaces: state.currentDecimalPlaces,
+        confirmationInfo: state.confirmationInfo,
+        displayWarnings: state.displayWarnings
       }}
     >
       {props.children}

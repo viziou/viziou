@@ -11,12 +11,12 @@ const Scene3D = ({ polyhedra }: Scene3DProps) => {
         throw new Error("Scene3D must be used within a PolyhedronProvider");
     }
     const { dispatch } = context;
-    
+
     // Deselect polyhedra when clicking outside
     const handlePointerMissed = (): void => {
         if (dispatch) {
             dispatch({ type: "SELECT_POLYHEDRON", index: null });
-      }
+        }
     };
 
     return (

@@ -1,16 +1,30 @@
 import { createContext, useReducer, ReactNode } from 'react';
-import { PolyhedronData, Polyhedron3DAction } from '../utils/types';
+import { PolyhedronData, Polyhedron3DAction, ConfirmationModalInfo } from '../utils/types';
 import * as THREE from "three";
+
+const defaultConfirmationInfo = {
+  isOpen: false,
+  onClose: () => {},
+  onConfirm: () => {},
+  message: "",
+  description: "",
+  confirmText: "",
+  cancelText: ""
+}
 
 const initialState: PolyhedronContextInterface = {
     polyhedra: [],
     selectedPolyhedronID: null,
+    confirmationInfo: defaultConfirmationInfo,
+    displayWarnings: false
 };
 
 interface PolyhedronContextInterface {
     polyhedra: PolyhedronData[];
     selectedPolyhedronID: number | null;
     dispatch?: React.Dispatch<Polyhedron3DAction>;
+    confirmationInfo: ConfirmationModalInfo;
+    displayWarnings: boolean
 }
 
 export const PolyhedronContext = createContext<PolyhedronContextInterface | undefined>(undefined);
@@ -111,6 +125,24 @@ function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron
                 selectedPolyhedronID: state.polyhedra.length - 1,
             };
 
+        case "OPEN_CONFIRMATION_MODAL":
+            return {
+            ...state,
+            confirmationInfo: action.info
+            }
+    
+        case "CLOSE_CONFIRMATION_MODAL":
+            return {
+            ...state,
+            confirmationInfo: defaultConfirmationInfo
+            }
+
+        case "SET_DISPLAY_WARNINGS":
+            return {
+                ...state,
+                displayWarnings: action.display
+            }
+
         default:
             return state;
     }
@@ -124,7 +156,7 @@ export function PolyhedronProvider(props: PolyhedronProviderProps) {
     const [state, dispatch] = useReducer(PolyhedronReducer, initialState);
 
     return (
-        <PolyhedronContext.Provider value={{ polyhedra: state.polyhedra, selectedPolyhedronID:state.selectedPolyhedronID, dispatch }}>
+        <PolyhedronContext.Provider value={{ polyhedra: state.polyhedra, dispatch, confirmationInfo: state.confirmationInfo, selectedPolyhedronID:state.selectedPolyhedronID, displayWarnings: state.displayWarnings }}>
             {props.children}
         </PolyhedronContext.Provider>
     );
