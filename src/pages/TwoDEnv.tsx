@@ -188,6 +188,11 @@ const TwoDEnv = () => {
     }
   };
 
+  const clearIoUs = () => {
+    console.log("Clearing IoU polygons...");
+    iouDispatch({ type: "CLEAR_POLYGONS" });
+  }
+
   const savePolygons = () => {
     console.log("Saving canvas...");
     Storage.save2D(Array.from(polygons.values()), "export");
@@ -218,6 +223,7 @@ const TwoDEnv = () => {
           addPolygon={handleAddShapeModalOpen}
           clearPolygons={clearPolygons}
           showIoUs={showIoUs}
+          clearIoUs={clearIoUs}
           savePolygons={savePolygons}
           loadPolygons={loadPolygons}
         />
