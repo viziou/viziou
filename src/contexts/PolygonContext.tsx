@@ -19,7 +19,8 @@ const initialState: PolygonContextInterface = {
   editingShape: null,
   selectability: true,
   currentDecimalPlaces: 2,
-  confirmationInfo: defaultConfirmationInfo
+  confirmationInfo: defaultConfirmationInfo,
+  displayWarnings: false
 };
 
 interface PolygonContextInterface {
@@ -31,6 +32,7 @@ interface PolygonContextInterface {
   selectability: boolean;
   currentDecimalPlaces: number;
   confirmationInfo: ConfirmationModalInfo;
+  displayWarnings: boolean
 }
 
 export const PolygonContext = createContext<
@@ -251,6 +253,12 @@ function PolygonReducer(
         ...state,
         confirmationInfo: defaultConfirmationInfo
       }
+    
+    case "SET_DISPLAY_WARNINGS":
+      return {
+        ... state,
+        displayWarnings: action.display
+      }
 
     default:
       return state;
@@ -274,7 +282,8 @@ export function PolygonProvider(props: PolygonProviderProps) {
         editingShape: state.editingShape,
         selectability: state.selectability,
         currentDecimalPlaces: state.currentDecimalPlaces,
-        confirmationInfo: state.confirmationInfo
+        confirmationInfo: state.confirmationInfo,
+        displayWarnings: state.displayWarnings
       }}
     >
       {props.children}

@@ -15,7 +15,8 @@ const defaultConfirmationInfo = {
 const initialState: PolyhedronContextInterface = {
     polyhedra: [],
     selectedPolyhedronID: null,
-    confirmationInfo: defaultConfirmationInfo
+    confirmationInfo: defaultConfirmationInfo,
+    displayWarnings: false
 };
 
 interface PolyhedronContextInterface {
@@ -23,6 +24,7 @@ interface PolyhedronContextInterface {
     selectedPolyhedronID: number | null;
     dispatch?: React.Dispatch<Polyhedron3DAction>;
     confirmationInfo: ConfirmationModalInfo;
+    displayWarnings: boolean
 }
 
 export const PolyhedronContext = createContext<PolyhedronContextInterface | undefined>(undefined);
@@ -135,6 +137,12 @@ function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron
             confirmationInfo: defaultConfirmationInfo
             }
 
+        case "SET_DISPLAY_WARNINGS":
+            return {
+                ...state,
+                displayWarnings: action.display
+            }
+
         default:
             return state;
     }
@@ -148,7 +156,7 @@ export function PolyhedronProvider(props: PolyhedronProviderProps) {
     const [state, dispatch] = useReducer(PolyhedronReducer, initialState);
 
     return (
-        <PolyhedronContext.Provider value={{ polyhedra: state.polyhedra, dispatch, confirmationInfo: state.confirmationInfo, selectedPolyhedronID:state.selectedPolyhedronID }}>
+        <PolyhedronContext.Provider value={{ polyhedra: state.polyhedra, dispatch, confirmationInfo: state.confirmationInfo, selectedPolyhedronID:state.selectedPolyhedronID, displayWarnings: state.displayWarnings }}>
             {props.children}
         </PolyhedronContext.Provider>
     );

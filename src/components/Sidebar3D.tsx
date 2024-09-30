@@ -8,7 +8,7 @@ import { PolyhedronContext } from '../contexts/PolyhedronContext';
 const Sidebar3D = (props: SidebarProps3D) => {
   const { polyhedrons, addRandomPolyhedron, clearPolyhedrons, savePolyhedrons, loadPolyhedrons } = props;
     const navigate = useNavigate();
-    const { dispatch } = useContext(PolyhedronContext)!;
+    const { dispatch, displayWarnings } = useContext(PolyhedronContext)!;
   return (
       <aside className="sidebar-3d">
           <NavLink to="/" className="logo-link-3d">
@@ -27,16 +27,21 @@ const Sidebar3D = (props: SidebarProps3D) => {
                 className={`nav-link-2d ${window.location.pathname === '/2D-Environment' ? 'active-link-2d' : ''}`} 
                 onClick={() => {
                     const changePage = () => navigate("/2D-Environment");
-                    dispatch!({
-                        type: "OPEN_CONFIRMATION_MODAL",
-                        info: {
-                          isOpen: true,
-                          onClose: () => {dispatch!( {type: "CLOSE_CONFIRMATION_MODAL"})},
-                          onConfirm: changePage,
-                          message: "Are you sure you want to leave this page?",
-                          description: "Your current shapes may not be saved.",
-                        },
-                      });
+                    if (!displayWarnings) {
+                        dispatch!({
+                            type: "OPEN_CONFIRMATION_MODAL",
+                            info: {
+                              isOpen: true,
+                              onClose: () => {dispatch!( {type: "CLOSE_CONFIRMATION_MODAL"})},
+                              onConfirm: changePage,
+                              message: "Are you sure you want to leave this page?",
+                              description: "Your current shapes may not be saved.",
+                            },
+                          });
+                    } else {
+                        changePage();
+                    }
+                    
                 }}
                 >2D Environment</button>
               <button 
@@ -51,7 +56,7 @@ const Sidebar3D = (props: SidebarProps3D) => {
               <div className="settings-3d">
                   <label className="checkbox-label-3d">
                       Disable save warnings
-                      <input type="checkbox" id="save-warnings-3d" />
+                      <input type="checkbox" id="save-warnings-3d" onChange={(e) => {dispatch!( {type: "SET_DISPLAY_WARNINGS", display: e.target.checked})}}/>
                   </label>
                   <label htmlFor="decimal-places-3d">
                       Decimal places:

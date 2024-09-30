@@ -54,7 +54,8 @@ export type Polygon2DAction =
   | { type: "SELECTABILITY"; payload: boolean}
   | { type: "SET_DECIMAL_PRECISION"; precision: number}
   | { type: "OPEN_CONFIRMATION_MODAL"; info: ConfirmationModalInfo}
-  | { type: "CLOSE_CONFIRMATION_MODAL"; };
+  | { type: "CLOSE_CONFIRMATION_MODAL"; }
+  | { type: "SET_DISPLAY_WARNINGS"; display: boolean};
 
 export interface PolyhedronData {
   geometry: THREE.BufferGeometry;
@@ -80,6 +81,7 @@ export type Polyhedron3DAction =
   | { type: "STORE_TRANSFORMED_VERTICES"; index: number; transformedVertices: THREE.Vector3[]; }
   | { type: "OPEN_CONFIRMATION_MODAL"; info: ConfirmationModalInfo}
   | { type: "CLOSE_CONFIRMATION_MODAL"; }
+  | { type: "SET_DISPLAY_WARNINGS"; display: boolean};
 
 export type SidebarProps2D = {
   polygons: PolygonData[];

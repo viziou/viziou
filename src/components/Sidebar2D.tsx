@@ -7,7 +7,7 @@ import { useContext } from 'react';
 
 const Sidebar2D = (props: SidebarProps2D) => {
   const { polygons, addPolygon: addPolygon, clearPolygons, showIoUs, clearIoUs, savePolygons, loadPolygons } = props;
-  const { dispatch, currentDecimalPlaces } = useContext(PolygonContext)!;
+  const { dispatch, currentDecimalPlaces, displayWarnings } = useContext(PolygonContext)!;
   const navigate = useNavigate();
 
   return (
@@ -33,16 +33,25 @@ const Sidebar2D = (props: SidebarProps2D) => {
                     className={`nav-link-2d ${window.location.pathname === '/3D-Environment' ? 'active-link-2d' : ''}`} 
                     onClick={() => {
                         const changePage = () => navigate("/3D-Environment");
-                        dispatch!({
+
+                        if (!displayWarnings) {
+                          dispatch!({
                             type: "OPEN_CONFIRMATION_MODAL",
                             info: {
                               isOpen: true,
-                              onClose: () => {dispatch!( {type: "CLOSE_CONFIRMATION_MODAL"})},
+                              onClose: () => {
+                                dispatch!({ type: "CLOSE_CONFIRMATION_MODAL" });
+                              },
                               onConfirm: changePage,
-                              message: "Are you sure you want to leave this page?",
-                              description: "Your current shapes may not be saved.",
+                              message:
+                                "Are you sure you want to leave this page?",
+                              description:
+                                "Your current shapes may not be saved.",
                             },
                           });
+                        } else {
+                          changePage();
+                        }
                     }}
                 >3D Environment</button>
           </div>
@@ -53,7 +62,7 @@ const Sidebar2D = (props: SidebarProps2D) => {
           <div className="settings-2d">
               <label className="checkbox-label-2d">
                   Disable save warnings
-                  <input type="checkbox" id="save-warnings-2d" />
+                  <input type="checkbox" id="save-warnings-2d" onChange={(e) => {dispatch!( {type: "SET_DISPLAY_WARNINGS", display: e.target.checked})}}/>
               </label>
               <label htmlFor="decimal-places-2d">
                   Decimal places:
