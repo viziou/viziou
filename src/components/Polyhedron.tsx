@@ -4,11 +4,14 @@ import { Edges, TransformControls } from '@react-three/drei'; // Ensure Edges is
 import { useThree } from '@react-three/fiber';
 import { PolyhedronData } from '../utils/types';
 import { PolyhedronContext } from '../contexts/PolyhedronContext';
+import edit from '../assets/new_edit.png';
+import bin from '../assets/new_bin.png';
+import duplicate from '../assets/new_duplicate.png';
 
 // Load texture icons
-const editIconTexture = new THREE.TextureLoader().load("src/assets/new_edit.png")
-const deleteIconTexture = new THREE.TextureLoader().load("src/assets/new_bin.png")
-const duplicateIconTexture = new THREE.TextureLoader().load("src/assets/new_duplicate.png")
+const editIconTexture = new THREE.TextureLoader().load(edit);
+const deleteIconTexture = new THREE.TextureLoader().load(bin);
+const duplicateIconTexture = new THREE.TextureLoader().load(duplicate);
 
 interface PolyhedronProps extends PolyhedronData {
     index: number;
