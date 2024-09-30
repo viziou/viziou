@@ -31,7 +31,19 @@ const Sidebar2D = (props: SidebarProps2D) => {
                 >2D Environment</button>
               <button 
                     className={`nav-link-2d ${window.location.pathname === '/3D-Environment' ? 'active-link-2d' : ''}`} 
-                    onClick={() => navigate("/3D-Environment")}
+                    onClick={() => {
+                        const changePage = () => navigate("/3D-Environment");
+                        dispatch!({
+                            type: "OPEN_CONFIRMATION_MODAL",
+                            info: {
+                              isOpen: true,
+                              onClose: () => {dispatch!( {type: "CLOSE_CONFIRMATION_MODAL"})},
+                              onConfirm: changePage,
+                              message: "Are you sure you want to leave this page?",
+                              description: "Your current shapes will not be saved.",
+                            },
+                          });
+                    }}
                 >3D Environment</button>
           </div>
       </div>
