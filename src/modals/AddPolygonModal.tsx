@@ -205,11 +205,11 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit, addRandomShape, addSquare 
           <div className="modal-actions-right">
             <button
               className="modal-button modal-button-green"
-              onClick={handleSubmit}
+              onClick={(e) => {setPoints([]); handleSubmit(e);}}
             >
               Submit
             </button>
-            <button className="modal-button modal-button-red" onClick={onClose}>
+            <button className="modal-button modal-button-red" onClick={() => { setPoints([]); onClose();}}>
               Close
             </button>
             <div className="colour-picker-container">
