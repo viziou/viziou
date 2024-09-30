@@ -67,18 +67,10 @@ function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron
             };
 
         case "DELETE_POLYGON":
-            const updatedPolyhedra = [...state.polyhedra];
             
-            updatedPolyhedra[action.index] = {
-                ...updatedPolyhedra[action.index],
-                position: action.position,  
-                rotation: action.rotation,  
-                scale: action.scale,       
-            };
 
             return {
                 ...state,
-                polyhedra: updatedPolyhedra, 
             };
 
         default:
