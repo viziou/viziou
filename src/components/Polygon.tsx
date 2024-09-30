@@ -241,41 +241,38 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
 
     // Obtain bounding box center
     const center = initialBBox.getCenter(new THREE.Vector3());
-    const size = initialBBox.getSize(new THREE.Vector3());
 
     // Get mouse position relative to the box center
     const mousePosition = getCanvasMousePosition().sub(center);
 
-    // If magnitude of vector larger than threshold, allowed to rotate
-    if (mousePosition.length() > 0.1*Math.min(size.x, size.y)/2) {
-      // Calculate angle of new orientation w.r.t the vertical
-      const vertical = new THREE.Vector3(0, 1, 0);
-      let newOrientation = mousePosition.angleTo(vertical);
-      if (mousePosition.cross(vertical).z > 0) {
-        newOrientation *= -1;
-      }
-
-      // Calculate the angle to rotate
-      const angleDiff = newOrientation - orientation;
-
-      // Apply rotation to geometry
-      const newGeometry = geometry.clone()
-      const translationX = center.x - position[0];
-      const translationY = center.y - position[1];
-      newGeometry.translate(-translationX, -translationY, 0);
-      newGeometry.rotateZ(angleDiff);
-      newGeometry.translate(translationX, translationY, 0);
-
-      if (dispatch) {
-        dispatch({
-          type: "UPDATE_GEOMETRY",
-          geometry: newGeometry,
-          id: id,
-        });
-      }
-
-      setOrientation(newOrientation);
+    // Calculate angle of new orientation w.r.t the vertical
+    const vertical = new THREE.Vector3(0, 1, 0);
+    let newOrientation = mousePosition.angleTo(vertical);
+    if (mousePosition.cross(vertical).z > 0) {
+      newOrientation *= -1;
     }
+
+    // Calculate the angle to rotate
+    const angleDiff = newOrientation - orientation;
+
+    // Apply rotation to geometry
+    const newGeometry = geometry.clone()
+    const translationX = center.x - position[0];
+    const translationY = center.y - position[1];
+    newGeometry.translate(-translationX, -translationY, 0);
+    newGeometry.rotateZ(angleDiff);
+    newGeometry.translate(translationX, translationY, 0);
+
+    if (dispatch) {
+      dispatch({
+        type: "UPDATE_GEOMETRY",
+        geometry: newGeometry,
+        id: id,
+      });
+    }
+
+    setOrientation(newOrientation);
+  
   };
 
   const handleRotateEnd = () => {
