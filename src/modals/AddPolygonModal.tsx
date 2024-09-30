@@ -16,6 +16,8 @@ interface AddPolygonProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (points: [number, number][], colour: string) => void;
+  addSquare: () => void;
+  addRandomShape: () => void;
 }
 
 interface Point {
@@ -155,7 +157,7 @@ const PointsCreator = ({
   );
 };
 
-const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
+const AddPolygonModal = ({ isOpen, onClose, onSubmit, addRandomShape, addSquare }: AddPolygonProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [points, setPoints] = useState<Point[]>([]);
   const [showColourPicker, setShowColourPicker] = useState(false);
@@ -196,24 +198,33 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
           </Canvas>
         </div>
         <div className="modal-actions">
-          <button className="modal-button modal-button-green" onClick={handleSubmit}>
-            Submit
-          </button>
-          <button className="modal-button modal-button-red" onClick={onClose}>
-            Close
-          </button>
-          <div className="colour-picker-container">
-            <button className="modal-button" onClick={toggleColourPicker}>
-              {showColourPicker ? "Hide Colour Picker" : "Show Colour Picker"}
+          <div className="modal-actions-left">
+            <button className="modal-button" onClick={addSquare}>Add Square</button>
+            <button className="modal-button" onClick={addRandomShape}>Add Random Polygon</button>
+          </div>
+          <div className="modal-actions-right">
+            <button
+              className="modal-button modal-button-green"
+              onClick={handleSubmit}
+            >
+              Submit
             </button>
-            {showColourPicker && (
-              <div className="colour-picker-popup">
-                <HexColorPicker
-                  color={displayColour}
-                  onChange={setDisplayColour}
-                />
-              </div>
-            )}
+            <button className="modal-button modal-button-red" onClick={onClose}>
+              Close
+            </button>
+            <div className="colour-picker-container">
+              <button className="modal-button" onClick={toggleColourPicker}>
+                {showColourPicker ? "Hide Colour Picker" : "Show Colour Picker"}
+              </button>
+              {showColourPicker && (
+                <div className="colour-picker-popup">
+                  <HexColorPicker
+                    color={displayColour}
+                    onChange={setDisplayColour}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

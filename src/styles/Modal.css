@@ -33,6 +33,18 @@
   gap: 10px;
 }
 
+.modal-actions-left {
+  margin-right: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.modal-actions-right {
+  display: flex;
+  gap: 10px;
+  white-space: nowrap;
+}
+
 .modal-button {
   padding: 8px 16px;
   background-color: #007bff;
