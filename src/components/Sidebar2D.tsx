@@ -43,7 +43,7 @@ const Sidebar2D = (props: SidebarProps2D) => {
                               onClose: () => {dispatch!( {type: "CLOSE_CONFIRMATION_MODAL"})},
                               onConfirm: changePage,
                               message: "Are you sure you want to leave this page?",
-                              description: "Your current shapes will not be saved.",
+                              description: "Your current shapes may not be saved.",
                             },
                           });
                     }}
