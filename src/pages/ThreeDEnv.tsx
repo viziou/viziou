@@ -3,12 +3,13 @@ import * as THREE from 'three';
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
 
 import Scene3D from '../components/Scene3D';
-import { PolyhedronData } from '../utils/types';
+import { IOUPolyhedronData, PolyhedronData } from '../utils/types'
 import { PolyhedronContext } from '../contexts/PolyhedronContext';
 import '../styles/ThreeDEnv.css';
-import { Storage } from '../backend/Interface.ts'
+import { Backend3D, Storage } from '../backend/Interface.ts'
 import Sidebar3D from '../components/Sidebar3D.tsx';
 import { IOUPolyhedronContext } from '../contexts/IOUPolyhedronContext.tsx'
+import { generatePairs } from '../utils/Generic.ts'
 
 // const getCube = (): THREE.BoxGeometry => {
 //     return new THREE.BoxGeometry(1, 1, 1);
@@ -114,6 +115,45 @@ const ThreeDEnv = () => {
       }
     }
 
+  const showIoUs = () => {
+    const IoUs: IOUPolyhedronData[] = [];
+    for (const [a, b] of generatePairs(Array.from(polyhedra.values()))) {
+      const { area, shape } = Backend3D.IoU(a, b);
+      console.log("IoU between " + a.id + " and " + b.id + ": " + area);
+      console.log("IoU shape: ", shape)
+      // TODO: don't push an IoU polygon if area is 0?
+      const IoUPolyhedra: IOUPolyhedronData = {
+        parentIDa: a.id,
+        parentIDb: b.id,
+        rotation: [0, 0, 0],
+        scale: [1, 1, 1],
+        geometry: shape,
+        position: [0, 0, 0],
+        colour: '#ce206b',
+        id: generateId(),
+        opacity: 1.0,
+      }
+      IoUs.push(IoUPolyhedra);
+    }
+    //console.log("Clearing canvas...");
+    //dispatch({type: "CLEAR_POLYGONS"});
+    for (const polyhedron of IoUs) {
+      console.log("Dispatching IoU Polyhedra via SET_POLYHEDRA...", polyhedron);
+      iouDispatch({ type: 'SET_POLYHEDRON', payload: polyhedron });
+      //const geomPos = polygon.geometry.getAttribute('position')
+      // for (let i = 0, l = geomPos.count; i < l; i += 3) {
+      //   const newPoint: PolygonData = {
+      //     geometry: new THREE.CircleGeometry(0.02, 50),
+      //     position: [geomPos.array[i], geomPos.array[i + 1]],
+      //     colour: '#2bc800',
+      //     id: this.geometry.id // dirty hack since we don't have an ID generator
+      //   }
+      //   console.log("Placing IoU vertex:")
+      //   dispatch({ type: "ADD_POINT", payload: newPoint });
+      // }
+    }
+  }
+
     return (
 
         <div className="ThreeDEnv">
@@ -124,6 +164,7 @@ const ThreeDEnv = () => {
                 clearPolyhedrons={clearPolyhedra}
                 savePolyhedrons={savePolyhedra}
                 loadPolyhedrons={loadPolyhedra}
+                showIoUs={showIoUs}
             />
 
             <main className="threed-canvas-container">

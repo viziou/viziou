@@ -112,7 +112,7 @@ export type SidebarProps3D = {
   polyhedrons: any[];
   addRandomPolyhedron: () => void;
   clearPolyhedrons: () => void;
-  // showIoUs: () => void;
+  showIoUs: () => void;
   savePolyhedrons: () => void;
   loadPolyhedrons: () => void;
 }

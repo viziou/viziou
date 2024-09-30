@@ -4,7 +4,7 @@ import logo from '../assets/favicon.png';
 import '../styles/Sidebar3D.css';
 
 const Sidebar3D = (props: SidebarProps3D) => {
-  const { polyhedrons, addRandomPolyhedron, clearPolyhedrons, savePolyhedrons, loadPolyhedrons } = props;
+  const { polyhedrons, addRandomPolyhedron, clearPolyhedrons, savePolyhedrons, loadPolyhedrons, showIoUs } = props;
 
   return (
       <aside className="sidebar-3d">
@@ -49,12 +49,13 @@ const Sidebar3D = (props: SidebarProps3D) => {
                   <button className="threed-button-3d" onClick={addRandomPolyhedron}>Add Polyhedron</button>
                   <button className="threed-button-3d" onClick={clearPolyhedrons}>Clear Canvas</button>
               </div>
-              <div className="canvas-buttons-3d">
-                  <button className="threed-button-3d">Clear IoU</button>
-              </div>
+            <div className="canvas-buttons-3d">
+              <button className="twod-button-2d" onClick={showIoUs}>Show IoU</button>
+              <button className="threed-button-3d">Clear IoU</button>
+            </div>
           </div>
 
-          <div className="polyhedron-list-3d scrollable">
+        <div className="polyhedron-list-3d scrollable">
               {polyhedrons.map((_, index) => (
                   <div key={index} className="polyhedron-item-3d">
                       <p>{`Polyhedron ${index + 1}`}</p>
