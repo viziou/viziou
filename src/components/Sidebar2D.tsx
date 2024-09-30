@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { SidebarProps2D } from '../utils/types';
 import logo from '../assets/favicon.png';
 import info from '../assets/info.png';
@@ -7,10 +7,11 @@ import '../styles/Sidebar2D.css';
 import { PolygonContext } from '../contexts/PolygonContext';
 
 const Sidebar2D = (props: SidebarProps2D) => {
+  const { polygons, addPolygon: addPolygon, clearPolygons, showIoUs, clearIoUs, savePolygons, loadPolygons } = props;
+  const { dispatch, currentDecimalPlaces } = useContext(PolygonContext)!;
+  const navigate = useNavigate();
 
-    const { polygons, addPolygon: addPolygon, clearPolygons, showIoUs, clearIoUs, savePolygons, loadPolygons } = props;
 
-    const { dispatch, currentDecimalPlaces } = useContext(PolygonContext)!;
 
     const [isCollapsed, setIsCollapsed] = useState(false);
   
@@ -26,6 +27,16 @@ const Sidebar2D = (props: SidebarProps2D) => {
                 {!isCollapsed && <div className="logo-text-2d">Viziou</div>}
                 </div>
             </NavLink>
+          <div className="env-buttons-2d">
+              <button 
+                className={`nav-link-2d ${window.location.pathname === '/2D-Environment' ? 'active-link-2d' : ''}`} 
+                onClick={() => navigate("/2D-Environment")}
+                >2D Environment</button>
+              <button 
+                    className={`nav-link-2d ${window.location.pathname === '/3D-Environment' ? 'active-link-2d' : ''}`} 
+                    onClick={() => navigate("/3D-Environment")}
+                >3D Environment</button>
+          </div>
 
             {!isCollapsed && (
                 <div className="nav-2d">
