@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import * as THREE from "three";
-import { IOUPolygonData, PolygonData } from '../utils/types'
+import { IOUPolygonData } from '../utils/types'
 import Infographic from './Infographic.tsx'
 import { Backend2D } from '../backend/Interface.ts'
 import { IOUPolygonContext } from '../contexts/IOUPolygonContext.tsx'

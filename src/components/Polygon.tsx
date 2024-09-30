@@ -20,7 +20,7 @@ const duplicateIconTexture = new THREE.TextureLoader().load(duplicate);
 
 const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectable }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
-  const { dispatch, selectedPolygonID, currentlyMousedOverPolygons, currentDecimalPlaces, selectability, polygons } = useContext(PolygonContext)!;
+  const { dispatch, selectedPolygonID, currentlyMousedOverPolygons, selectability, polygons } = useContext(PolygonContext)!;
   const originalPosition = useRef<[number, number]>([0, 0]);
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
