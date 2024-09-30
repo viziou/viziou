@@ -7,7 +7,8 @@ import { useThree } from "@react-three/fiber";
 import edit from '../assets/new_edit.png';
 import bin from '../assets/new_bin.png';
 import duplicate from '../assets/new_duplicate.png';
-// import Infographic from "./Infographic";
+//import Infographic from './Infographic'
+//import { Backend2D } from '../backend/Interface.ts'
 
 type PolygonProps = PolygonData & { index: number; selectable: boolean } & {iouDispatch?: React.Dispatch<IOUPolygon2DAction>} & {polygons?: Map<string, PolygonData>;};
 // Load texture icons
@@ -19,7 +20,7 @@ const duplicateIconTexture = new THREE.TextureLoader().load(duplicate);
 
 const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectable }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
-  const { dispatch, selectedPolygonID, currentlyMousedOverPolygons, selectability, polygons } = useContext(PolygonContext)!;
+  const { dispatch, selectedPolygonID, currentlyMousedOverPolygons, currentDecimalPlaces, selectability, polygons } = useContext(PolygonContext)!;
   const originalPosition = useRef<[number, number]>([0, 0]);
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
@@ -524,11 +525,12 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
           />
         </mesh>
         {/* Example infographic: */}
-        {/* {Math.max(...currentlyMousedOverPolygons) === index && (
+        {/*Math.max(...currentlyMousedOverPolygons) === id && (
           <Infographic
           position={!boundingBox ? new THREE.Vector3(position[0], position[1], 0) : boundingBox.getCenter(new THREE.Vector3).sub(boundingBox.getSize(new THREE.Vector3).multiplyScalar(0.5))
-          } info={{"hi": "yeah", "hello": 12.345678.toPrecision(currentDecimalPlaces+2)}} />
-        )} */}
+          } info={{"Area": Backend2D.area(geometry).toPrecision(currentDecimalPlaces+2),
+                   "Perimeter": Backend2D.perimeter(geometry).toPrecision(currentDecimalPlaces+2)}} />
+        ) */}
       </DragControls>
       {BoundingBox}
     </>

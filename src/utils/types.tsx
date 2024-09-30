@@ -26,6 +26,8 @@ export type IOUPolygon2DAction =
   | { type: "HIDE_CHILD_IOUS_USING_ID", payload: number}
   | { type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: number, polygons: Map<string, PolygonData>}}
   | { type: "SHOW_CHILD_IOUS_USING_ID", payload: number }
+  | { type: "ADD_MOUSED_OVER_POLYGON", id: number }
+  | { type: "REMOVE_MOUSED_OVER_POLYGON", id: number }
   | { type: "CLEAR_POLYGONS" };
 
 export type Scene2DProps = {
