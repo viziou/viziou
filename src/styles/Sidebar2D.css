@@ -6,6 +6,31 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: width 0.3s ease-in-out;
+  height: 100vh;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.sidebar-2d.collapsed {
+  width: 60px;
+  padding: 10px;
+}
+
+.sidebar-2d.collapsed .logo-text-2d,
+.sidebar-2d.collapsed .nav-2d,
+.sidebar-2d.collapsed .section-2d,
+.sidebar-2d.collapsed .polygon-list-2d,
+.sidebar-2d.collapsed .footer-buttons-2d {
+  display: none;
+}
+
+.sidebar-2d.collapsed .logo-container-2d {
+  justify-content: center;
+}
+
+.sidebar-2d.collapsed .logo-image-2d {
+  margin-right: 0;
 }
 
 .logo-container-2d {
@@ -74,13 +99,24 @@
 
 .settings-2d {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .checkbox-label-2d {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.checkbox-label-2d input[type="checkbox"] {
+  margin-left: 10px;
+}
+
+input[type="number"] {
+  width: 100%;
 }
 
 .canvas-buttons-2d {
@@ -105,7 +141,8 @@
   background-color: #353ea9;
 }
 
-input, select {
+input,
+select {
   background-color: white;
   color: black;
   padding: 5px;
@@ -144,4 +181,96 @@ input, select {
 
 .footer-buttons-2d .twod-button-2d {
   width: 48%;
+}
+
+.collapse-button-2d {
+  background-color: #4a56de;
+  color: white;
+  padding: 5px;
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  font-size: 14px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.collapse-button-2d:hover {
+  background-color: #353ea9;
+}
+
+@media only screen and (max-height: 800px) {
+  .sidebar-2d {
+    width: 180px;
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .twod-button-2d {
+    font-size: 12px;
+    padding: 5px;
+  }
+
+  .logo-image-2d {
+    width: 20px;
+    height: 20px;
+  }
+
+  .logo-text-2d {
+    font-size: 14px;
+  }
+
+  .nav-link-2d {
+    font-size: 12px;
+    padding: 5px 0;
+  }
+
+  .settings-2d {
+    gap: 5px;
+  }
+
+  .settings-2d label {
+    font-size: 12px;
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .settings-2d input[type="number"] {
+    width: 100%;
+    padding: 4px;
+    font-size: 12px;
+  }
+
+  .settings-2d input[type="checkbox"] {
+    transform: scale(0.8);
+    margin-left: 10px;
+  }
+
+  .checkbox-label-2d {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    white-space: nowrap;
+  }
+
+  input,
+  select {
+    font-size: 10px;
+    padding: 4px;
+  }
+
+  .polygon-item-2d {
+    font-size: 10px;
+  }
+
+  .footer-buttons-2d {
+    font-size: 10px;
+  }
+
+  .collapse-button-2d {
+    font-size: 12px;
+    padding: 4px;
+  }
 }

@@ -106,7 +106,7 @@ const Scene3D = ({ polyhedra, selectedIndex, setSelectedIndex }: Scene3DProps) =
     };
 
     return (
-        <Canvas style={{ height: "100vh", background: "#cccccc" }} onPointerMissed={handlePointerMissed}>
+        <Canvas style={{ height: "100vh", width: "100vw", background: "#cccccc" }} onPointerMissed={handlePointerMissed}>
             <ambientLight intensity={0.5} />
 
             {polyhedra.map((polyhedron, index) => (

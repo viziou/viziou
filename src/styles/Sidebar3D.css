@@ -6,6 +6,31 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: width 0.3s ease-in-out;
+  height: 100vh;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.sidebar-3d.collapsed {
+  width: 60px;
+  padding: 10px;
+}
+
+.sidebar-3d.collapsed .logo-text-3d,
+.sidebar-3d.collapsed .nav-3d,
+.sidebar-3d.collapsed .section-3d,
+.sidebar-3d.collapsed .polyhedron-list-3d,
+.sidebar-3d.collapsed .footer-buttons-3d {
+  display: none;
+}
+
+.sidebar-3d.collapsed .logo-container-3d {
+  justify-content: center;
+}
+
+.sidebar-3d.collapsed .logo-image-3d {
+  margin-right: 0;
 }
 
 .logo-container-3d {
@@ -58,7 +83,7 @@
 }
 
 .active-link-3d::after {
-  width: 100%; 
+  width: 100%;
 }
 
 .env-buttons-3d {
@@ -74,13 +99,24 @@
 
 .settings-3d {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .checkbox-label-3d {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.checkbox-label-3d input[type="checkbox"] {
+  margin-left: 10px;
+}
+
+input[type="number"] {
+  width: 100%;
 }
 
 .canvas-buttons-3d {
@@ -105,7 +141,8 @@
   background-color: #353ea9;
 }
 
-input, select {
+input,
+select {
   background-color: white;
   color: black;
   padding: 5px;
@@ -144,4 +181,96 @@ input, select {
 
 .footer-buttons-3d .threed-button-3d {
   width: 48%;
+}
+
+.collapse-button-3d {
+  background-color: #4a56de;
+  color: white;
+  padding: 5px;
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  font-size: 14px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.collapse-button-3d:hover {
+  background-color: #353ea9;
+}
+
+@media only screen and (max-height: 800px) {
+  .sidebar-3d {
+    width: 180px;
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .threed-button-3d {
+    font-size: 12px;
+    padding: 5px;
+  }
+
+  .logo-image-3d {
+    width: 20px;
+    height: 20px;
+  }
+
+  .logo-text-3d {
+    font-size: 14px;
+  }
+
+  .nav-link-3d {
+    font-size: 12px;
+    padding: 5px 0;
+  }
+
+  .settings-3d {
+    gap: 5px;
+  }
+
+  .settings-3d label {
+    font-size: 12px;
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .settings-3d input[type="number"] {
+    width: 100%;
+    padding: 4px;
+    font-size: 12px;
+  }
+
+  .settings-3d input[type="checkbox"] {
+    transform: scale(0.8);
+    margin-left: 10px;
+  }
+
+  .checkbox-label-3d {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    white-space: nowrap;
+  }
+
+  input,
+  select {
+    font-size: 10px;
+    padding: 4px;
+  }
+
+  .polyhedron-item-3d {
+    font-size: 10px;
+  }
+
+  .footer-buttons-3d {
+    font-size: 10px;
+  }
+
+  .collapse-button-3d {
+    font-size: 12px;
+    padding: 4px;
+  }
 }

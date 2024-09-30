@@ -1,23 +1,24 @@
 .about-container {
-    color: white;
-    min-height: 100vh; 
-    padding: 2rem;
-    position: relative;
-  }
-  
+  color: white;
+  min-height: 100vh;
+  padding: 2rem;
+  position: relative;
+}
+
 .about-header {
   text-align: center;
   margin-bottom: 3rem;
-  margin-top: 6rem;
+  margin-top: 4rem;
 }
 
 .about-header h1 {
-  font-size: 4rem;
+  font-size: 3rem;
   margin-bottom: 1rem;
 }
 
-.about-description h2, .about-description p {
-  font-size: 1.5rem;
+.about-description h2,
+.about-description p {
+  font-size: 1.3rem;
 }
 
 .about-description {
@@ -26,50 +27,130 @@
 
 .developers-section {
   text-align: center;
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
 
 .developers-section h2 {
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .developers-grid {
   display: flex;
-  justify-content: space-between;
-  align-items: center; 
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
   flex-wrap: wrap;
-  gap: 2rem; 
 }
 
 .developer {
   flex: 1;
-  min-width: 200px;
-  max-width: 250px;
+  min-width: 180px;
+  max-width: 220px;
   text-align: center;
 }
 
 .developer-photo {
-  width: 150px;
-  height: 150px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   margin-bottom: 1rem;
-  background-color: #004466; 
+  background-color: #004466;
 }
 
 .mubasshir-photo, .satya-photo {
   object-fit: cover;
-  width: 150px;
-  height: 150px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
 }
 
 ul {
   list-style-type: none;
   padding: 0;
-  font-size: 1.2rem; 
+  font-size: 1rem;
 }
 
 ul li {
   margin-bottom: 0.5rem;
+}
+
+@media only screen and (max-width: 1280px) {
+  a {
+    overflow-y: auto;
+  }
+
+  .about-header h1 {
+    font-size: 2.2rem;
+    overflow-y: auto;
+  }
+
+  .about-description h2,
+  .about-description p {
+    font-size: 1.1rem;
+  }
+
+  .developers-section h2 {
+    font-size: 1.8rem;
+  }
+
+  .developers-grid {
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .developer {
+    min-width: 140px;
+  }
+
+  .developer-photo {
+    width: 120px;
+    height: 120px;
+  }
+
+  ul {
+    font-size: 0.9rem;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  a {
+    overflow-y: auto;
+  }
+
+  .about-container {
+    padding: 1rem;
+  }
+
+  .about-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .about-description h2,
+  .about-description p {
+    font-size: 1rem;
+  }
+
+  .developers-section h2 {
+    font-size: 1.6rem;
+  }
+
+  .developers-grid {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .developer {
+    min-width: 100%; 
+    max-width: none;
+  }
+
+  .developer-photo {
+    width: 100px;
+    height: 100px;
+  }
+
+  ul {
+    font-size: 0.8rem;
+  }
 }
