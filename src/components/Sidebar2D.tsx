@@ -6,7 +6,7 @@ import { PolygonContext } from '../contexts/PolygonContext';
 import { useContext } from 'react';
 
 const Sidebar2D = (props: SidebarProps2D) => {
-  const { polygons, addPolygon: addPolygon, clearPolygons, showIoUs, savePolygons, loadPolygons } = props;
+  const { polygons, addPolygon: addPolygon, clearPolygons, showIoUs, clearIoUs, savePolygons, loadPolygons } = props;
 
   const { dispatch, currentDecimalPlaces } = useContext(PolygonContext)!;
 
@@ -56,7 +56,7 @@ const Sidebar2D = (props: SidebarProps2D) => {
           </div>
           <div className="canvas-buttons-2d">
               <button className="twod-button-2d" onClick={showIoUs}>Show IoU</button>
-              <button className="twod-button-2d">Clear IoU</button>
+              <button className="twod-button-2d" onClick={clearIoUs}>Clear IoU</button>
           </div>
       </div>
 

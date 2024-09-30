@@ -79,6 +79,7 @@ export type SidebarProps2D = {
   addPolygon: () => void;
   clearPolygons: () => void;
   showIoUs: () => void;
+  clearIoUs: () => void;
   savePolygons: () => void;
   loadPolygons: () => Promise<void>;
 }
