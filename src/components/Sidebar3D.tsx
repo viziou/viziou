@@ -1,11 +1,14 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { SidebarProps3D } from '../utils/types';
 import logo from '../assets/favicon.png';
 import '../styles/Sidebar3D.css';
+import { useContext } from 'react';
+import { PolyhedronContext } from '../contexts/PolyhedronContext';
 
 const Sidebar3D = (props: SidebarProps3D) => {
   const { polyhedrons, addRandomPolyhedron, clearPolyhedrons, savePolyhedrons, loadPolyhedrons } = props;
-
+    const navigate = useNavigate();
+    const { dispatch } = useContext(PolyhedronContext)!;
   return (
       <aside className="sidebar-3d">
           <NavLink to="/" className="logo-link-3d">
@@ -20,12 +23,26 @@ const Sidebar3D = (props: SidebarProps3D) => {
                   About
               </NavLink>
               <div className="env-buttons-3d">
-                  <NavLink to="/2D-Environment" className={({ isActive }) => isActive ? "nav-link-3d active-link-3d" : "nav-link-3d"}>
-                      2D Environment
-                  </NavLink>
-                  <NavLink to="/3D-Environment" className={({ isActive }) => isActive ? "nav-link-3d active-link-3d" : "nav-link-3d"}>
-                      3D Environment
-                  </NavLink>
+              <button 
+                className={`nav-link-2d ${window.location.pathname === '/2D-Environment' ? 'active-link-2d' : ''}`} 
+                onClick={() => {
+                    const changePage = () => navigate("/2D-Environment");
+                    dispatch!({
+                        type: "OPEN_CONFIRMATION_MODAL",
+                        info: {
+                          isOpen: true,
+                          onClose: () => {dispatch!( {type: "CLOSE_CONFIRMATION_MODAL"})},
+                          onConfirm: changePage,
+                          message: "Are you sure you want to leave this page?",
+                          description: "Your current shapes may not be saved.",
+                        },
+                      });
+                }}
+                >2D Environment</button>
+              <button 
+                    className={`nav-link-2d ${window.location.pathname === '/3D-Environment' ? 'active-link-2d' : ''}`} 
+                    onClick={() => navigate("/3D-Environment")}
+                >3D Environment</button>
               </div>
           </div>
 

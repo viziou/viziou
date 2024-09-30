@@ -76,7 +76,10 @@ export type Polyhedron3DAction =
   | { type: "UPDATE_POLYHEDRON"; index: number; position: [number, number, number]; rotation: [number, number, number]; scale: [number, number, number] }
   | { type: "DELETE_POLYHEDRON"; index: number }
   | { type: "DUPLICATE_POLYHEDRON"; index: number }
-  | { type: "SELECT_POLYHEDRON"; index: number | null };
+  | { type: "SELECT_POLYHEDRON"; index: number | null }
+  | { type: "STORE_TRANSFORMED_VERTICES"; index: number; transformedVertices: THREE.Vector3[]; }
+  | { type: "OPEN_CONFIRMATION_MODAL"; info: ConfirmationModalInfo}
+  | { type: "CLOSE_CONFIRMATION_MODAL"; }
 
 export type SidebarProps2D = {
   polygons: PolygonData[];
