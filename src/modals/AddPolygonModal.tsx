@@ -180,7 +180,7 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2>Create Custom Shape</h2>
+        <h2>Add Shape</h2>
         <div className="canvas-container">
           <Canvas
             style={{ background: "#cccccc" }}
@@ -196,10 +196,10 @@ const AddPolygonModal = ({ isOpen, onClose, onSubmit }: AddPolygonProps) => {
           </Canvas>
         </div>
         <div className="modal-actions">
-          <button className="modal-button" onClick={handleSubmit}>
+          <button className="modal-button modal-button-green" onClick={handleSubmit}>
             Submit
           </button>
-          <button className="modal-button" onClick={onClose}>
+          <button className="modal-button modal-button-red" onClick={onClose}>
             Close
           </button>
           <div className="colour-picker-container">
