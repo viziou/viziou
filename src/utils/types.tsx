@@ -73,9 +73,9 @@ export type Polyhedron3DAction =
   | { type: "SET_POLYHEDRONS"; payload: PolyhedronData[] }
   | { type: "CLEAR_POLYHEDRA" }
   | { type: "UPDATE_POLYHEDRON"; index: number; position: [number, number, number]; rotation: [number, number, number]; scale: [number, number, number] }
-  | { type: "STORE_TRANSFORMED_VERTICES"; index: number; transformedVertices: THREE.Vector3[];
-
-  };
+  | { type: "STORE_TRANSFORMED_VERTICES"; index: number; transformedVertices: THREE.Vector3[] }
+  | { type: "DELETE_POLYGON"; index: number }
+  | { type: "DUPLICATE_POLYGON"; index: number };
 
 export type SidebarProps2D = {
   polygons: PolygonData[];
