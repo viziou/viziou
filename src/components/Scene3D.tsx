@@ -6,8 +6,9 @@ import { useRef, useContext, useState } from 'react';
 import Polyhedron from './Polyhedron';
 import { PolyhedronContext } from '../contexts/PolyhedronContext';
 import { Scene3DProps } from '../utils/types';
+import IOUPolyhedron from './IOUPolyhedron.tsx'
 
-const Scene3D = ({ polyhedra, selectedId, setSelectedId }: Scene3DProps) => {
+const Scene3D = ({ polyhedra, selectedId, setSelectedId, iouPolyhedrons, /*iouDispatch*/ }: Scene3DProps) => {
     const context = useContext(PolyhedronContext);
 
     if (!context?.dispatch) {
@@ -109,7 +110,7 @@ const Scene3D = ({ polyhedra, selectedId, setSelectedId }: Scene3DProps) => {
         <Canvas style={{ height: "100vh", background: "#cccccc" }} onPointerMissed={handlePointerMissed}>
             <ambientLight intensity={0.5} />
 
-            {polyhedra.map((polyhedron, index) => (
+            {Array.from(polyhedra.values()).map((polyhedron, index) => (
                 <Polyhedron
                     id={polyhedron.id}
                     key={index}
@@ -123,6 +124,21 @@ const Scene3D = ({ polyhedra, selectedId, setSelectedId }: Scene3DProps) => {
                     opacity={polyhedron.opacity}
                 />
             ))}
+
+          {Array.from(iouPolyhedrons.values()).map((polyhedron, index) => (
+            <IOUPolyhedron
+              id={polyhedron.id}
+              key={index}
+              position={polyhedron.position}
+              rotation={polyhedron.rotation}
+              scale={polyhedron.scale}
+              geometry={polyhedron.geometry}
+              colour={polyhedron.colour}
+              opacity={polyhedron.opacity}
+              parentIDa={polyhedron.parentIDa}
+              parentIDb={polyhedron.parentIDb}
+            />
+          ))}
 
             {selectedObject.current && (
                 <TransformControls

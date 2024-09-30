@@ -8,6 +8,7 @@ import { PolyhedronContext } from '../contexts/PolyhedronContext';
 import '../styles/ThreeDEnv.css';
 import { Storage } from '../backend/Interface.ts'
 import Sidebar3D from '../components/Sidebar3D.tsx';
+import { IOUPolyhedronContext } from '../contexts/IOUPolyhedronContext.tsx'
 
 // const getCube = (): THREE.BoxGeometry => {
 //     return new THREE.BoxGeometry(1, 1, 1);
@@ -37,6 +38,8 @@ const getRandomColour = (): string => {
 
 const ThreeDEnv = () => {
     const context = useContext(PolyhedronContext);
+    const IoUcontext = useContext(IOUPolyhedronContext)
+
     const nonceGenerator = useRef(0);
 
     const generateId = () => {
@@ -44,11 +47,12 @@ const ThreeDEnv = () => {
       return nonceGenerator.current
     }
 
-    if (!context?.dispatch) {
+    if (!context?.dispatch || !IoUcontext?.dispatch) {
         throw new Error("ThreeDEnv must be used within a PolyhedronProvider");
     }
 
-    const { polyhedra, dispatch } = context;
+    const { polyhedra, dispatch, } = context;
+    const { polyhedronMap: iouPolyhedrons, dispatch: iouDispatch } = IoUcontext
 
     const [selectedId, setSelectedId] = useState<number | null>(null);
 
@@ -82,7 +86,7 @@ const ThreeDEnv = () => {
             rotation: [0, 0, 0],
             scale: [1, 1, 1],
             colour: getRandomColour(),
-            opacity: 1
+            opacity: 0.5
         };
 
         console.log("Dispatching ADD_RANDOM_POLYHEDRON:", newPolyhedron);
@@ -124,9 +128,11 @@ const ThreeDEnv = () => {
 
             <main className="threed-canvas-container">
                 <Scene3D
-                polyhedra={Array.from(polyhedra.values())}
+                polyhedra={polyhedra}
                 selectedId={selectedId}
                 setSelectedId={setSelectedId}
+                iouPolyhedrons={iouPolyhedrons}
+                iouDispatch={iouDispatch}
                 />
             </main>
 

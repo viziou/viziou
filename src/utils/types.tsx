@@ -52,7 +52,7 @@ export type Polygon2DAction =
   | { type: "SELECTABILITY"; payload: boolean}
   | { type: "SET_DECIMAL_PRECISION"; precision: number};
 
-export interface PolyhedronData {
+export type PolyhedronData = {
   id: number;
   geometry: THREE.BufferGeometry;
   position: [number, number, number];
@@ -63,10 +63,17 @@ export interface PolyhedronData {
   opacity: number;
 }
 
+export type IOUPolyhedronData = PolyhedronData & {
+  parentIDa: number;
+  parentIDb: number;
+}
+
 export type Scene3DProps = {
-  polyhedra: PolyhedronData[];
+  polyhedra: Map<string, PolyhedronData>;
   setSelectedId: React.Dispatch<React.SetStateAction<number | null>>;
   selectedId: number | null;
+  iouPolyhedrons: Map<string, IOUPolyhedronData>;
+  iouDispatch: React.Dispatch<IOUPolyhedron3DAction>;
 };
 
 export type Polyhedron3DAction =
@@ -76,8 +83,21 @@ export type Polyhedron3DAction =
   | { type: "CLEAR_POLYHEDRA" }
   | { type: "UPDATE_POLYHEDRON"; id: number; position: [number, number, number]; rotation: [number, number, number]; scale: [number, number, number] }
   | { type: "STORE_TRANSFORMED_VERTICES"; id: number; transformedVertices: THREE.Vector3[];
-
   };
+
+export type IOUPolyhedron3DAction =
+  | { type: "SET_POLYHEDRON", payload: IOUPolyhedronData }
+  | { type: "UPDATE_POLYHEDRON", payload: IOUPolyhedronData }
+  | { type: "SHOW_POLYHEDRON", payload: [number, number] }
+  | { type: "HIDE_POLYHEDRON", payload: [number, number] }
+  | { type: "DELETE_POLYHEDRON", payload: [number, number] }
+  | { type: "DELETE_CHILD_IOUS", payload: IOUPolyhedronData }
+  | { type: "DELETE_CHILD_IOUS_USING_ID", id: number }
+  | { type: "HIDE_CHILD_IOUS", payload: PolyhedronData}
+  | { type: "HIDE_CHILD_IOUS_USING_ID", payload: number}
+  | { type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: number, polyhedrons: Map<string, IOUPolyhedronData>}}
+  | { type: "SHOW_CHILD_IOUS_USING_ID", payload: number }
+  | { type: "CLEAR_POLYHEDRONS" };
 
 export type SidebarProps2D = {
   polygons: PolygonData[];

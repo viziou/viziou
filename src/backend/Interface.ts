@@ -285,13 +285,13 @@ class Backend3D {
   }
 
   public static IoU({geometry: geometryA, position: positionA}: PolyhedronData,
-                    {geometry: geometryB, position: positionB}: PolyhedronData) {
+                    {geometry: geometryB, position: positionB}: PolyhedronData): {area: number, shape: BufferGeometry} {
     const offsetA = new Point3D(positionA[0], positionA[1], positionA[2]);
     const offsetB = new Point3D(positionB[0], positionB[1], positionB[2]);
     const polyhedronA = this._threeGeometryToPolyhedra3D(geometryA).translate(offsetA);
     const polyhedronB = this._threeGeometryToPolyhedra3D(geometryB).translate(offsetB);
     return {area: IoU3D(polyhedronA, polyhedronB),
-    shape: getIntersectionPolyhedra(polyhedronA, polyhedronB)}
+    shape: this._polyhedra3DToBufferGeometry(getIntersectionPolyhedra(polyhedronA, polyhedronB))}
   }
 
   public static reduceVectorThrees(array: number[] | TypedArray) {
@@ -491,4 +491,4 @@ class Storage {
   }
 }
 
-export { Backend2D, ConvexGeometry, Storage };
+export { Backend2D, Backend3D, ConvexGeometry, Storage };

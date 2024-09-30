@@ -19,7 +19,7 @@ interface PolyhedronProps extends PolyhedronData {
     onDoubleClick?: () => void;
 }
 
-const Polyhedron = ({ id, position, rotation, scale, geometry, colour, onClick, isSelected, onPointerOver, onPointerOut }: PolyhedronProps) => {
+const Polyhedron = ({ id, position, rotation, scale, geometry, colour, onClick, isSelected, onPointerOver, onPointerOut, opacity }: PolyhedronProps) => {
     const mesh = useRef<THREE.Mesh>(null);
     const boundingBoxRef = useRef<THREE.BoxHelper | null>(null);
     const { scene } = useThree();
@@ -96,7 +96,11 @@ const Polyhedron = ({ id, position, rotation, scale, geometry, colour, onClick, 
             onPointerOver={onPointerOver}
             onPointerOut={onPointerOut}
         >
-            <meshStandardMaterial color={colour} />
+            <meshStandardMaterial
+              color={colour}
+              transparent={true}
+              opacity={opacity}
+            />
             <Edges geometry={geometry} scale={1} color="white" />
         </mesh>
     );
