@@ -7,7 +7,9 @@ import { PolygonContext } from '../contexts/PolygonContext';
 
 const Sidebar2D = (props: SidebarProps2D) => {
 
-  const { polygons, addPolygon: addPolygon, clearPolygons, showIoUs, clearIoUs, savePolygons, loadPolygons } = props;
+    const { polygons, addPolygon: addPolygon, clearPolygons, showIoUs, clearIoUs, savePolygons, loadPolygons } = props;
+
+    const { dispatch, currentDecimalPlaces } = useContext(PolygonContext)!;
 
     const [isCollapsed, setIsCollapsed] = useState(false);
 
