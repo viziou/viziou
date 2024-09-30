@@ -215,10 +215,10 @@ const EditPolygonModal = ({
           </Canvas>
         </div>
         <div className="modal-actions">
-          <button className="modal-button" onClick={handleSave}>
+          <button className="modal-button modal-button-green" onClick={handleSave}>
             Save
           </button>
-          <button className="modal-button" onClick={onClose}>
+          <button className="modal-button modal-button-red" onClick={onClose}>
             Cancel
           </button>
           <div className="colour-picker-container">

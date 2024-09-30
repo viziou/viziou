@@ -12,7 +12,8 @@
 }
 
 .modal-content {
-  background-color: white;
+  background-color: #2b2240;
+  color: white;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -44,6 +45,19 @@
 
 .modal-button:hover {
   background-color: #0056b3;
+}
+
+.modal-button-green {
+  background-color: #00bd3f;
+}
+.modal-button-green:hover {
+  background-color: #00d146;
+}
+.modal-button-red {
+  background-color: #b90000;
+}
+.modal-button-red:hover {
+  background-color: #FF0000
 }
 .modal-actions {
   display: flex;
