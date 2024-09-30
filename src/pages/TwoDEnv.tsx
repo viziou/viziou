@@ -109,7 +109,7 @@ const TwoDEnv = () => {
 
   return (
     <div className="TwoDEnv">
-        <Sidebar
+        <Sidebar2D
           polygons={Array.from(polygons.values())}
           addPolygon={handleAddShapeModalOpen}
           clearPolygons={clearPolygons}
