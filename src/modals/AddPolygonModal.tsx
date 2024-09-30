@@ -160,7 +160,7 @@ const PointsCreator = ({
       <mesh
         onClick={handleCanvasClick}
         onPointerDown={handleRightMouseDown}
-        onPointerUp={handleRightMouseUp}
+        onPointerUp={(e) => {handleRightMouseUp(e); handleDragEnd();}}
         onPointerMove={handleDrag}
         onPointerLeave={() => {
           handleDragEnd();
