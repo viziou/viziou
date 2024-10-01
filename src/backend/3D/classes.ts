@@ -50,7 +50,7 @@ class Point3D {
     }
 
     public rotate(pitch: number, yaw: number, roll: number): Point3D {
-      /* Basically setting up a rotation matrix without actually using a matrix */
+        /* Basically setting up a rotation matrix without actually using a matrix */
         const cosa = Math.cos(yaw);
         const sina = Math.sin(yaw);
 
@@ -64,17 +64,21 @@ class Point3D {
         const Axy = cosa * sinb * sinc - sina * cosc;
         const Axz = cosa * sinb * cosc + sina * sinc;
 
-      const Ayx = sina * cosb;
+        const Ayx = sina * cosb;
         const Ayy = sina * sinb * sinc + cosa * cosc;
-      const Ayz = sina * sinb * cosc - cosa * sinc;
+        const Ayz = sina * sinb * cosc - cosa * sinc;
 
-      const Azx = -sinb;
-      const Azy = cosb*sinc;
-      const Azz = cosb*cosc;
+        const Azx = -sinb;
+        const Azy = cosb*sinc;
+        const Azz = cosb*cosc;
 
-      return new Point3D(Axx*this._x + Axy*this._y + Axz*this._z,
+        return new Point3D(Axx*this._x + Axy*this._y + Axz*this._z,
                           Ayx*this._x + Ayy*this._y + Ayz*this._z,
                           Azx*this._x + Azy*this._y + Azz*this._z)
+    }
+
+    public scale(x: number, y: number, z: number) {
+        return new Point3D(this._x * x, this._y * y, this._z * z);
     }
 
     public add(p: Point3D): Point3D {
@@ -341,6 +345,14 @@ class Face3D {
         return this;
     }
 
+    public rotate(pitch: number, yaw: number, roll: number) {
+        return new Face3D(this.vertices.map((point: Point3D) => {return point.rotate(pitch, yaw, roll)}))
+    }
+
+    public scale(x: number, y: number, z: number) {
+        return new Face3D(this.vertices.map((point: Point3D) => {return point.scale(x, y, z)}))
+    }
+
     public area(): number {
         let sum: number = 0;
         let p: Point3D;
@@ -489,6 +501,14 @@ class Polyhedra3D {
             return new Polyhedra3D(this.faces.map((face: Face3D) => {return face.translate(x)}));
         }
         return this;
+    }
+
+    public rotate(pitch: number, yaw: number, roll: number) {
+        return new Polyhedra3D(this.faces.map((face: Face3D) => {return face.rotate(pitch, yaw, roll)}))
+    }
+
+    public scale(x: number, y: number, z: number) {
+        return new Polyhedra3D(this.faces.map((face: Face3D) => {return face.scale(x, y, z)}))
     }
 
     public centroid(): Point3D {
