@@ -18,6 +18,8 @@ import ConfirmationModal from "../modals/ConfirmationModal";
 
 const getSquare = (): THREE.PlaneGeometry => {
   return new THREE.PlaneGeometry(1, 1);
+  // const vertices = [[0,0], [0,1], [1,1], [1,0]].map(p => new THREE.Vector3(p[0], p[1], 0));
+  // return ConvexGeometry.fromPoints(vertices)
 };
 
 const getRandomGeometry =
