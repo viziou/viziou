@@ -5,6 +5,9 @@ import logo from '../assets/favicon.png';
 import info from '../assets/info.png';
 import '../styles/Sidebar2D.css';
 import { PolygonContext } from '../contexts/PolygonContext';
+import edit from '../assets/new_edit.png';
+import bin from '../assets/new_bin.png';
+import duplicate from '../assets/new_duplicate.png';
 
 const Sidebar2D = (props: SidebarProps2D) => {
     const { polygons, addPolygon: addPolygon, clearPolygons, showIoUs, clearIoUs, savePolygons, loadPolygons } = props;
@@ -127,20 +130,51 @@ const Sidebar2D = (props: SidebarProps2D) => {
 
             {!isCollapsed && (
                 <div className="polygon-list-2d scrollable">
-                {polygons.map((polygon, index) => (
-                    <div key={index} className="polygon-item-2d small-polygon">
-                        <button onClick={() => dispatch!({ type: 'SELECT_POLYGON', id: polygon.id})}>{`Polygon ${index + 1}`}</button>
+                    {polygons.map((polygon, index) => (
+                        <div key={index} className="polygon-item-2d small-polygon">
 
-                        <button onClick={() => dispatch!({type: "SET_EDIT", id: polygon.id})}>{`Edit`}</button>
+                            <span 
+                                style={{ 
+                                    display: 'inline-block', 
+                                    width: '20px', 
+                                    height: '20px', 
+                                    backgroundColor: polygon.colour,
+                                    borderRadius: '3px',
+                                    marginRight: '10px'
+                                }} 
+                            />
 
-                        <button onClick={() => dispatch!({type: "DUPLICATE_POLYGON", id: polygon.id, newId: polygon.id*100000})}>{`Duplicate`}</button>
+                            <span onClick={() => dispatch!({ type: 'SELECT_POLYGON', id: polygon.id })}>
+                                {`Polygon ${index + 1}`}
+                            </span>
 
-                        <button onClick={() => {
-                            dispatch!({type: "DELETE_POLYGON", id: polygon.id})
-                            dispatch!({ type: "SELECT_POLYGON", id: null });
-                        }}>{`Delete`}</button>
-                    </div>
-                ))}
+                            <div className="icon-buttons-2d">
+                                <img
+                                    src={edit}
+                                    alt="Edit"
+                                    className="icon-2d"
+                                    onClick={() => dispatch!({ type: "SET_EDIT", id: polygon.id })}
+                                />
+                                
+                                <img
+                                    src={duplicate}
+                                    alt="Duplicate"
+                                    className="icon-2d"
+                                    onClick={() => dispatch!({ type: "DUPLICATE_POLYGON", id: polygon.id, newId: polygon.id * 100000 })}
+                                />
+                                
+                                <img
+                                    src={bin}
+                                    alt="Delete"
+                                    className="icon-2d"
+                                    onClick={() => {
+                                        dispatch!({ type: "DELETE_POLYGON", id: polygon.id });
+                                        dispatch!({ type: "SELECT_POLYGON", id: null });
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
 

@@ -5,6 +5,9 @@ import info from '../assets/info.png';
 import '../styles/Sidebar3D.css';
 import { useContext, useState } from 'react';
 import { PolyhedronContext } from '../contexts/PolyhedronContext';
+// import edit from '../assets/new_edit.png';
+import bin from '../assets/new_bin.png';
+import duplicate from '../assets/new_duplicate.png';
 
 const Sidebar3D = (props: SidebarProps3D) => {
     const { polyhedrons, addRandomPolyhedron, clearPolyhedrons, savePolyhedrons, loadPolyhedrons } = props;
@@ -116,22 +119,68 @@ const Sidebar3D = (props: SidebarProps3D) => {
             </div>
 
             {!isCollapsed && (
+                // <div className="polyhedron-list-3d scrollable">
+                //     {polyhedrons.map((_, index) => (
+                //         <div key={index} className="polyhedron-item-3d">
+                //             <button onClick={() => dispatch!({ type: 'SELECT_POLYHEDRON', index: index})}>{`Polyhedron ${index + 1}`}</button>
+                            
+                //             {/* <button onClick={() => dispatch!({ type: "SET_EDIT", index: index})}>{`Edit`}</button> */}
+
+                //             <button onClick={() => dispatch!({type: "DUPLICATE_POLYHEDRON", index: index})}>{`Duplicate`}</button>
+
+                //             <button onClick={() => {
+                //                 dispatch!({type: "DELETE_POLYHEDRON", index: index})
+                //                 dispatch!({ type: "SELECT_POLYHEDRON", index: null });
+                //             }}>{`Delete`}</button>
+                //         </div>
+                //     ))}
+                // </div>
+
                 <div className="polyhedron-list-3d scrollable">
                     {polyhedrons.map((_, index) => (
                         <div key={index} className="polyhedron-item-3d">
-                            <button onClick={() => dispatch!({ type: 'SELECT_POLYHEDRON', index: index})}>{`Polyhedron ${index + 1}`}</button>
-                            
-                            {/* <button onClick={() => dispatch!({ type: "SET_EDIT", index: index})}>{`Edit`}</button> */}
 
-                            <button onClick={() => dispatch!({type: "DUPLICATE_POLYHEDRON", index: index})}>{`Duplicate`}</button>
+                            <span 
+                                style={{ 
+                                    display: 'inline-block', 
+                                    width: '20px', 
+                                    height: '20px', 
+                                    backgroundColor: _.colour,
+                                    borderRadius: '3px',
+                                    marginRight: '10px'
+                                }} 
+                            />
 
-                            <button onClick={() => {
-                                dispatch!({type: "DELETE_POLYHEDRON", index: index})
-                                dispatch!({ type: "SELECT_POLYHEDRON", index: null });
-                            }}>{`Delete`}</button>
+                            <span onClick={() => dispatch!({ type: 'SELECT_POLYHEDRON', index: index })}>
+                                {`Polyhedron ${index + 1}`}
+                            </span>
+
+                            <div className="icon-buttons-3d">
+
+                                {/* uncomment if you want to add an Edit icon */}
+                                {/* <img src={editIcon} alt="Edit" className="icon" onClick={() => dispatch!({ type: "SET_EDIT", index: index })} /> */}
+
+                                <img
+                                    src={duplicate}
+                                    alt="Duplicate"
+                                    className="icon-3d"
+                                    onClick={() => dispatch!({ type: "DUPLICATE_POLYHEDRON", index: index })}
+                                />
+                                
+                                <img
+                                    src={bin}
+                                    alt="Delete"
+                                    className="icon-3d"
+                                    onClick={() => {
+                                        dispatch!({ type: "DELETE_POLYHEDRON", index: index });
+                                        dispatch!({ type: "SELECT_POLYHEDRON", index: null });
+                                    }}
+                                />
+                            </div>
                         </div>
                     ))}
                 </div>
+
             )}
 
             {!isCollapsed && (
