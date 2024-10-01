@@ -53,7 +53,7 @@ const ThreeDEnv = () => {
         throw new Error("ThreeDEnv must be used within a PolyhedronProvider");
     }
 
-    const { polyhedra, dispatch, } = context;
+    const { polyhedra, dispatch, confirmationInfo, } = context;
     const { polyhedronMap: iouPolyhedrons, dispatch: iouDispatch } = IoUcontext
 
     const [selectedId, setSelectedId] = useState<number | null>(null);

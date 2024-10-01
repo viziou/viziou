@@ -146,7 +146,7 @@ const Sidebar3D = (props: SidebarProps3D) => {
                                     display: 'inline-block',
                                     width: '20px',
                                     height: '20px',
-                                    backgroundColor: _.colour,
+                                    backgroundColor: polyhedron.colour,
                                     borderRadius: '3px',
                                     marginRight: '10px'
                                 }}
