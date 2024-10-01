@@ -8,6 +8,7 @@ import { PolyhedronContext } from '../contexts/PolyhedronContext';
 import '../styles/ThreeDEnv.css';
 import { Backend3D, Storage } from '../backend/Interface.ts'
 import Sidebar3D from '../components/Sidebar3D.tsx';
+import ConfirmationModal from '../modals/ConfirmationModal.tsx';
 import { IOUPolyhedronContext } from '../contexts/IOUPolyhedronContext.tsx'
 import { generatePairs } from '../utils/Generic.ts'
 
@@ -96,7 +97,7 @@ const ThreeDEnv = () => {
 
     const clearPolyhedra = () => {
         console.log("Dispatching CLEAR_POLYHEDRA");
-        setSelectedId(null);
+        dispatch({ type: "SELECT_POLYHEDRON", id: null });
         dispatch({ type: "CLEAR_POLYHEDRA" });
     };
 
@@ -176,7 +177,13 @@ const ThreeDEnv = () => {
                 iouDispatch={iouDispatch}
                 />
             </main>
-
+            <ConfirmationModal
+                isOpen={confirmationInfo.isOpen}
+                message={confirmationInfo.message}
+                description={confirmationInfo.description}
+                onConfirm={confirmationInfo.onConfirm}
+                onClose={confirmationInfo.onClose}
+            />
         </div>
     );
 };

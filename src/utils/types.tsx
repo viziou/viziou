@@ -26,6 +26,8 @@ export type IOUPolygon2DAction =
   | { type: "HIDE_CHILD_IOUS_USING_ID", payload: number}
   | { type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: number, polygons: Map<string, PolygonData>}}
   | { type: "SHOW_CHILD_IOUS_USING_ID", payload: number }
+  | { type: "ADD_MOUSED_OVER_POLYGON", id: number }
+  | { type: "REMOVE_MOUSED_OVER_POLYGON", id: number }
   | { type: "CLEAR_POLYGONS" };
 
 export type Scene2DProps = {
@@ -50,7 +52,10 @@ export type Polygon2DAction =
   | { type: "SET_EDIT"; id: number | null}
   | { type: "EDIT_POLYGON"; id: number, geometry: THREE.BufferGeometry; colour: string}
   | { type: "SELECTABILITY"; payload: boolean}
-  | { type: "SET_DECIMAL_PRECISION"; precision: number};
+  | { type: "SET_DECIMAL_PRECISION"; precision: number}
+  | { type: "OPEN_CONFIRMATION_MODAL"; info: ConfirmationModalInfo}
+  | { type: "CLOSE_CONFIRMATION_MODAL"; }
+  | { type: "SET_DISPLAY_WARNINGS"; display: boolean};
 
 export type PolyhedronData = {
   id: number;
@@ -82,28 +87,34 @@ export type Polyhedron3DAction =
   | { type: "SET_POLYHEDRONS"; payload: PolyhedronData[] }
   | { type: "CLEAR_POLYHEDRA" }
   | { type: "UPDATE_POLYHEDRON"; id: number; position: [number, number, number]; rotation: [number, number, number]; scale: [number, number, number] }
-  | { type: "STORE_TRANSFORMED_VERTICES"; id: number; transformedVertices: THREE.Vector3[];
-  };
+  | { type: "DELETE_POLYHEDRON"; id: number }
+  | { type: "DUPLICATE_POLYHEDRON"; id: number, newId: number }
+  | { type: "SELECT_POLYHEDRON"; id: number | null }
+  | { type: "STORE_TRANSFORMED_VERTICES"; id: number; transformedVertices: THREE.Vector3[]; }
+  | { type: "OPEN_CONFIRMATION_MODAL"; info: ConfirmationModalInfo}
+  | { type: "CLOSE_CONFIRMATION_MODAL"; }
+  | { type: "SET_DISPLAY_WARNINGS"; display: boolean};
 
 export type IOUPolyhedron3DAction =
-  | { type: "SET_POLYHEDRON", payload: IOUPolyhedronData }
-  | { type: "UPDATE_POLYHEDRON", payload: IOUPolyhedronData }
-  | { type: "SHOW_POLYHEDRON", payload: [number, number] }
-  | { type: "HIDE_POLYHEDRON", payload: [number, number] }
-  | { type: "DELETE_POLYHEDRON", payload: [number, number] }
-  | { type: "DELETE_CHILD_IOUS", payload: IOUPolyhedronData }
-  | { type: "DELETE_CHILD_IOUS_USING_ID", id: number }
-  | { type: "HIDE_CHILD_IOUS", payload: PolyhedronData}
-  | { type: "HIDE_CHILD_IOUS_USING_ID", payload: number}
-  | { type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: number, polyhedrons: Map<string, IOUPolyhedronData>}}
-  | { type: "SHOW_CHILD_IOUS_USING_ID", payload: number }
-  | { type: "CLEAR_POLYHEDRONS" };
+    | { type: "SET_POLYHEDRON", payload: IOUPolyhedronData }
+    | { type: "UPDATE_POLYHEDRON", payload: IOUPolyhedronData }
+    | { type: "SHOW_POLYHEDRON", payload: [number, number] }
+    | { type: "HIDE_POLYHEDRON", payload: [number, number] }
+    | { type: "DELETE_POLYHEDRON", payload: [number, number] }
+    | { type: "DELETE_CHILD_IOUS", payload: IOUPolyhedronData }
+    | { type: "DELETE_CHILD_IOUS_USING_ID", id: number }
+    | { type: "HIDE_CHILD_IOUS", payload: PolyhedronData}
+    | { type: "HIDE_CHILD_IOUS_USING_ID", payload: number}
+    | { type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: number, polyhedrons: Map<string, IOUPolyhedronData>}}
+    | { type: "SHOW_CHILD_IOUS_USING_ID", payload: number }
+    | { type: "CLEAR_POLYHEDRONS" };
 
 export type SidebarProps2D = {
   polygons: PolygonData[];
   addPolygon: () => void;
   clearPolygons: () => void;
   showIoUs: () => void;
+  clearIoUs: () => void;
   savePolygons: () => void;
   loadPolygons: () => Promise<void>;
 }
@@ -115,4 +126,14 @@ export type SidebarProps3D = {
   showIoUs: () => void;
   savePolyhedrons: () => void;
   loadPolyhedrons: () => void;
+}
+
+export type ConfirmationModalInfo = {
+  isOpen: boolean;
+  onClose?: () => void;
+  onConfirm: () => void;
+  message: string;
+  description?: string;
+  confirmText?: string;
+  cancelText?: string;
 }

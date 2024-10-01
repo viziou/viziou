@@ -1,5 +1,8 @@
 import { Link } from 'react-router-dom';
 import '../styles/Hero.css';
+import orb1 from '../assets/orb1.png'
+import orb2 from '../assets/orb2.png'
+import block from '../assets/block.png'
 
 const Hero = () => {
   return (
@@ -24,10 +27,10 @@ const Hero = () => {
                     
             </div>
 
-            <div className="hero-info">
+            {/* <div className="hero-info">
                 <p>Developed for FIT3161/FIT3162</p>
                 <p>Computer Science Project</p>
-            </div>
+            </div> */}
 
         </div>
 
@@ -48,6 +51,14 @@ const Hero = () => {
             <div className="hero-shapes-blur-1"></div>
             <div className="hero-shapes-blur-2"></div>
             <div className="hero-shapes-blur-3"></div>
+        </div>
+
+        <div className="hero-floating-shapes">
+            <img className="hero-floating-shape-1" src={orb1} alt="Floating orb 1" />
+
+            <img className="hero-floating-shape-2" src={orb2} alt="Floating orb 2" />
+
+            <img className="hero-floating-shape-3" src={block} alt="Block" />
         </div>
 
     </section>

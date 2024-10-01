@@ -7,9 +7,10 @@ import { useThree } from "@react-three/fiber";
 import edit from '../assets/new_edit.png';
 import bin from '../assets/new_bin.png';
 import duplicate from '../assets/new_duplicate.png';
-// import Infographic from "./Infographic";
+//import Infographic from './Infographic'
+//import { Backend2D } from '../backend/Interface.ts'
 
-type PolygonProps = PolygonData & { index: number; selectable: boolean } & {iouDispatch?: React.Dispatch<IOUPolygon2DAction>} & {polygons?: Map<string, PolygonData>;};
+type PolygonProps = PolygonData & { index: number; selectable: boolean } & { iouDispatch?: React.Dispatch<IOUPolygon2DAction> } & { polygons?: Map<string, PolygonData>; };
 // Load texture icons
 const editIconTexture = new THREE.TextureLoader().load(edit);
 const deleteIconTexture = new THREE.TextureLoader().load(bin);
@@ -17,12 +18,13 @@ const duplicateIconTexture = new THREE.TextureLoader().load(duplicate);
 
 // TODO: Make information on top of the polygon as a child instead?
 
-const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectable }: PolygonProps) => {
+const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selectable }: PolygonProps) => {
   const mesh = useRef<THREE.Mesh>(null!);
   const { dispatch, selectedPolygonID, currentlyMousedOverPolygons, selectability, polygons } = useContext(PolygonContext)!;
   const originalPosition = useRef<[number, number]>([0, 0]);
   const matrix = new THREE.Matrix4();
   const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
+  const [initialBBox, setInitialBBox] = useState<THREE.Box3 | null>(null);
   const { scene, camera, pointer } = useThree();
   const [mousePointer, setMousePointer] = useState<string | null>(null);
   const [resizing, setResizing] = useState(false);
@@ -53,7 +55,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
   const handleDragEnd = () => {
     /* Could trigger updates to IoU or something here maybe */
     if (iouDispatch) {
-      iouDispatch({type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: id, polygons: polygons}})
+      iouDispatch({ type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: { id: id, polygons: polygons } })
     }
   };
 
@@ -64,14 +66,14 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
     if (mesh.current) {
       const v = new THREE.Vector3();
       mesh.current.getWorldPosition(v)
-      originalPosition.current = v.toArray().slice(0,2) as [number, number];
+      originalPosition.current = v.toArray().slice(0, 2) as [number, number];
       //console.log('original_position: ', originalPosition);
       // test clearing all IoU polygons
       console.log("dispatch: ", iouDispatch)
       if (iouDispatch) {
         console.log("trying to hide child IoUs that have ID ", id)
         //iouDispatch({type: "DELETE_CHILD_IOUS_USING_ID", payload: id});
-        iouDispatch({type: "HIDE_CHILD_IOUS_USING_ID", payload: id})
+        iouDispatch({ type: "HIDE_CHILD_IOUS_USING_ID", payload: id })
       }
       mesh.current.getWorldPosition(v);
       originalPosition.current = v.toArray().slice(0, 2) as [number, number];
@@ -103,12 +105,12 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
       mousePointer === "nesw"
         ? `nesw-resize`
         : mousePointer === "nwse"
-        ? "nwse-resize"
-        : mousePointer === "move"
-        ? "move"
-        : mousePointer === "pointer"
-        ? "pointer"
-        : "auto";
+          ? "nwse-resize"
+          : mousePointer === "move"
+            ? "move"
+            : mousePointer === "pointer"
+              ? "pointer"
+              : "auto";
   }, [mousePointer]);
 
   const getCanvasMousePosition = () => {
@@ -131,7 +133,10 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
     setResizing(true);
     setCorner(corner);
     if (dispatch)
-      dispatch({ type: "SELECTABILITY",  payload: false});
+      dispatch({ type: "SELECTABILITY", payload: false });
+    if (iouDispatch) {
+      iouDispatch({ type: "HIDE_CHILD_IOUS_USING_ID", payload: id })
+    }
   };
 
   const handleResizeDrag = () => {
@@ -144,6 +149,17 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
 
     // Get mouse position relative to the box center
     const mousePosition = getCanvasMousePosition().sub(center);
+
+    // Set corner based on where mousePosition is
+    if (mousePosition.x > 0 && mousePosition.y > 0) {
+      setCorner("topRight")
+    } else if (mousePosition.x < 0 && mousePosition.y > 0) {
+      setCorner("topLeft")
+    } else if (mousePosition.x < 0 && mousePosition.y < 0) {
+      setCorner("bottomLeft")
+    } else if (mousePosition.x > 0 && mousePosition.y < 0) {
+      setCorner("bottomRight")
+    }
 
     // Initialise corner position
     let cornerPosition = new THREE.Vector3(0, 0, 0);
@@ -170,33 +186,38 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
     }
 
     // Calculate the multiplier needed to bring the corner box to the current mouse position
-    const scaleX = mousePosition.x / cornerPosition.x;
-    const scaleY = mousePosition.y / cornerPosition.y;
+    if (cornerPosition.x != 0 && cornerPosition.y != 0 && mousePosition.x != 0 && mousePosition.y != 0) {
+      const scaleX = mousePosition.x / cornerPosition.x;
+      const scaleY = mousePosition.y / cornerPosition.y;
 
-    // Create the translations to anchor all scaling to opposite corner
-    // const translationX = center.x - position[0] - cornerPosition.x;
-    // const translationY = center.y - position[1] - cornerPosition.y;
-    const translationX = center.x - position[0];
-    const translationY = center.y - position[1];
+      // Create the translations to anchor all scaling to opposite corner
+      // const translationX = center.x - position[0] - cornerPosition.x;
+      // const translationY = center.y - position[1] - cornerPosition.y;
+      const translationX = center.x - position[0];
+      const translationY = center.y - position[1];
 
-    // Translate from position to bbox center
-    const newGeometry = geometry.clone();
-    newGeometry.translate(-translationX, -translationY, 0);
-    newGeometry.scale(scaleX, scaleY, 1);
-    newGeometry.translate(translationX, translationY, 0);
+      // Translate from position to bbox center
+      const newGeometry = geometry.clone();
+      newGeometry.translate(-translationX, -translationY, 0);
+      newGeometry.scale(scaleX, scaleY, 1);
+      newGeometry.translate(translationX, translationY, 0);
 
-    if (dispatch) {
-      dispatch({
-        type: "UPDATE_GEOMETRY",
-        geometry: newGeometry,
-        id: id,
-      });
+      if (dispatch) {
+        dispatch({
+          type: "UPDATE_GEOMETRY",
+          geometry: newGeometry,
+          id: id,
+        });
+      }
     }
   };
 
   const handleResizeEnd = () => {
     setResizing(false);
     setCorner(null);
+    if (iouDispatch) {
+      iouDispatch({ type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: { id: id, polygons: polygons } })
+    }
   };
   /**********************************/
 
@@ -204,17 +225,22 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
   const handleRotateStart = () => {
     setRotating(true);
     setOrientation(0);
-    if (dispatch)
-      dispatch({ type: "SELECTABILITY",  payload: false});
+    if (dispatch) {
+      dispatch({ type: "SELECTABILITY", payload: false });
+    }
+    if (iouDispatch) {
+      iouDispatch({ type: "HIDE_CHILD_IOUS_USING_ID", payload: id })
+    }
+    setInitialBBox(boundingBox);
   };
 
   const handleRotateDrag = () => {
-    if (!rotating || !boundingBox)
+    if (!rotating || !initialBBox)
       return;
     setMousePointer("move")
 
     // Obtain bounding box center
-    const center = boundingBox.getCenter(new THREE.Vector3());
+    const center = initialBBox.getCenter(new THREE.Vector3());
 
     // Get mouse position relative to the box center
     const mousePosition = getCanvasMousePosition().sub(center);
@@ -246,14 +272,19 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
     }
 
     setOrientation(newOrientation);
+  
   };
 
   const handleRotateEnd = () => {
     setRotating(false);
     setOrientation(0);
+    setInitialBBox(null);
     setMousePointer(null);
     if (dispatch) {
-      dispatch({ type: "SELECTABILITY",  payload: true});
+      dispatch({ type: "SELECTABILITY", payload: true });
+    }
+    if (iouDispatch) {
+      iouDispatch({ type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: { id: id, polygons: polygons } })
     }
   };
   /**********************************/
@@ -261,7 +292,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
   const deleteSelectedPolygon = () => {
     document.body.style.cursor = "auto";
     if (dispatch) {
-      dispatch({type: "DELETE_POLYGON", id: id})
+      dispatch({ type: "DELETE_POLYGON", id: id })
       dispatch({ type: "SELECT_POLYGON", id: null });
     }
   }
@@ -269,13 +300,13 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
   const duplicateSelectedPolygon = () => {
     if (dispatch) {
       // TODO: pass down a reference to the nonce generator. THIS MUST BE FIXED BEFORE PRODUCTION
-      dispatch({type: "DUPLICATE_POLYGON", id: id, newId: id*100000})
+      dispatch({ type: "DUPLICATE_POLYGON", id: id, newId: id * 100000 })
     }
   }
 
   const editSelectedPolygon = () => {
     if (dispatch) {
-      dispatch({type: "SET_EDIT", id: id})
+      dispatch({ type: "SET_EDIT", id: id })
     }
   }
 
@@ -340,7 +371,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
                 itemSize={3}
               />
             </bufferGeometry>
-            <lineBasicMaterial color="red" />
+            <lineBasicMaterial color="red" side={THREE.DoubleSide}/>
           </line>
         ) : null}
 
@@ -364,16 +395,16 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
                     : "nwse"
                 );
                 if (dispatch && !rotating)
-                  dispatch({ type: "SELECTABILITY",  payload: false});
+                  dispatch({ type: "SELECTABILITY", payload: false });
               }}
               onPointerLeave={() => {
                 setMousePointer(null);
                 if (dispatch && !rotating)
-                  dispatch({ type: "SELECTABILITY",  payload: true});
+                  dispatch({ type: "SELECTABILITY", payload: true });
               }}
             >
               <boxGeometry args={[0.2, 0.2, 0]} />
-              <meshBasicMaterial color="blue" />
+              <meshBasicMaterial color="blue" side={THREE.DoubleSide} />
             </mesh>
           )
         ) : null}
@@ -387,7 +418,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
           onPointerLeave={() => setMousePointer(null)}
         >
           <circleGeometry args={[0.1, 16]} />
-          <meshBasicMaterial color="green" />
+          <meshBasicMaterial color="green" side={THREE.DoubleSide}/>
         </mesh> : null}
 
         {/* Line to Rotate circle: */}
@@ -403,7 +434,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
                 itemSize={3}
               />
             </bufferGeometry>
-            <lineBasicMaterial color="red" />
+            <lineBasicMaterial color="red" side={THREE.DoubleSide}/>
           </line>
         ) : null}
 
@@ -417,7 +448,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
             onPointerUp={() => setMousePointer(null)}
             scale={[0.4, 0.4, 0]}
           >
-            <spriteMaterial map={editIconTexture}/>
+            <spriteMaterial map={editIconTexture} />
           </sprite>
         ) : null}
 
@@ -431,7 +462,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
             onPointerUp={() => setMousePointer(null)}
             scale={[0.4, 0.4, 0]}
           >
-            <spriteMaterial map={duplicateIconTexture}/>
+            <spriteMaterial map={duplicateIconTexture} />
           </sprite>
         ) : null}
 
@@ -445,12 +476,12 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
             onPointerUp={() => setMousePointer(null)}
             scale={[0.4, 0.4, 0]}
           >
-            <spriteMaterial map={deleteIconTexture}/>
+            <spriteMaterial map={deleteIconTexture} />
           </sprite>
         ) : null}
       </group>
     );
-  }, [boundingBox, isPolygonSelected, scene, polygons]);
+  }, [boundingBox, isPolygonSelected, scene, polygons, geometry, position]);
 
   // const renderPoint = ({x, y}: {x: number, y: number}, size = 0.03, smoothness = 50) => {
   //   return (
@@ -485,7 +516,7 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
         matrix={matrix}
         autoTransform={false}
         onDragStart={handleDragStart}
-        onDrag={(localMatrix) => {handleDrag(localMatrix)}}
+        onDrag={(localMatrix) => { handleDrag(localMatrix) }}
         onDragEnd={handleDragEnd}
       >
         <mesh
@@ -501,21 +532,23 @@ const Polygon = ({id, position, geometry, colour, iouDispatch, opacity, selectab
               dispatch({ type: "REMOVE_MOUSED_OVER_POLYGON", id: id });
           }}
           onClick={selectPolygon}
-          // TEsting:
-          onDoubleClick={editSelectedPolygon}
+        // TEsting:
+        // onDoubleClick={editSelectedPolygon}
         >
           <meshBasicMaterial
             color={colour}
             transparent={true}
             opacity={opacity}
+            side={THREE.DoubleSide}
           />
         </mesh>
         {/* Example infographic: */}
-        {/* {Math.max(...currentlyMousedOverPolygons) === index && (
+        {/*Math.max(...currentlyMousedOverPolygons) === id && (
           <Infographic
           position={!boundingBox ? new THREE.Vector3(position[0], position[1], 0) : boundingBox.getCenter(new THREE.Vector3).sub(boundingBox.getSize(new THREE.Vector3).multiplyScalar(0.5))
-          } info={{"hi": "yeah", "hello": 12.345678.toPrecision(currentDecimalPlaces+2)}} />
-        )} */}
+          } info={{"Area": Backend2D.area(geometry).toPrecision(currentDecimalPlaces+2),
+                   "Perimeter": Backend2D.perimeter(geometry).toPrecision(currentDecimalPlaces+2)}} />
+        ) */}
       </DragControls>
       {BoundingBox}
     </>

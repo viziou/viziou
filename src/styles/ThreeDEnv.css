@@ -1,15 +1,3 @@
-:root {
-    /*========== Colors ==========*/
-    --first-colour: hsl(203, 71%, 60%);
-    --second-colour: hsl(277, 56%, 68%);
-    --text-colour: hsl(203, 8%, 98%);
-    --body-colour: hsl(259, 20%, 18%);
-    --btn-colour: hsl(239, 62%, 60%);
-    --btn-hover-colour: hsl(239, 72%, 56%);
-  
-    /*========== Font and typography ==========*/
-}
-
 .ThreeDEnv {
     display: flex;
     height: 100vh;
@@ -22,79 +10,5 @@
     align-items: center;
     justify-content: center;
     background-color: white;
+    overflow: hidden;
 }
-  
-
-@media only screen and (max-width: 853px) {
-    .ThreeDEnv {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
-
-    .threed-canvas-container {
-        padding-top: 25px; 
-        box-sizing: border-box;
-    }
-
-    .threed-button-container {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        background-color: var(--body-colour);
-        gap: 10px;
-    }
-
-    .threed-button {
-        flex: 1; 
-        padding: 10px;
-        font-size: 0.8rem;
-        height: 60px; 
-    }
-
-    .overflow-button {
-        display: block;
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: white;
-        position: relative;
-        padding: 10px;
-    }
-    
-    .overflow-menu {
-        display: none;
-        position: absolute;
-        bottom: 50px;
-        right: 10px; 
-        background-color: var(--body-colour);
-        border-radius: 5px;
-        z-index: 1;
-        padding: 10px;
-    }
-    
-    .overflow-menu button {
-        display: block;
-        background-color: var(--btn-colour);
-        color: white;
-        border: none;
-        padding: 10px;
-        margin: 5px 0;
-        text-align: left;
-        width: 100%;
-        cursor: pointer;
-    }
-    
-    .overflow-menu button:hover {
-        background-color: var(--btn-hover-colour);
-    }
-    
-    .show {
-        display: block;
-    }
-}
-
