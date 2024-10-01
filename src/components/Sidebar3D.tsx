@@ -5,7 +5,7 @@ import info from '../assets/info.png';
 import '../styles/Sidebar3D.css';
 import { useContext, useState } from 'react';
 import { PolyhedronContext } from '../contexts/PolyhedronContext';
-// import edit from '../assets/new_edit.png';
+import edit from '../assets/new_edit.png';
 import bin from '../assets/new_bin.png';
 import duplicate from '../assets/new_duplicate.png';
 
@@ -158,7 +158,7 @@ const Sidebar3D = (props: SidebarProps3D) => {
                             <div className="icon-buttons-3d">
 
                                 {/* uncomment if you want to add an Edit icon */}
-                                {/* <img src={editIcon} alt="Edit" className="icon" onClick={() => dispatch!({ type: "SET_EDIT", index: index })} /> */}
+                                <img src={edit} alt="Edit" className="icon-3d" onClick={() => {console.log("lol")}}/>
 
                                 <img
                                     src={duplicate}
