@@ -72,6 +72,7 @@ class Backend2D {
              { geometry: geometryB, position: positionB }: PolygonData) {
     const offsetA = new Point2D(positionA[0], positionA[1]);
     const offsetB = new Point2D(positionB[0], positionB[1]);
+
     const polygonA = this._threeGeometryToPolygon2D(geometryA).translate(offsetA);
     const polygonB = this._threeGeometryToPolygon2D(geometryB).translate(offsetB);
     return {area: IoU(polygonA, polygonB),
@@ -284,12 +285,12 @@ class Backend3D {
     return this._threeGeometryToPolyhedra3D(geometry).centroid()
   }
 
-  public static IoU({geometry: geometryA, position: positionA}: PolyhedronData,
-                    {geometry: geometryB, position: positionB}: PolyhedronData): {area: number, shape: BufferGeometry} {
+  public static IoU({geometry: geometryA, position: positionA, rotation: rotationA, scale: scaleA}: PolyhedronData,
+                    {geometry: geometryB, position: positionB, rotation: rotationB, scale: scaleB}: PolyhedronData): {area: number, shape: BufferGeometry} {
     const offsetA = new Point3D(positionA[0], positionA[1], positionA[2]);
     const offsetB = new Point3D(positionB[0], positionB[1], positionB[2]);
-    const polyhedronA = this._threeGeometryToPolyhedra3D(geometryA).translate(offsetA);
-    const polyhedronB = this._threeGeometryToPolyhedra3D(geometryB).translate(offsetB);
+    const polyhedronA = this._threeGeometryToPolyhedra3D(geometryA).rotate(...rotationA).scale(...scaleA).translate(offsetA);
+    const polyhedronB = this._threeGeometryToPolyhedra3D(geometryB).rotate(...rotationB).scale(...scaleB).translate(offsetB);
     return {area: IoU3D(polyhedronA, polyhedronB),
     shape: this._polyhedra3DToBufferGeometry(getIntersectionPolyhedra(polyhedronA, polyhedronB))}
   }
