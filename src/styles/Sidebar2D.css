@@ -222,14 +222,29 @@ select {
   margin-bottom: 10px;
   height: 200px;
   overflow-y: auto;
+  display: flex; 
+  flex-direction: column;
 }
 
 .polygon-item-2d {
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between;
+  padding: 5px; 
+  margin-bottom: 2px;
+  font-size: 15px;
   background-color: #4a4a6a;
-  padding: 5px;
-  margin-bottom: 5px;
-  text-align: center;
-  font-size: 12px;
+}
+
+.icon-buttons-2d {
+  display: flex;
+  gap: 4px;
+}
+
+.icon-2d {
+  width: 20px;
+  height: 20px; 
+  cursor: pointer; 
 }
 
 .footer-2d {
