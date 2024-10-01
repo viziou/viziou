@@ -49,6 +49,34 @@ class Point3D {
         return new Point3D(0, 0, 0);
     }
 
+    public rotate(pitch: number, yaw: number, roll: number): Point3D {
+      /* Basically setting up a rotation matrix without actually using a matrix */
+        const cosa = Math.cos(yaw);
+        const sina = Math.sin(yaw);
+
+        const cosb = Math.cos(pitch);
+        const sinb = Math.sin(pitch);
+
+        const cosc = Math.cos(roll);
+        const sinc = Math.sin(roll);
+
+        const Axx = cosa * cosb;
+        const Axy = cosa * sinb * sinc - sina * cosc;
+        const Axz = cosa * sinb * cosc + sina * sinc;
+
+      const Ayx = sina * cosb;
+        const Ayy = sina * sinb * sinc + cosa * cosc;
+      const Ayz = sina * sinb * cosc - cosa * sinc;
+
+      const Azx = -sinb;
+      const Azy = cosb*sinc;
+      const Azz = cosb*cosc;
+
+      return new Point3D(Axx*this._x + Axy*this._y + Axz*this._z,
+                          Ayx*this._x + Ayy*this._y + Ayz*this._z,
+                          Azx*this._x + Azy*this._y + Azz*this._z)
+    }
+
     public add(p: Point3D): Point3D {
         return new Point3D(this.x + p.x, this.y + p.y, this.z + p.z);
     }
@@ -166,7 +194,7 @@ class Face3D {
         if (this.numVertices < 3) {
             return new Point3D(0, 0, 0);
         }
-        
+
         // Establish points to use
         const Point1 = this._vertices[0];
         const Point2 = this._vertices[1];
@@ -250,7 +278,7 @@ class Face3D {
         const x_mag = x.magnitude();
         const x_hat = x.normalise();
 
-        // Set new y-direction component vector by taking cross product face normal and x. This order ensures anticlockwise x and y 
+        // Set new y-direction component vector by taking cross product face normal and x. This order ensures anticlockwise x and y
         const y = cross(this.normal, x);
         const y_mag = y.magnitude();
         const y_hat = y.normalise();
@@ -274,7 +302,7 @@ class Face3D {
             }
             return angle;
         })
-        
+
 
         // Zip the points with key value of angle
         const collection: Pair<Point3D, number>[] = [];
@@ -504,7 +532,7 @@ class Polyhedra3D {
             // Get base area
             let baseArea = face.area();
 
-            // Get perpendicular height to apex by getting normal vector of face and 
+            // Get perpendicular height to apex by getting normal vector of face and
             // doing scalar resolute with any slant vector
             let n = face.normal;
             let slantVector = meanVertex.sub(face.vertices[0]);
