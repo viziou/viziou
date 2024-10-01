@@ -49,7 +49,8 @@ class Point3D {
         return new Point3D(0, 0, 0);
     }
 
-    public rotate(pitch: number, yaw: number, roll: number): Point3D {
+    // roll = u, v = pitch, w = yaw
+    public rotate(roll: number, pitch: number, yaw: number): Point3D {
         /* Basically setting up a rotation matrix without actually using a matrix */
         const cosa = Math.cos(yaw);
         const sina = Math.sin(yaw);
@@ -60,8 +61,8 @@ class Point3D {
         const cosc = Math.cos(roll);
         const sinc = Math.sin(roll);
 
-        const Axx = cosa * cosb;
-        const Axy = cosa * sinb * sinc - sina * cosc;
+        const Axx = cosa * cosb;                        // cos(pitch) * cos(yaw)
+        const Axy = cosa * sinb * sinc - sina * cosc;   // cos(yaw) * sin(pitch) * sin(roll) - sin(yaw) * cos(roll)
         const Axz = cosa * sinb * cosc + sina * sinc;
 
         const Ayx = sina * cosb;
@@ -345,8 +346,8 @@ class Face3D {
         return this;
     }
 
-    public rotate(pitch: number, yaw: number, roll: number) {
-        return new Face3D(this.vertices.map((point: Point3D) => {return point.rotate(pitch, yaw, roll)}))
+    public rotate(yaw: number, pitch: number, roll: number) {
+        return new Face3D(this.vertices.map((point: Point3D) => {return point.rotate(yaw, pitch, roll)}))
     }
 
     public scale(x: number, y: number, z: number) {
@@ -503,8 +504,8 @@ class Polyhedra3D {
         return this;
     }
 
-    public rotate(pitch: number, yaw: number, roll: number) {
-        return new Polyhedra3D(this.faces.map((face: Face3D) => {return face.rotate(pitch, yaw, roll)}))
+    public rotate(yaw: number, pitch: number, roll: number) {
+        return new Polyhedra3D(this.faces.map((face: Face3D) => {return face.rotate(yaw, pitch, roll)}))
     }
 
     public scale(x: number, y: number, z: number) {
