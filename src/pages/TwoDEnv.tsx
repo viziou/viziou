@@ -173,7 +173,7 @@ const TwoDEnv = () => {
       },
     });
   };
-  
+
   const showIoUs = () => {
       const IoUs: IOUPolygonData[] = [];
       for (const [a, b] of generatePairs(Array.from(polygons.values()))) {
@@ -206,7 +206,7 @@ const TwoDEnv = () => {
       console.log("Saving canvas...");
       Storage.save2D(Array.from(polygons.values()), "export");
   };
-  
+
   const loadPolygons = async () => {
       console.log("Opening file dialog...");
       const polygonData = await Storage.load2D();
@@ -256,7 +256,10 @@ const TwoDEnv = () => {
                   id: selectedPolygonID!,
                 });
                 console.log(polygons);
-                dispatch({ type: "SET_EDIT", id: null });
+                dispatch({ type: "SET_EDIT", id: null })
+                if (iouDispatch) {
+                  iouDispatch({type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: selectedPolygonID!, polygons: polygons}} )
+                }
               }
             }}
             initialPoints={Backend2D._threeGeometryToPolygon2D(polygons.get(`${selectedPolygonID}`)!.geometry).vertices.map(v => [v.x, v.y])}
