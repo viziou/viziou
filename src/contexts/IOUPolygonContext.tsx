@@ -84,8 +84,8 @@ function IOUPolygonReducer(state: IOUPolygonContextInterface, action: IOUPolygon
           }
 
       case "RECALCULATE_CHILD_IOUS_USING_ID":
-        console.log('recalculating children...')
-        console.log('polygons map is ', action.payload.polygons)
+        // console.log('recalculating children...')
+        // console.log('polygons map is ', action.payload.polygons)
         state.parentsMap.get(`${action.payload.id}`)?.
         forEach((key) => {
           const polygon = state.polygonMap.get(key);
@@ -127,7 +127,7 @@ function IOUPolygonReducer(state: IOUPolygonContextInterface, action: IOUPolygon
           }
 
       case "HIDE_CHILD_IOUS_USING_ID":
-          console.log('inside hide children')
+          // console.log('inside hide children')
           state.parentsMap.get(`${action.payload}`)?.
           forEach((key) => {
             const polygon = state.polygonMap.get(key);

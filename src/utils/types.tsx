@@ -15,6 +15,14 @@ export type IOUPolygonData = PolygonData & {
   parentIDb: number;
 }
 
+export type BoundingBoxProps = {
+  id: number,
+  position: [number, number],
+  geometry: THREE.BufferGeometry,
+  mesh: React.MutableRefObject<THREE.Mesh>,
+  iouDispatch?: React.Dispatch<IOUPolygon2DAction>
+}
+
 export type IOUPolygon2DAction =
   | { type: 'SET_POLYGON', payload: IOUPolygonData }
   | { type: 'UPDATE_POLYGON', payload: IOUPolygonData }
