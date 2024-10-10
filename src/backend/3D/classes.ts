@@ -504,8 +504,8 @@ class Polyhedra3D {
         return this;
     }
 
-    public rotate(yaw: number, pitch: number, roll: number) {
-        return new Polyhedra3D(this.faces.map((face: Face3D) => {return face.rotate(yaw, pitch, roll)}))
+    public rotate(roll: number, pitch: number, yaw: number) {
+        return new Polyhedra3D(this.faces.map((face: Face3D) => {return face.rotate(roll, pitch, yaw)}))
     }
 
     public scale(x: number, y: number, z: number) {

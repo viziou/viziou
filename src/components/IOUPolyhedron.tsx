@@ -4,11 +4,12 @@ import { Edges } from '@react-three/drei'; // Ensure Edges is correctly imported
 //import { ThreeEvent, useThree } from '@react-three/fiber';
 import { IOUPolyhedronData } from '../utils/types'
 import { PolyhedronContext } from '../contexts/PolyhedronContext';
+import { EulerOrder } from 'three'
 
 interface IOUPolyhedronProps extends IOUPolyhedronData {
     id: number;
     position: [number, number, number];
-    rotation: [number, number, number];
+    rotation: [number, number, number, EulerOrder];
     scale: [number, number, number];
     geometry: THREE.BufferGeometry;
     colour: string;

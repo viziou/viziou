@@ -85,7 +85,7 @@ const ThreeDEnv = () => {
                 Math.random() * 4 - 2,
                 Math.random() * 4 - 2
             ],
-            rotation: [0, 0, 0],
+            rotation: [0, 0, 0, 'ZYX'],
             scale: [1, 1, 1],
             colour: getRandomColour(),
             opacity: 0.5
@@ -126,7 +126,7 @@ const ThreeDEnv = () => {
       const IoUPolyhedra: IOUPolyhedronData = {
         parentIDa: a.id,
         parentIDb: b.id,
-        rotation: [0, 0, 0],
+        rotation: [0, 0, 0, 'ZYX'],
         scale: [1, 1, 1],
         geometry: shape,
         position: [0, 0, 0],
@@ -155,6 +155,11 @@ const ThreeDEnv = () => {
     }
   }
 
+  const clearIoUs = () => {
+    console.log("Clearing IoU polyhedrons...");
+    iouDispatch({ type: "CLEAR_POLYHEDRONS" });
+  }
+
     return (
 
         <div className="ThreeDEnv">
@@ -166,6 +171,7 @@ const ThreeDEnv = () => {
                 savePolyhedrons={savePolyhedra}
                 loadPolyhedrons={loadPolyhedra}
                 showIoUs={showIoUs}
+                clearIoUs={clearIoUs}
             />
 
             <main className="threed-canvas-container">

@@ -10,7 +10,7 @@ import bin from '../assets/new_bin.png';
 import duplicate from '../assets/new_duplicate.png';
 
 const Sidebar3D = (props: SidebarProps3D) => {
-    const { polyhedrons, addRandomPolyhedron, clearPolyhedrons, savePolyhedrons, loadPolyhedrons, showIoUs } = props;
+    const { polyhedrons, addRandomPolyhedron, clearPolyhedrons, savePolyhedrons, loadPolyhedrons, showIoUs, clearIoUs } = props;
 
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -115,7 +115,7 @@ const Sidebar3D = (props: SidebarProps3D) => {
               </div>
             <div className="canvas-buttons-3d">
               <button className="twod-button-2d" onClick={showIoUs}>Show IoU</button>
-              <button className="threed-button-3d">Clear IoU</button>
+              <button className="threed-button-3d" onClick={clearIoUs}>Clear IoU</button>
             </div>
           </div>
 

@@ -293,8 +293,8 @@ class Backend3D {
                     {geometry: geometryB, position: positionB, rotation: rotationB, scale: scaleB}: PolyhedronData): {area: number, shape: BufferGeometry} {
     const offsetA = new Point3D(positionA[0], positionA[1], positionA[2]);
     const offsetB = new Point3D(positionB[0], positionB[1], positionB[2]);
-    const polyhedronA = this._threeGeometryToPolyhedra3D(geometryA).rotate(...rotationA).scale(...scaleA).translate(offsetA);
-    const polyhedronB = this._threeGeometryToPolyhedra3D(geometryB).rotate(...rotationB).scale(...scaleB).translate(offsetB);
+    const polyhedronA = this._threeGeometryToPolyhedra3D(geometryA).scale(...scaleA).rotate(rotationA[0], rotationA[1], rotationA[2]).translate(offsetA);
+    const polyhedronB = this._threeGeometryToPolyhedra3D(geometryB).scale(...scaleB).rotate(rotationB[0], rotationB[1], rotationB[2]).translate(offsetB);
     return {area: IoU3D(polyhedronA, polyhedronB),
     shape: this._polyhedra3DToBufferGeometry(getIntersectionPolyhedra(polyhedronA, polyhedronB))}
   }

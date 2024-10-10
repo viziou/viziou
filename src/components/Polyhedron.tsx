@@ -16,7 +16,7 @@ const duplicateIconTexture = new THREE.TextureLoader().load(duplicate);
 interface PolyhedronProps extends PolyhedronData {
     id: number;
     position: [number, number, number];
-    rotation: [number, number, number];
+    rotation: [number, number, number, THREE.EulerOrder];
     scale: [number, number, number];
     geometry: THREE.BufferGeometry;
     colour: string;
@@ -114,7 +114,7 @@ const Polyhedron = ({
                 type: "UPDATE_POLYHEDRON",
                 id: id,
                 position: newPosition,
-                rotation: newRotation,
+                rotation: [...newRotation, 'ZYX'],
                 scale: newScale,
             });
         }

@@ -2,6 +2,8 @@ import { createContext, useReducer, ReactNode } from 'react';
 import { PolyhedronData, Polyhedron3DAction, ConfirmationModalInfo } from '../utils/types';
 import * as THREE from "three";
 
+import { Backend3D } from '../backend/Interface.ts';
+
 const defaultConfirmationInfo = {
   isOpen: false,
   onClose: () => {},
@@ -69,6 +71,9 @@ function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron
               updatedPolyhedra.position = action.position;
               updatedPolyhedra.rotation = action.rotation;
               updatedPolyhedra.scale = action.scale;
+              // rotation debugging, attempt to apply rotation to geometry directly
+              //updatedPolyhedra.geometry = Backend3D._polyhedra3DToBufferGeometry(Backend3D._threeGeometryToPolyhedra3D(updatedPolyhedra.geometry).rotate(action.rotation[0], action.rotation[1], action.rotation[2]));
+
             }
 
             return {
@@ -109,6 +114,7 @@ function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron
                         polyhedron.rotation[0],
                         polyhedron.rotation[1],
                         polyhedron.rotation[2],
+                        polyhedron.rotation[3]
                     ],
                     colour: polyhedron.colour.slice(),
                     id: action.newId,
