@@ -226,6 +226,9 @@ const BoundingBox2D = ({ id, position, geometry, mesh, iouDispatch }: BoundingBo
 		if (dispatch) {
 			dispatch({ type: "DELETE_POLYGON", id: id })
 			dispatch({ type: "SELECT_POLYGON", id: null });
+      if (iouDispatch) {
+        iouDispatch({type: "DELETE_CHILD_IOUS_USING_ID", payload: id })
+      }
 		}
 	}
 
@@ -276,7 +279,7 @@ const BoundingBox2D = ({ id, position, geometry, mesh, iouDispatch }: BoundingBo
 			{!rotating && !resizing ? (
 				<Line
 					points={[
-						[-size.x / 2, -size.y / 2, 0], 
+						[-size.x / 2, -size.y / 2, 0],
 						[size.x / 2, -size.y / 2, 0],
 						[size.x / 2, size.y / 2, 0],
 						[-size.x / 2, size.y / 2, 0],
@@ -338,7 +341,7 @@ const BoundingBox2D = ({ id, position, geometry, mesh, iouDispatch }: BoundingBo
 			{!resizing && !rotating ? (
 				<Line
 				points={[
-					[0, size.y / 2, 0], 
+					[0, size.y / 2, 0],
 					[0, size.y / 2 + 0.5 - 0.1, 0]
 				]}
 				color={"red"}

@@ -33,7 +33,7 @@ export type IOUPolygon2DAction =
   | { type: 'DELETE_CHILD_IOUS_USING_ID', payload: number }
   | { type: 'HIDE_CHILD_IOUS', payload: PolygonData }
   | { type: 'HIDE_CHILD_IOUS_USING_ID', payload: number }
-  | { type: 'RECALCULATE_CHILD_IOUS_USING_ID', payload: { id: number, polygons: Map<string, PolygonData> } }
+  | { type: 'RECALCULATE_CHILD_IOUS_USING_ID', payload: { id: number, polygons: Map<string, PolygonData> } } // this could be cleaned up to not use the payload name attribute, honestly I wasn't sure if everything had to be named 'payload' when I wrote the context functions
   | { type: 'SHOW_CHILD_IOUS_USING_ID', payload: number }
   | { type: 'ADD_MOUSED_OVER_POLYGON', id: number }
   | { type: 'REMOVE_MOUSED_OVER_POLYGON', id: number }
