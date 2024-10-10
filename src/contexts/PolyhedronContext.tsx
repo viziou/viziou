@@ -2,8 +2,6 @@ import { createContext, useReducer, ReactNode } from 'react';
 import { PolyhedronData, Polyhedron3DAction, ConfirmationModalInfo } from '../utils/types';
 import * as THREE from "three";
 
-import { Backend3D } from '../backend/Interface.ts';
-
 const defaultConfirmationInfo = {
   isOpen: false,
   onClose: () => {},
@@ -35,7 +33,7 @@ export function key(polyhedron: PolyhedronData) {
   return `${polyhedron.id}`
 }
 
-function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron3DAction) {
+function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron3DAction): PolyhedronContextInterface {
     switch (action.type) {
         case "ADD_CUBE":
             return {
@@ -75,16 +73,16 @@ function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron
               //updatedPolyhedra.geometry = Backend3D._polyhedra3DToBufferGeometry(Backend3D._threeGeometryToPolyhedra3D(updatedPolyhedra.geometry).rotate(action.rotation[0], action.rotation[1], action.rotation[2]));
 
             }
-
             return {
                 ...state,
                 polyhedra: state.polyhedra,
             };
 
         case "DELETE_POLYHEDRON":
+            state.polyhedra.delete(`${action.id}`);
             return {
                 ...state,
-                polyhedra: state.polyhedra.delete(`${action.id}`),
+                polyhedra: state.polyhedra,
                 selectedPolyhedronID: null
             };
 
