@@ -10,7 +10,7 @@ import bin from '../assets/new_bin.png';
 import duplicate from '../assets/new_duplicate.png';
 
 const Sidebar3D = (props: SidebarProps3D) => {
-    const { polyhedrons, addRandomPolyhedron, clearPolyhedrons, savePolyhedrons, loadPolyhedrons } = props;
+    const { polyhedrons, addRandomPolyhedron, clearPolyhedrons, savePolyhedrons, loadPolyhedrons, showIoUs, clearIoUs } = props;
 
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -109,21 +109,22 @@ const Sidebar3D = (props: SidebarProps3D) => {
 
             <div className="section-3d">
                 {!isCollapsed && <h2>Canvas</h2>}
-                <div className="canvas-buttons-3d">
-                    <button className="threed-button-3d" onClick={addRandomPolyhedron}>Add Polyhedron</button>
-                    <button className="threed-button-3d" onClick={clearPolyhedrons}>Clear Canvas</button>
-                </div>
-                <div className="canvas-buttons-3d">
-                    <button className="threed-button-3d">Clear IoU</button>
-                </div>
+              <div className="canvas-buttons-3d">
+                  <button className="threed-button-3d" onClick={addRandomPolyhedron}>Add Polyhedron</button>
+                  <button className="threed-button-3d" onClick={clearPolyhedrons}>Clear Canvas</button>
+              </div>
+            <div className="canvas-buttons-3d">
+              <button className="twod-button-2d" onClick={showIoUs}>Show IoU</button>
+              <button className="threed-button-3d" onClick={clearIoUs}>Clear IoU</button>
             </div>
+          </div>
 
-            {!isCollapsed && (
+        {!isCollapsed && (
                 // <div className="polyhedron-list-3d scrollable">
                 //     {polyhedrons.map((_, index) => (
                 //         <div key={index} className="polyhedron-item-3d">
                 //             <button onClick={() => dispatch!({ type: 'SELECT_POLYHEDRON', index: index})}>{`Polyhedron ${index + 1}`}</button>
-                            
+
                 //             {/* <button onClick={() => dispatch!({ type: "SET_EDIT", index: index})}>{`Edit`}</button> */}
 
                 //             <button onClick={() => dispatch!({type: "DUPLICATE_POLYHEDRON", index: index})}>{`Duplicate`}</button>
@@ -137,21 +138,21 @@ const Sidebar3D = (props: SidebarProps3D) => {
                 // </div>
 
                 <div className="polyhedron-list-3d scrollable">
-                    {polyhedrons.map((_, index) => (
+                    {polyhedrons.map((polyhedron, index) => (
                         <div key={index} className="polyhedron-item-3d">
 
-                            <span 
-                                style={{ 
-                                    display: 'inline-block', 
-                                    width: '20px', 
-                                    height: '20px', 
-                                    backgroundColor: _.colour,
+                            <span
+                                style={{
+                                    display: 'inline-block',
+                                    width: '20px',
+                                    height: '20px',
+                                    backgroundColor: polyhedron.colour,
                                     borderRadius: '3px',
                                     marginRight: '10px'
-                                }} 
+                                }}
                             />
 
-                            <span onClick={() => dispatch!({ type: 'SELECT_POLYHEDRON', index: index })}>
+                            <span onClick={() => dispatch!({ type: 'SELECT_POLYHEDRON', id: polyhedron.id })}>
                                 {`Polyhedron ${index + 1}`}
                             </span>
 
@@ -164,16 +165,17 @@ const Sidebar3D = (props: SidebarProps3D) => {
                                     src={duplicate}
                                     alt="Duplicate"
                                     className="icon-3d"
-                                    onClick={() => dispatch!({ type: "DUPLICATE_POLYHEDRON", index: index })}
+                                    // TODO: fix this "newId = id * 10000" hack
+                                    onClick={() => dispatch!({ type: "DUPLICATE_POLYHEDRON", id: polyhedron.id, newId: polyhedron.id * 10000 })}
                                 />
-                                
+
                                 <img
                                     src={bin}
                                     alt="Delete"
                                     className="icon-3d"
                                     onClick={() => {
-                                        dispatch!({ type: "DELETE_POLYHEDRON", index: index });
-                                        dispatch!({ type: "SELECT_POLYHEDRON", index: null });
+                                        dispatch!({ type: "DELETE_POLYHEDRON", id: polyhedron.id });
+                                        dispatch!({ type: "SELECT_POLYHEDRON", id: null });
                                     }}
                                 />
                             </div>

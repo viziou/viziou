@@ -11,6 +11,7 @@ import PageNotFound from './pages/PageNotFound';
 import { PolygonProvider } from './contexts/PolygonContext';
 import { PolyhedronProvider } from './contexts/PolyhedronContext';
 import { IOUPolygonProvider } from './contexts/IOUPolygonContext.tsx'
+import { IOUPolyhedronProvider } from './contexts/IOUPolyhedronContext.tsx';
 
 function App() {
 
@@ -39,7 +40,9 @@ function App() {
 
                   <Route path="/3D-Environment" element={
                       <PolyhedronProvider>
+                        <IOUPolyhedronProvider>
                           <ThreeD />
+                        </IOUPolyhedronProvider>
                       </PolyhedronProvider>
                       }
                   />

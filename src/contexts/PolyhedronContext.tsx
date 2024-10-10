@@ -13,14 +13,14 @@ const defaultConfirmationInfo = {
 }
 
 const initialState: PolyhedronContextInterface = {
-    polyhedra: [],
+    polyhedra: new Map<string, PolyhedronData>,
     selectedPolyhedronID: null,
     confirmationInfo: defaultConfirmationInfo,
     displayWarnings: false
 };
 
 interface PolyhedronContextInterface {
-    polyhedra: PolyhedronData[];
+    polyhedra: Map<string, PolyhedronData>;
     selectedPolyhedronID: number | null;
     dispatch?: React.Dispatch<Polyhedron3DAction>;
     confirmationInfo: ConfirmationModalInfo;
@@ -29,108 +29,127 @@ interface PolyhedronContextInterface {
 
 export const PolyhedronContext = createContext<PolyhedronContextInterface | undefined>(undefined);
 
-function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron3DAction) {
+export function key(polyhedron: PolyhedronData) {
+  return `${polyhedron.id}`
+}
+
+function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron3DAction): PolyhedronContextInterface {
     switch (action.type) {
         case "ADD_CUBE":
             return {
                 ...state,
-                polyhedra: [...state.polyhedra, action.payload],
+                polyhedra: state.polyhedra.set(key(action.payload), action.payload),
             };
 
         case "ADD_RANDOM_POLYHEDRON":
             return {
                 ...state,
-                polyhedra: [...state.polyhedra, action.payload],
+                polyhedra: state.polyhedra.set(key(action.payload), action.payload),
             };
 
         case "SET_POLYHEDRONS":
+            state.polyhedra.clear();
+            for (const polyhedron of action.payload) {
+              state.polyhedra.set(key(polyhedron), polyhedron);
+            }
             return {
               ...state,
-              polyhedra: [...action.payload]
+              polyhedra: state.polyhedra
             };
 
-        case "CLEAR_POLYHEDRA":
+      case "CLEAR_POLYHEDRA":
             return {
                 ...state,
-                polyhedra: [],
+                polyhedra: new Map<string, PolyhedronData>,
             };
 
         case "UPDATE_POLYHEDRON":
-            const updatedPolyhedra = [...state.polyhedra];
-            
-            updatedPolyhedra[action.index] = {
-                ...updatedPolyhedra[action.index],
-                position: action.position,  
-                rotation: action.rotation,  
-                scale: action.scale,       
-            };
+            const updatedPolyhedra = state.polyhedra.get(`${action.id}`);
+            if (updatedPolyhedra) {
+              updatedPolyhedra.position = action.position;
+              updatedPolyhedra.rotation = action.rotation;
+              updatedPolyhedra.scale = action.scale;
+              // rotation debugging, attempt to apply rotation to geometry directly
+              //updatedPolyhedra.geometry = Backend3D._polyhedra3DToBufferGeometry(Backend3D._threeGeometryToPolyhedra3D(updatedPolyhedra.geometry).rotate(action.rotation[0], action.rotation[1], action.rotation[2]));
 
+            }
             return {
                 ...state,
-                polyhedra: updatedPolyhedra, 
+                polyhedra: state.polyhedra,
             };
 
         case "DELETE_POLYHEDRON":
-            const remainingPolyhedra = [...state.polyhedra];
-            remainingPolyhedra.splice(action.index, 1);
+            state.polyhedra.delete(`${action.id}`);
             return {
                 ...state,
-                polyhedra: remainingPolyhedra,
+                polyhedra: state.polyhedra,
                 selectedPolyhedronID: null
             };
-        
+
         case "SELECT_POLYHEDRON":
             return {
                 ...state,
-                selectedPolyhedronID: action.index
+                selectedPolyhedronID: action.id
             };
 
         case "DUPLICATE_POLYHEDRON":
             console.log("DISPATCHING DUPLICATE")
-            const polyhedron = state.polyhedra[action.index]
-            const duplicatePolyhedron: PolyhedronData = {
-                position: [
-                    polyhedron.position[0],
-                    polyhedron.position[1],
-                    polyhedron.position[2],
-                ],
-                geometry: polyhedron.geometry.clone(),
-                scale: [
-                    polyhedron.scale[0],
-                    polyhedron.scale[1],
-                    polyhedron.scale[2],
-                ],
-                rotation: [
-                    polyhedron.rotation[0],
-                    polyhedron.rotation[1],
-                    polyhedron.rotation[2],
-                ],
-                colour: polyhedron.colour.slice(),
-            };
+            const polyhedron = state.polyhedra.get(`${action.id}`);
+            if (polyhedron) {
+                const duplicatePolyhedron: PolyhedronData = {
+                    position: [
+                        polyhedron.position[0],
+                        polyhedron.position[1],
+                        polyhedron.position[2],
+                    ],
+                    geometry: polyhedron.geometry.clone(),
+                    scale: [
+                        polyhedron.scale[0],
+                        polyhedron.scale[1],
+                        polyhedron.scale[2],
+                    ],
+                    rotation: [
+                        polyhedron.rotation[0],
+                        polyhedron.rotation[1],
+                        polyhedron.rotation[2],
+                        polyhedron.rotation[3]
+                    ],
+                    colour: polyhedron.colour.slice(),
+                    id: action.newId,
+                    opacity: 0.5,
+                };
 
-            // Get bbox to figure out optimal placement of clone
-            duplicatePolyhedron.geometry.computeBoundingBox();
-            const box = duplicatePolyhedron.geometry.boundingBox;
-            if (box) {
-                const size = box.getSize(new THREE.Vector3());
-                duplicatePolyhedron.position[0] += size.x / 2;
-                duplicatePolyhedron.position[1] -= size.y / 2;
-                duplicatePolyhedron.position[2] += size.z / 2;
+                // Get bbox to figure out optimal placement of clone
+                duplicatePolyhedron.geometry.computeBoundingBox();
+                const box = duplicatePolyhedron.geometry.boundingBox;
+                if (box) {
+                    const size = box.getSize(new THREE.Vector3());
+                    duplicatePolyhedron.position[0] += size.x / 2;
+                    duplicatePolyhedron.position[1] -= size.y / 2;
+                    duplicatePolyhedron.position[2] += size.z / 2;
+                }
+                state.polyhedra.set(key(duplicatePolyhedron), duplicatePolyhedron)
             }
-            const currentPolyhedra = [...state.polyhedra, duplicatePolyhedron]
-
             return {
                 ...state,
-                polyhedra: currentPolyhedra,
-                selectedPolyhedronID: currentPolyhedra.length - 1,
+                polyhedra: state.polyhedra,
+                selectedPolyhedronID: action.newId,
             };
+
+        case "STORE_TRANSFORMED_VERTICES":
+            const updatedPolyhedraWithVertices = state.polyhedra.get(`${action.id}`);
+
+            if (updatedPolyhedraWithVertices) {
+              updatedPolyhedraWithVertices.transformedVertices = action.transformedVertices;
+            }
+            return {...state}
 
         case "OPEN_CONFIRMATION_MODAL":
             return {
             ...state,
             confirmationInfo: action.info
             }
-    
+
         case "CLOSE_CONFIRMATION_MODAL":
             return {
             ...state,
@@ -156,7 +175,7 @@ export function PolyhedronProvider(props: PolyhedronProviderProps) {
     const [state, dispatch] = useReducer(PolyhedronReducer, initialState);
 
     return (
-        <PolyhedronContext.Provider value={{ polyhedra: state.polyhedra, dispatch, confirmationInfo: state.confirmationInfo, selectedPolyhedronID:state.selectedPolyhedronID, displayWarnings: state.displayWarnings }}>
+        <PolyhedronContext.Provider value={{ polyhedra: state.polyhedra, dispatch, confirmationInfo: state.confirmationInfo, selectedPolyhedronID: state.selectedPolyhedronID, displayWarnings: state.displayWarnings }}>
             {props.children}
         </PolyhedronContext.Provider>
     );

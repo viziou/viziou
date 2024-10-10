@@ -14,16 +14,16 @@ const deleteIconTexture = new THREE.TextureLoader().load(bin);
 const duplicateIconTexture = new THREE.TextureLoader().load(duplicate);
 
 interface PolyhedronProps extends PolyhedronData {
-    index: number;
+    id: number;
     position: [number, number, number];
-    rotation: [number, number, number];  
-    scale: [number, number, number];  
+    rotation: [number, number, number, THREE.EulerOrder];
+    scale: [number, number, number];
     geometry: THREE.BufferGeometry;
     colour: string;
 }
 
-const Polyhedron = ({ 
-    index, position, rotation, scale, geometry, colour, 
+const Polyhedron = ({
+    id, position, rotation, scale, geometry, colour, opacity
 }: PolyhedronProps) => {
     const mesh = useRef<THREE.Mesh>(null);
     const { scene } = useThree();
@@ -32,6 +32,7 @@ const Polyhedron = ({
     if (!context?.dispatch) {
         throw new Error("Scene3D must be used within a PolyhedronProvider");
     }
+
     const { selectedPolyhedronID, dispatch } = context;
 
     const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
@@ -40,12 +41,12 @@ const Polyhedron = ({
 
     const selectPolyhedra = () => {
         if (dispatch) {
-            dispatch({ type: "SELECT_POLYHEDRON", index: index });
+            dispatch({ type: "SELECT_POLYHEDRON", id: id });
         }
     };
-    
+
     const isPolyhedronSelected = () => {
-        return selectedPolyhedronID === index;
+        return selectedPolyhedronID === id;
     };
 
     const changeTransformMode = (): void => {
@@ -75,16 +76,16 @@ const Polyhedron = ({
     const deleteSelectedPolyhedron = () => {
         document.body.style.cursor = "auto";
         if (dispatch) {
-            dispatch({ type: "DELETE_POLYHEDRON", index: index});
+            dispatch({ type: "DELETE_POLYHEDRON", id: id});
         }
     }
-    
+
     const duplicateSelectedPolyhedron = () => {
         if (dispatch) {
-            dispatch({type: "DUPLICATE_POLYHEDRON", index: index})
+            dispatch({type: "DUPLICATE_POLYHEDRON", id: id, newId: id * 10000})
         }
     }
-    
+
     const editSelectedPolyhedron = () => {
         console.log("lol")
     }
@@ -111,9 +112,9 @@ const Polyhedron = ({
 
             dispatch({
                 type: "UPDATE_POLYHEDRON",
-                index: index,
+                id: id,
                 position: newPosition,
-                rotation: newRotation,
+                rotation: [...newRotation, 'ZYX'],
                 scale: newScale,
             });
         }
@@ -123,13 +124,13 @@ const Polyhedron = ({
         if (!boundingBox || !isPolyhedronSelected()) {
             return <></>;
         }
-    
+
         const size = boundingBox.getSize(new THREE.Vector3());
         const center = boundingBox.getCenter(new THREE.Vector3());
         return (
             <group>
-                <TransformControls 
-                    object={mesh.current as THREE.Mesh} 
+                <TransformControls
+                    object={mesh.current as THREE.Mesh}
                     position={position}
                     onObjectChange={handleTransformChange}
                     mode={mode}
@@ -165,7 +166,7 @@ const Polyhedron = ({
                 >
                     <spriteMaterial map={duplicateIconTexture}/>
                 </sprite>
-                
+
                 {/* Delete button */}
                 <sprite
                     position={[center.x + 0.75, center.y + size.y/2 + 0.5, center.z]}
@@ -178,7 +179,7 @@ const Polyhedron = ({
                     scale={[0.5, 0.5, 0.5]}
                 >
                     <spriteMaterial map={deleteIconTexture}/>
-                </sprite>            
+                </sprite>
             </group>
         );
     }, [boundingBox, selectedPolyhedronID, scene, mode]);
@@ -197,8 +198,12 @@ const Polyhedron = ({
                 }}
                 onDoubleClick={changeTransformMode}
             >
-                <meshBasicMaterial color={colour} />
-                <Edges scale={1} color="white" />
+                <meshBasicMaterial
+              color={colour}
+              transparent={true}
+              opacity={opacity}
+            />
+            <Edges scale={1} color="white" />
             </mesh>
             {BoundingBox}
         </>
