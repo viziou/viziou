@@ -28,9 +28,10 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
 	/**********************************/
 	const handleDragEnd = () => {
 		/* Could trigger updates to IoU or something here maybe */
-		if (iouDispatch) {
-			iouDispatch({ type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: { id: id, polygons: polygons } })
-		}
+    /* Spec change: IOU Polygons now update live. */
+		// if (iouDispatch) {
+		// 	iouDispatch({ type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: { id: id, polygons: polygons } })
+		// }
 	};
 
 	const handleDragStart = () => {
@@ -41,9 +42,10 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
 			const v = new THREE.Vector3();
 			mesh.current.getWorldPosition(v)
 			originalPosition.current = v.toArray().slice(0, 2) as [number, number];
-			if (iouDispatch) {
-				iouDispatch({ type: "HIDE_CHILD_IOUS_USING_ID", payload: id })
-			}
+      /* Spec change: IOU Polygons now update live since we have the performance for it. */
+			// if (iouDispatch) {
+			// 	iouDispatch({ type: "HIDE_CHILD_IOUS_USING_ID", payload: id })
+			// }
 			mesh.current.getWorldPosition(v);
 			originalPosition.current = v.toArray().slice(0, 2) as [number, number];
 		}
@@ -63,6 +65,9 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
 					id: id,
 					position: new_pos,
 				});
+      if (iouDispatch) {
+        iouDispatch({ type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: { id: id, polygons: polygons } });
+      }
 			}
 		}
 	};

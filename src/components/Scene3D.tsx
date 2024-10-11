@@ -6,7 +6,7 @@ import { PolyhedronContext } from '../contexts/PolyhedronContext';
 import { Scene3DProps } from '../utils/types';
 import IOUPolyhedron from './IOUPolyhedron.tsx'
 
-const Scene3D = ({ polyhedra, iouPolyhedrons, /* selectedId, setSelectedId,iouDispatch*/ }: Scene3DProps) => {
+const Scene3D = ({ polyhedra, iouPolyhedrons, generateId, iouDispatch /* selectedId, setSelectedId,*/ }: Scene3DProps) => {
     const context = useContext(PolyhedronContext);
     if (!context?.dispatch) {
         throw new Error("Scene3D must be used within a PolyhedronProvider");
@@ -34,6 +34,9 @@ const Scene3D = ({ polyhedra, iouPolyhedrons, /* selectedId, setSelectedId,iouDi
                     geometry={polyhedron.geometry}
                     colour={polyhedron.colour}
                     opacity={polyhedron.opacity}
+                    generateId={generateId}
+                    polyhedrons={polyhedra}
+                    iouDispatch={iouDispatch}
                 />
             ))}
 
@@ -49,6 +52,7 @@ const Scene3D = ({ polyhedra, iouPolyhedrons, /* selectedId, setSelectedId,iouDi
               opacity={polyhedron.opacity}
               parentIDa={polyhedron.parentIDa}
               parentIDb={polyhedron.parentIDb}
+              generateId={generateId}
             />
           ))}
 

@@ -68,9 +68,10 @@ const BoundingBox2D = ({ id, position, geometry, mesh, iouDispatch, generateId }
 		setCorner(corner);
 		if (dispatch)
 			dispatch({ type: "SELECTABILITY", payload: false });
-		if (iouDispatch) {
-			iouDispatch({ type: "HIDE_CHILD_IOUS_USING_ID", payload: id })
-		}
+    /* Spec change: IOUs now update live. */
+		// if (iouDispatch) {
+		// 	iouDispatch({ type: "HIDE_CHILD_IOUS_USING_ID", payload: id })
+		// }
 	};
 
 	const handleResizeDrag = () => {
@@ -142,6 +143,9 @@ const BoundingBox2D = ({ id, position, geometry, mesh, iouDispatch, generateId }
 					geometry: newGeometry,
 					id: id,
 				});
+        if (iouDispatch) {
+          iouDispatch({ type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: { id: id, polygons: polygons } });
+        }
 			}
 		}
 	};
@@ -149,9 +153,10 @@ const BoundingBox2D = ({ id, position, geometry, mesh, iouDispatch, generateId }
 	const handleResizeEnd = () => {
 		setResizing(false);
 		setCorner(null);
-		if (iouDispatch) {
-			iouDispatch({ type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: { id: id, polygons: polygons } })
-		}
+    /* Spec change: IOU Polygons update live. */
+		// if (iouDispatch) {
+		// 	iouDispatch({ type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: { id: id, polygons: polygons } })
+		// }
 	};
 	/**********************************/
 
@@ -162,9 +167,10 @@ const BoundingBox2D = ({ id, position, geometry, mesh, iouDispatch, generateId }
 		if (dispatch) {
 			dispatch({ type: "SELECTABILITY", payload: false });
 		}
-		if (iouDispatch) {
-			iouDispatch({ type: "HIDE_CHILD_IOUS_USING_ID", payload: id })
-		}
+    /* Spec change: IOU Polygons update live. */
+		// if (iouDispatch) {
+		// 	iouDispatch({ type: "HIDE_CHILD_IOUS_USING_ID", payload: id })
+		// }
 		setInitialBBox(boundingBox);
 	};
 
@@ -203,6 +209,9 @@ const BoundingBox2D = ({ id, position, geometry, mesh, iouDispatch, generateId }
 				geometry: newGeometry,
 				id: id,
 			});
+      if (iouDispatch) {
+        iouDispatch({ type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: { id: id, polygons: polygons } });
+      }
 		}
 		setOrientation(newOrientation);
 	};
@@ -215,9 +224,10 @@ const BoundingBox2D = ({ id, position, geometry, mesh, iouDispatch, generateId }
 		if (dispatch) {
 			dispatch({ type: "SELECTABILITY", payload: true });
 		}
-		if (iouDispatch) {
-			iouDispatch({ type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: { id: id, polygons: polygons } })
-		}
+    /* Spec change: IOU Polygons update live. */
+		// if (iouDispatch) {
+		// 	iouDispatch({ type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: { id: id, polygons: polygons } })
+		// }
 	};
 	/**********************************/
 
@@ -234,7 +244,6 @@ const BoundingBox2D = ({ id, position, geometry, mesh, iouDispatch, generateId }
 
 	const duplicateSelectedPolygon = () => {
 		if (dispatch) {
-			// TODO: pass down a reference to the nonce generator. THIS MUST BE FIXED BEFORE PRODUCTION
 			dispatch({ type: "DUPLICATE_POLYGON", id: id, newId: generateId() })
 		}
 	}

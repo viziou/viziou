@@ -78,6 +78,7 @@ export type PolyhedronData = {
   colour: string;
   transformedVertices?: THREE.Vector3[];
   opacity: number;
+  generateId: () => number
 }
 
 export type IOUPolyhedronData = PolyhedronData & {
@@ -91,6 +92,7 @@ export type Scene3DProps = {
   selectedId: number | null;
   iouPolyhedrons: Map<string, IOUPolyhedronData>;
   iouDispatch: React.Dispatch<IOUPolyhedron3DAction>;
+  generateId: () => number
 };
 
 export type Polyhedron3DAction =
@@ -123,7 +125,7 @@ export type IOUPolyhedron3DAction =
   | { type: 'DELETE_CHILD_IOUS_USING_ID', id: number }
   | { type: 'HIDE_CHILD_IOUS', payload: PolyhedronData }
   | { type: 'HIDE_CHILD_IOUS_USING_ID', payload: number }
-  | { type: 'RECALCULATE_CHILD_IOUS_USING_ID', payload: { id: number, polyhedrons: Map<string, IOUPolyhedronData> } }
+  | { type: 'RECALCULATE_CHILD_IOUS_USING_ID', payload: { id: number, polyhedrons: Map<string, PolyhedronData> } }
   | { type: 'SHOW_CHILD_IOUS_USING_ID', payload: number }
   | { type: 'CLEAR_POLYHEDRONS' };
 
