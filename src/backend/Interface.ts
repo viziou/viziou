@@ -281,6 +281,14 @@ class Backend3D {
     return this._threeGeometryToPolyhedra3D(geometry).volume();
   }
 
+  public static surfaceArea( geometry: BufferGeometry) {
+    return this._threeGeometryToPolyhedra3D(geometry).surfaceArea();
+  }
+
+  public static perimeter( geometry: BufferGeometry ) {
+    return this._threeGeometryToPolyhedra3D(geometry).perimeter();
+  }
+
   public static pointInPolyhedron({geometry}: PolyhedronData, point: Vector3) {
     return this._threeGeometryToConvexHull(geometry).containsPoint(point)
   }

@@ -84,6 +84,8 @@ const IOUPolyhedron = ({id, position, rotation, scale, geometry, colour, opacity
             <Infographic
               position={!boundingBox ? new THREE.Vector3(position[0], position[1], position[2]) : boundingBox.getCenter(new THREE.Vector3).sub(boundingBox.getSize(new THREE.Vector3).multiplyScalar(0.5))
               } info={{"Volume": Backend3D.volume(geometry).toPrecision(currentDecimalPlaces+2),
+              "Surface Area": Backend3D.surfaceArea(geometry).toPrecision(currentDecimalPlaces+2),
+              "Perimeter": Backend3D.perimeter(geometry).toPrecision(currentDecimalPlaces+2),
               "IoU": calculateIoU().toPrecision(currentDecimalPlaces+2)}} />
           ) }
         </mesh>
