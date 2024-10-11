@@ -1,85 +1,14 @@
 .TwoDEnv {
     display: flex;
     height: 100vh;
+    overflow: hidden;
 }
 
 .twod-canvas-container {
     flex-grow: 1;
-    background-color: white;
     display: flex;
-    justify-content: center;
     align-items: center;
-}
-  
-@media only screen and (max-width: 853px) {
-    .TwoDEnv {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
-
-    .twod-canvas-container {
-        padding-top: 25px; 
-        box-sizing: border-box;
-    }
-
-    .twod-button-container {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        background-color: var(--body-colour);
-        gap: 10px;
-    }
-
-    .twod-button {
-        flex: 1; 
-        padding: 10px;
-        font-size: 0.8rem;
-        height: 60px; 
-    }
-
-    .overflow-button {
-        display: block;
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: white;
-        position: relative;
-        padding: 10px;
-    }
-    
-    .overflow-menu {
-        display: none;
-        position: absolute;
-        bottom: 50px;
-        right: 10px; 
-        background-color: var(--body-colour);
-        border-radius: 5px;
-        z-index: 1;
-        padding: 10px;
-    }
-    
-    .overflow-menu button {
-        display: block;
-        background-color: var(--btn-colour);
-        color: white;
-        border: none;
-        padding: 10px;
-        margin: 5px 0;
-        text-align: left;
-        width: 100%;
-        cursor: pointer;
-    }
-    
-    .overflow-menu button:hover {
-        background-color: var(--btn-hover-colour);
-    }
-    
-    .show {
-        display: block;
-    }
+    justify-content: center;
+    background-color: white;
+    overflow: hidden;
 }

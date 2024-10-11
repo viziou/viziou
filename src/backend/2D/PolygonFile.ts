@@ -25,7 +25,6 @@ class v1 implements PolygonFile {
   dimension = 2;
   payload: PolygonData[];
 
-  // TODO: can you overload a constructor?
   constructor(polygons: string | PolygonData[]) {
     console.log("polygons: ", polygons)
     if (polygons instanceof Array ) {
@@ -68,11 +67,15 @@ class v1 implements PolygonFile {
     }
   }
 
-  public canUpgrade() {return false}
+  public canUpgrade() {return true}
 
   public upgrade() {
-    return this;
-    //return new v2(this.payload).upgrade(); // trigger a recursive upgrade
+    /* Upgrade to v2 version, which includes id and opacity. */
+    this.payload.forEach((polygon: PolygonData, index) => {
+      polygon.id = index;
+      polygon.opacity = 1.0;
+    })
+    return new v2(this.payload).upgrade(); // trigger a recursive upgrade
   }
 
   public getPolygons() {
@@ -83,6 +86,20 @@ class v1 implements PolygonFile {
     // TODO: use a replacer to force strictly only elements from PolygonData in the file
     return JSON.stringify(this);
   }
+}
+
+class v2 extends v1 {
+
+    constructor(polygons: PolygonData[] | string) {
+    super(polygons);
+    this.version = 2;
+  }
+
+    public canUpgrade() {return false}
+
+    public upgrade() {
+      return this;
+    }
 }
 
 // class v2 extends v1 {
@@ -112,16 +129,16 @@ class v1 implements PolygonFile {
 //
 // }
 
-class vLatest extends v1 {}
+class vLatest extends v2 {}
 
 class Handler {
-  private static readonly versions = [vLatest, v1];//, v2];
+  private static readonly versions = [vLatest, v1, v2];
 
   public static getConstructor(version: number) {
     return this.versions[version]
   }
 
-  public static prepareSave(pf: PolygonFile, shouldUpgrade: boolean = true) {
+  public static prepareSave(pf: PolygonFile, shouldUpgrade: boolean = false) {
     if (shouldUpgrade) {
       pf = pf.upgrade();
     }
@@ -129,14 +146,17 @@ class Handler {
     return pf.toSave();
   }
 
-  public static prepareLoad(content: string) {
+  public static prepareLoad(content: string, shouldUpgrade: boolean = true) {
     console.log('prepareLoad content: ', content);
     const o = JSON.parse(content);
     console.log('prepareLoad object: ', o);
     const c = this.getConstructor(o.version) // get the constructor for this version
     console.log('prepareLoad constructor: ', c);
-    const p = new c(content)
+    let p = new c(content)
     console.log('polygonFile object: ', p)
+    if (shouldUpgrade) {
+      p = p.upgrade();
+    }
     return p.getPolygons()
   }
 }

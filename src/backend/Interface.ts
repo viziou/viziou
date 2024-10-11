@@ -2,9 +2,14 @@
 import { PolygonData, PolyhedronData } from '../utils/types.tsx';
 import { Point2D, Polygon2D } from './2D/classes.ts';
 import { IoU, getIntersectionPolygon } from './2D/iou.ts';
-import { BufferGeometry, Vector3 } from 'three';
+import { IoU as IoU3D, getIntersectionPolyhedra } from "./3D/iou.ts";
+import { ConvexHull, Face } from 'three/addons/math/ConvexHull.js'; // QuickHull implementation
+import { ConvexGeometry as ConvexGeometry3 } from 'three/addons/geometries/ConvexGeometry.js';
+import { BufferGeometry, TypedArray, Vector3 } from 'three';
 import { Handler as Handler2D, vLatest as vLatest2D } from './2D/PolygonFile.ts';
 import { Handler as Handler3D, vLatest as vLatest3D } from './3D/PolyhedronFile.ts';
+import {Face3D, Point3D, Polyhedra3D} from "./3D/classes.ts";
+import {HalfEdge} from 'three/addons/math/ConvexHull.js';
 
 class ConvexGeometry {
 
@@ -52,8 +57,12 @@ class ConvexGeometry {
 
 class Backend2D {
 
-  public static area( { geometry }: PolygonData ) {
+  public static area( geometry: BufferGeometry ) {
     return this._threeGeometryToPolygon2D(geometry).area();
+  }
+
+  public static perimeter( geometry: BufferGeometry ) {
+    return this._threeGeometryToPolygon2D(geometry).perimeter();
   }
 
   public static pointInPolygon({x, y}: { x: number; y: number }, { geometry, position }: PolygonData) {
@@ -67,6 +76,7 @@ class Backend2D {
              { geometry: geometryB, position: positionB }: PolygonData) {
     const offsetA = new Point2D(positionA[0], positionA[1]);
     const offsetB = new Point2D(positionB[0], positionB[1]);
+
     const polygonA = this._threeGeometryToPolygon2D(geometryA).translate(offsetA);
     const polygonB = this._threeGeometryToPolygon2D(geometryB).translate(offsetB);
     return {area: IoU(polygonA, polygonB),
@@ -78,24 +88,30 @@ class Backend2D {
     return this._threeGeometryToPolygon2D(geometry).centroid().translate(offset).xy;
   }
 
-  private static _threeGeometryToPolygon2D( geometry: BufferGeometry ): Polygon2D {
-    const geometryPosition = geometry.getAttribute('position');
-    let vertices: Point2D[] = [];
-    const vertexSet: Set<{x: number, y: number}> = new Set();
-    for (let i = 0, l = geometryPosition.count; i < l; i+=3 ) {
-      //vertices.push(new Point2D(geometryPosition.array[i], geometryPosition.array[i + 1]));
-      vertexSet.add({x: geometryPosition.array[i], y: geometryPosition.array[i + 1]});  // sets do not allow duplicates
+  public static _threeGeometryToPolygon2D( geometry: BufferGeometry ): Polygon2D {
+    function key({x, y}: {x: number; y: number}) {
+      return `${x},${y}`;
     }
-    vertexSet.forEach(({x, y}) => {
+
+    const geometryPosition = geometry.getAttribute('position');
+    // console.log('geometryPosition: ', geometryPosition)
+    let vertices: Point2D[] = [];
+    const vertexMap: Map<string, {x: number, y: number}> = new Map();
+    for (let i = 0; i < geometryPosition.array.length; i+=3 ) {
+      //vertices.push(new Point2D(geometryPosition.array[i], geometryPosition.array[i + 1]));
+      const pos = {x: geometryPosition.array[i], y: geometryPosition.array[i + 1]};
+      vertexMap.set(key(pos), pos);  // maps do not allow duplicates
+    }
+    vertexMap.forEach(({x, y}) => {
       vertices.push(new Point2D(x, y))
     })
-    console.log('vertexSet: ', vertexSet);
-    console.log('vertices: ', vertices)
-    console.log('number of vertices parsed: ', geometryPosition.count / 3);
-    console.log('number of vertices included: ', vertices.length)
+    // console.log('vertexMap: ', vertexMap);
+    // console.log('vertices: ', vertices)
+    // console.log('number of vertices parsed: ', geometryPosition.count / 3);
+    // console.log('number of vertices included: ', vertices.length)
     vertices = this._reducePointsToConvexHull(vertices);
-    console.log('vertices after convex hull reduction: ', vertices);
-    console.log('number of vertices on hull: ', vertices.length)
+    // console.log('vertices after convex hull reduction: ', vertices);
+    // console.log('number of vertices on hull: ', vertices.length)
     return new Polygon2D(vertices, true);
   }
 
@@ -159,7 +175,7 @@ class Backend2D {
     // This code is ugly as hell since there was so much debugging involved to get it working.
     //console.log('initial points: ', points);
     // Step 0: If you have a triangle (or less), there's nothing to do.
-    if (points.length <= 3) return points;
+    if (points.length < 3) return points;
     const reducedVertices: Point2D[] = [];
 
     // Step 1: Find an extremal starting point.
@@ -257,6 +273,113 @@ class Backend2D {
       }
     return reducedVertices;
   }
+}
+
+class Backend3D {
+
+  public static volume( geometry: BufferGeometry) {
+    return this._threeGeometryToPolyhedra3D(geometry).volume();
+  }
+
+  public static surfaceArea( geometry: BufferGeometry) {
+    return this._threeGeometryToPolyhedra3D(geometry).surfaceArea();
+  }
+
+  public static perimeter( geometry: BufferGeometry ) {
+    return this._threeGeometryToPolyhedra3D(geometry).perimeter();
+  }
+
+  public static pointInPolyhedron({geometry}: PolyhedronData, point: Vector3) {
+    return this._threeGeometryToConvexHull(geometry).containsPoint(point)
+  }
+
+  public static centreOfMass({geometry}: PolyhedronData) {
+    return this._threeGeometryToPolyhedra3D(geometry).centroid()
+  }
+
+  public static IoU({geometry: geometryA, position: positionA, rotation: rotationA, scale: scaleA}: PolyhedronData,
+                    {geometry: geometryB, position: positionB, rotation: rotationB, scale: scaleB}: PolyhedronData): {area: number, shape: BufferGeometry} {
+    const offsetA = new Point3D(positionA[0], positionA[1], positionA[2]);
+    const offsetB = new Point3D(positionB[0], positionB[1], positionB[2]);
+    const polyhedronA = this._threeGeometryToPolyhedra3D(geometryA).scale(...scaleA).rotate(rotationA[0], rotationA[1], rotationA[2]).translate(offsetA);
+    const polyhedronB = this._threeGeometryToPolyhedra3D(geometryB).scale(...scaleB).rotate(rotationB[0], rotationB[1], rotationB[2]).translate(offsetB);
+    return {area: IoU3D(polyhedronA, polyhedronB),
+    shape: this._polyhedra3DToBufferGeometry(getIntersectionPolyhedra(polyhedronA, polyhedronB))}
+  }
+
+  public static reduceVectorThrees(array: number[] | TypedArray) {
+    function key({x, y, z}: {x: number, y: number, z: number}) {
+      return `${x},${y},${z}`;
+    }
+
+    const vectorMap: Map<string, Vector3> = new Map();
+    for (let i = 0; i < array.length; i+=3) {
+      const pos = new Vector3(array[i], array[i+1], array[i+2]);
+      vectorMap.set(key(pos), pos);
+    }
+
+    return Array.from(vectorMap.values());
+  }
+
+  public static _polyhedra3DToBufferGeometry(polyhedron: Polyhedra3D) {
+    function key({x, y, z}: {x: number, y: number, z: number}) {
+      return `${x},${y},${z}`;
+    }
+
+    const vectorMap: Map<string, Vector3> = new Map();
+    for (const face of polyhedron.faces) {
+      const points = this._face3DToVector3(face)
+      for (const point of points) {
+        vectorMap.set(key(point), point);
+      }
+    }
+
+    const vectors = Array.from(vectorMap.values());
+    return new ConvexGeometry3(vectors);
+  }
+
+  public static _threeGeometryToConvexHull( geometry: BufferGeometry ) {
+      const hull = new ConvexHull();
+      const points: Vector3[] = this.reduceVectorThrees( geometry.getAttribute('position').array );
+      hull.setFromPoints(points);
+      hull.compute();
+      return hull
+  }
+
+  public static _faceToFace3D(face: Face) {
+    const vertices: Point3D[] = [];
+    const edges: HalfEdge[] = [];
+    let edge = face.edge;
+    edges.push(edge); // edge 1
+    edge = edge.next;
+    edges.push(edge); // edge 2
+    edge = edge.next;
+    edges.push(edge); // edge 3
+
+    for (const edge of edges) {
+      const point: Vector3 = edge.vertex.point;
+      vertices.push(new Point3D(point.x, point.y, point.z));
+    }
+    return new Face3D(vertices);
+  }
+
+  public static _convexHullToPolyhedra(hull: ConvexHull) {
+    const faces = hull.faces.map(this._faceToFace3D);
+    return new Polyhedra3D(faces);
+  }
+
+  public static _threeGeometryToPolyhedra3D(geometry: BufferGeometry) {
+    return this._convexHullToPolyhedra(this._threeGeometryToConvexHull(geometry));
+  }
+
+  public static _face3DToVector3(face: Face3D) {
+    const vertices: Vector3[] = [];
+    for (const point of face.vertices) {
+      vertices.push(new Vector3(point.x, point.y, point.z));
+    }
+    return vertices;
+  }
+
 }
 
 class Storage {
@@ -381,4 +504,4 @@ class Storage {
   }
 }
 
-export { Backend2D, ConvexGeometry, Storage };
+export { Backend2D, Backend3D, ConvexGeometry, Storage };

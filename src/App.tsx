@@ -10,46 +10,51 @@ import PageNotFound from './pages/PageNotFound';
 
 import { PolygonProvider } from './contexts/PolygonContext';
 import { PolyhedronProvider } from './contexts/PolyhedronContext';
+import { IOUPolygonProvider } from './contexts/IOUPolygonContext.tsx'
+import { IOUPolyhedronProvider } from './contexts/IOUPolyhedronContext.tsx';
 
 function App() {
 
   return (
       <BrowserRouter>
           <div>
-
               <Routes>
-                    <Route 
-                            path="/" 
+                    <Route
+                            path="/"
                             element={
                             <>
-                                <Navbar /> 
+                                <Navbar />
                                 <Hero />
                             </>
-                            } 
+                            }
                     />
 
                   <Route path="/2D-Environment" element={
                       <PolygonProvider>
+                        <IOUPolygonProvider>
                           <TwoD />
+                        </IOUPolygonProvider>
                       </PolygonProvider>
                       }
                   />
 
                   <Route path="/3D-Environment" element={
                       <PolyhedronProvider>
+                        <IOUPolyhedronProvider>
                           <ThreeD />
+                        </IOUPolyhedronProvider>
                       </PolyhedronProvider>
-                      } 
+                      }
                   />
-                  
-                  <Route 
-                            path="/about" 
+
+                  <Route
+                            path="/about"
                             element={
                             <>
-                                <Navbar /> 
+                                <Navbar />
                                 <About />
                             </>
-                            } 
+                            }
                     />
 
                   <Route path="*" element={<PageNotFound />} />

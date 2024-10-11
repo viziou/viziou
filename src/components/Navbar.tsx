@@ -19,7 +19,7 @@ const Navbar = () => {
     return (
         <header className="header">
             <a href="/" className="logo">
-                Viziou
+                <b>viziou</b>
                 <img src={Logo} alt="Intersection of Union" className="logo-image" />
             </a>
 
