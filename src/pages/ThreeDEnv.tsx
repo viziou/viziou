@@ -88,7 +88,8 @@ const ThreeDEnv = () => {
             rotation: [0, 0, 0, 'ZYX'],
             scale: [1, 1, 1],
             colour: getRandomColour(),
-            opacity: 0.5
+            opacity: 0.5,
+            generateId: generateId
         };
 
         console.log("Dispatching ADD_RANDOM_POLYHEDRON:", newPolyhedron);
@@ -133,6 +134,7 @@ const ThreeDEnv = () => {
         colour: '#ce206b',
         id: generateId(),
         opacity: 1.0,
+        generateId: generateId
       }
       IoUs.push(IoUPolyhedra);
     }
@@ -181,6 +183,7 @@ const ThreeDEnv = () => {
                 setSelectedId={setSelectedId}
                 iouPolyhedrons={iouPolyhedrons}
                 iouDispatch={iouDispatch}
+                generateId={generateId}
                 />
             </main>
             <ConfirmationModal

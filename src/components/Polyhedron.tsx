@@ -1,8 +1,8 @@
-import { useState, useRef, useMemo, useEffect, useContext } from 'react';
+import React, { useState, useRef, useMemo, useEffect, useContext } from 'react';
 import * as THREE from 'three';
 import { Edges, TransformControls } from '@react-three/drei'; // Ensure Edges is correctly imported
 import { useThree } from '@react-three/fiber';
-import { PolyhedronData } from '../utils/types';
+import { IOUPolyhedron3DAction, PolyhedronData } from '../utils/types'
 import { PolyhedronContext } from '../contexts/PolyhedronContext';
 import edit from '../assets/new_edit.png';
 import bin from '../assets/new_bin.png';
@@ -20,10 +20,12 @@ interface PolyhedronProps extends PolyhedronData {
     scale: [number, number, number];
     geometry: THREE.BufferGeometry;
     colour: string;
+    iouDispatch?: React.Dispatch<IOUPolyhedron3DAction>;
+    polyhedrons?: Map<string, PolyhedronData>
 }
 
 const Polyhedron = ({
-    id, position, rotation, scale, geometry, colour, opacity
+    id, position, rotation, scale, geometry, colour, opacity, iouDispatch, generateId, polyhedrons
 }: PolyhedronProps) => {
     const mesh = useRef<THREE.Mesh>(null);
     const { scene } = useThree();
@@ -77,12 +79,15 @@ const Polyhedron = ({
         document.body.style.cursor = "auto";
         if (dispatch) {
             dispatch({ type: "DELETE_POLYHEDRON", id: id});
+            if (iouDispatch) {
+              iouDispatch({type: "DELETE_CHILD_IOUS_USING_ID", id: id})
+            }
         }
     }
 
     const duplicateSelectedPolyhedron = () => {
         if (dispatch) {
-            dispatch({type: "DUPLICATE_POLYHEDRON", id: id, newId: id * 10000})
+            dispatch({type: "DUPLICATE_POLYHEDRON", id: id, newId: generateId()})
         }
     }
 
@@ -117,6 +122,10 @@ const Polyhedron = ({
                 rotation: [...newRotation, 'ZYX'],
                 scale: newScale,
             });
+
+            if (iouDispatch) {
+              iouDispatch({type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: id, polyhedrons: polyhedrons!}} );
+            }
         }
     };
 

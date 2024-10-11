@@ -117,6 +117,7 @@ function PolyhedronReducer(state: PolyhedronContextInterface, action: Polyhedron
                     colour: polyhedron.colour.slice(),
                     id: action.newId,
                     opacity: 0.5,
+                    generateId: polyhedron.generateId
                 };
 
                 // Get bbox to figure out optimal placement of clone
