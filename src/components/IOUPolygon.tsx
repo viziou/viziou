@@ -43,8 +43,10 @@ const IOUPolygon = ({id, position, geometry, colour, opacity, parentIDa, parentI
             geometry={geometry}
             ref={mesh}
             onPointerEnter={() => {
+              console.log('entered iou polyhedron ', id);
               if (dispatch)
                 dispatch({ type: "ADD_MOUSED_OVER_POLYGON", id: id });
+              console.log('currently mousing over ', currentlyMousedOverPolygons.length, ' iou polyhedra');
             }}
             onPointerLeave={() => {
               if (dispatch)

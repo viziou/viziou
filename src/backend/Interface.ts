@@ -277,7 +277,7 @@ class Backend2D {
 
 class Backend3D {
 
-  public static volume( {geometry}: PolyhedronData) {
+  public static volume( geometry: BufferGeometry) {
     return this._threeGeometryToPolyhedra3D(geometry).volume();
   }
 

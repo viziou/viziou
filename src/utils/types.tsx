@@ -127,6 +127,8 @@ export type IOUPolyhedron3DAction =
   | { type: 'HIDE_CHILD_IOUS_USING_ID', payload: number }
   | { type: 'RECALCULATE_CHILD_IOUS_USING_ID', payload: { id: number, polyhedrons: Map<string, PolyhedronData> } }
   | { type: 'SHOW_CHILD_IOUS_USING_ID', payload: number }
+  | { type: 'ADD_MOUSED_OVER_POLYHEDRON', id: number }
+  | { type: 'REMOVE_MOUSED_OVER_POLYHEDRON', id: number }
   | { type: 'CLEAR_POLYHEDRONS' };
 
 export type SidebarProps2D = {
