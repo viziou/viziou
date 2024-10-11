@@ -86,6 +86,7 @@ const TwoDEnv = () => {
         colour: colour,
         id: generateId(),
         opacity: 1,
+        generateId: generateId
       };
       dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
     }
@@ -101,7 +102,8 @@ const TwoDEnv = () => {
       ],
       colour: getRandomColour(),
       id: generateId(),
-      opacity: 1
+      opacity: 1,
+      generateId: generateId
     };
 
     console.log("Dispatching ADD_SQUARE:", newPolygon);
@@ -118,7 +120,8 @@ const TwoDEnv = () => {
       ],
       colour: getRandomColour(),
       opacity: 1,
-      id: generateId()
+      id: generateId(),
+      generateId: generateId
     };
 
     console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
@@ -188,6 +191,7 @@ const TwoDEnv = () => {
               colour: '#ce206b',
               id: generateId(),
               opacity: 1.0,
+              generateId: generateId
           };
           IoUs.push(IoUPolygon);
       }
@@ -268,7 +272,7 @@ const TwoDEnv = () => {
           ) : null}
 
         <main className="twod-canvas-container">
-            <Scene2D polygons={polygons} iouPolygons={iouPolygons} iouDispatch={iouDispatch} />
+            <Scene2D polygons={polygons} iouPolygons={iouPolygons} iouDispatch={iouDispatch} generateId={generateId} />
         </main>
         <ConfirmationModal
         isOpen={confirmationInfo.isOpen}

@@ -98,7 +98,7 @@ const PointsCreator = ({
   const handleRightMouseUp = (event: ThreeEvent<MouseEvent>) => {
     if (event.button === 2 && isRightMouseDown) {
       const endPosition = getWorldPosition(event);
-      if (rightClickStartPosition.current && 
+      if (rightClickStartPosition.current &&
           endPosition.distanceTo(rightClickStartPosition.current) < 0.1) {
         removeNearestPoint(endPosition);
       }
@@ -181,7 +181,9 @@ const PointsCreator = ({
           index={points.length + 2}
           selectable={false}
           opacity={1}
-        ></Polygon>
+          generateId={() => -1}
+          >
+        </Polygon>
       ) : (
         <></>
       )}

@@ -3,11 +3,12 @@ import React from 'react'
 import { EulerOrder } from 'three'
 
 export type PolygonData = {
-  id: number;
-  position: [number, number];
-  geometry: THREE.BufferGeometry;
-  colour: string;
-  opacity: number;
+  id: number,
+  position: [number, number],
+  geometry: THREE.BufferGeometry,
+  colour: string,
+  opacity: number,
+  generateId: () => number
 };
 
 export type IOUPolygonData = PolygonData & {
@@ -20,7 +21,8 @@ export type BoundingBoxProps = {
   position: [number, number],
   geometry: THREE.BufferGeometry,
   mesh: React.MutableRefObject<THREE.Mesh>,
-  iouDispatch?: React.Dispatch<IOUPolygon2DAction>
+  iouDispatch?: React.Dispatch<IOUPolygon2DAction>,
+  generateId: () => number
 }
 
 export type IOUPolygon2DAction =
@@ -40,9 +42,10 @@ export type IOUPolygon2DAction =
   | { type: 'CLEAR_POLYGONS' };
 
 export type Scene2DProps = {
-  polygons: Map<string, PolygonData>;
-  iouPolygons: Map<string, IOUPolygonData>;
-  iouDispatch: React.Dispatch<IOUPolygon2DAction>;
+  polygons: Map<string, PolygonData>,
+  iouPolygons: Map<string, IOUPolygonData>,
+  iouDispatch: React.Dispatch<IOUPolygon2DAction>,
+  generateId: () => number
 };
 
 export type Polygon2DAction =
