@@ -3,14 +3,18 @@ import { IOUPolyhedron3DAction, IOUPolyhedronData } from '../utils/types';
 import { Backend3D } from '../backend/Interface';
 
 const initialState: IOUPolyhedronContextInterface = {
-  polyhedronMap: new Map<string, IOUPolyhedronData>,
-    parentsMap: new Map<string, Set<string>>
+    polyhedronMap: new Map<string, IOUPolyhedronData>,
+    parentsMap: new Map<string, Set<string>>,
+    currentlyMousedOverPolyhedrons: [],
+    currentDecimalPlaces: 2,
 };
 
 interface IOUPolyhedronContextInterface {
     polyhedronMap: Map<string, IOUPolyhedronData>;
     parentsMap: Map<string, Set<string>>; // key-to-key matching for a single parent object
     dispatch?: React.Dispatch<IOUPolyhedron3DAction>;
+    currentlyMousedOverPolyhedrons: number[],
+    currentDecimalPlaces: number,
 }
 
 function key(IOUPolyhedron: IOUPolyhedronData): string {
@@ -186,6 +190,29 @@ function IOUPolygonReducer(state: IOUPolyhedronContextInterface, action: IOUPoly
                 parentsMap: state.parentsMap
             }
 
+      case "ADD_MOUSED_OVER_POLYHEDRON":
+        const mousedOver = state.currentlyMousedOverPolyhedrons.slice();
+        if (!mousedOver.includes(action.id)) {
+          mousedOver.push(action.id);
+        }
+        return {
+          ...state,
+          currentlyMousedOverPolyhedrons: mousedOver.slice(),
+        };
+
+      case "REMOVE_MOUSED_OVER_POLYHEDRON":
+        const mousedOverArr = state.currentlyMousedOverPolyhedrons.slice();
+        if (mousedOverArr.includes(action.id)) {
+          const index = mousedOverArr.indexOf(action.id);
+          if (index > -1) {
+            mousedOverArr.splice(index, 1);
+          }
+        }
+        return {
+          ...state,
+          currentlyMousedOverPolyhedrons: mousedOverArr.slice(),
+        };
+
         default:
             return state;
     }
@@ -199,7 +226,8 @@ export function IOUPolyhedronProvider(props: PolygonProviderProps) {
     const [state, dispatch] = useReducer(IOUPolygonReducer, initialState);
 
     return (
-        <IOUPolyhedronContext.Provider value={{ polyhedronMap: state.polyhedronMap, parentsMap: state.parentsMap, dispatch }}>
+        <IOUPolyhedronContext.Provider value={{ polyhedronMap: state.polyhedronMap, parentsMap: state.parentsMap,
+          currentlyMousedOverPolyhedrons: state.currentlyMousedOverPolyhedrons, currentDecimalPlaces: state.currentDecimalPlaces, dispatch }}>
             {props.children}
         </IOUPolyhedronContext.Provider>
     );

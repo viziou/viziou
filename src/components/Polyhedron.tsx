@@ -211,6 +211,7 @@ const Polyhedron = ({
               color={colour}
               transparent={true}
               opacity={opacity}
+              depthTest={false}
             />
             <Edges scale={1} color="white" />
             </mesh>

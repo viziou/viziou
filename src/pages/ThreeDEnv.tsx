@@ -100,6 +100,7 @@ const ThreeDEnv = () => {
         console.log("Dispatching CLEAR_POLYHEDRA");
         dispatch({ type: "SELECT_POLYHEDRON", id: null });
         dispatch({ type: "CLEAR_POLYHEDRA" });
+        iouDispatch({ type: "CLEAR_POLYHEDRONS"} )
     };
 
     const savePolyhedra = () => {

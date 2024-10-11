@@ -277,8 +277,16 @@ class Backend2D {
 
 class Backend3D {
 
-  public static volume( {geometry}: PolyhedronData) {
+  public static volume( geometry: BufferGeometry) {
     return this._threeGeometryToPolyhedra3D(geometry).volume();
+  }
+
+  public static surfaceArea( geometry: BufferGeometry) {
+    return this._threeGeometryToPolyhedra3D(geometry).surfaceArea();
+  }
+
+  public static perimeter( geometry: BufferGeometry ) {
+    return this._threeGeometryToPolyhedra3D(geometry).perimeter();
   }
 
   public static pointInPolyhedron({geometry}: PolyhedronData, point: Vector3) {

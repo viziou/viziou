@@ -24,7 +24,7 @@ interface PolyhedronContextInterface {
     selectedPolyhedronID: number | null;
     dispatch?: React.Dispatch<Polyhedron3DAction>;
     confirmationInfo: ConfirmationModalInfo;
-    displayWarnings: boolean
+    displayWarnings: boolean;
 }
 
 export const PolyhedronContext = createContext<PolyhedronContextInterface | undefined>(undefined);
