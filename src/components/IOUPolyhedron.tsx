@@ -73,13 +73,15 @@ const IOUPolyhedron = ({id, position, rotation, scale, geometry, colour, opacity
               if (dispatch)
                 dispatch({ type: "REMOVE_MOUSED_OVER_POLYHEDRON", id: id });
             }}
+            renderOrder={999} // this forces the IoU polygon to always render over the top
         >
             <meshStandardMaterial
               color={colour}
               transparent={true}
               opacity={opacity}
+              depthTest={false}
             />
-            <Edges geometry={geometry} scale={1} color="white" />
+            <Edges geometry={geometry} scale={1} color="white" renderOrder={9999} depthTest={false} transparent={true} />
           {Math.max(...currentlyMousedOverPolyhedrons) === id && (
             <Infographic
               position={!boundingBox ? new THREE.Vector3(position[0], position[1], position[2]) : boundingBox.getCenter(new THREE.Vector3).sub(boundingBox.getSize(new THREE.Vector3).multiplyScalar(0.5))
