@@ -7,7 +7,7 @@ import BoundingBox2D from './BoundingBox2D'
 
 type PolygonProps = PolygonData & { index: number; selectable: boolean } & { iouDispatch?: React.Dispatch<IOUPolygon2DAction> } & { polygons?: Map<string, PolygonData>; };
 
-const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selectable }: PolygonProps) => {
+const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selectable, generateId }: PolygonProps) => {
 	const mesh = useRef<THREE.Mesh>(null!);
 	const { dispatch, selectedPolygonID, currentlyMousedOverPolygons, selectability, polygons } = useContext(PolygonContext)!;
 	const originalPosition = useRef<[number, number]>([0, 0]);
@@ -106,8 +106,9 @@ const Polygon = ({ id, position, geometry, colour, iouDispatch, opacity, selecta
 				geometry={geometry}
 				mesh={mesh}
 				iouDispatch={iouDispatch}
+        generateId={generateId}
 			/>
-			
+
 		</>
 	);
 };

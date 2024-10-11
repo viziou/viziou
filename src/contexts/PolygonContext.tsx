@@ -134,7 +134,8 @@ function PolygonReducer(
           ],
           geometry: polygon.geometry.clone(),
           colour: polygon.colour.slice(),
-          opacity: 1
+          opacity: 1,
+          generateId: polygon.generateId
         };
 
         // Get bbox to figure out optimal placement of clone
@@ -253,7 +254,7 @@ function PolygonReducer(
         ...state,
         confirmationInfo: defaultConfirmationInfo
       }
-    
+
     case "SET_DISPLAY_WARNINGS":
       return {
         ... state,

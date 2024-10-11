@@ -13,7 +13,7 @@ const editIconTexture = new THREE.TextureLoader().load(edit);
 const deleteIconTexture = new THREE.TextureLoader().load(bin);
 const duplicateIconTexture = new THREE.TextureLoader().load(duplicate);
 
-const BoundingBox2D = ({ id, position, geometry, mesh, iouDispatch }: BoundingBoxProps) => {
+const BoundingBox2D = ({ id, position, geometry, mesh, iouDispatch, generateId }: BoundingBoxProps) => {
 	const { dispatch, selectedPolygonID, polygons } = useContext(PolygonContext)!;
 	const { scene, camera, pointer } = useThree();
 	const [boundingBox, setBoundingBox] = useState<THREE.Box3 | null>(null);
@@ -235,7 +235,7 @@ const BoundingBox2D = ({ id, position, geometry, mesh, iouDispatch }: BoundingBo
 	const duplicateSelectedPolygon = () => {
 		if (dispatch) {
 			// TODO: pass down a reference to the nonce generator. THIS MUST BE FIXED BEFORE PRODUCTION
-			dispatch({ type: "DUPLICATE_POLYGON", id: id, newId: id * 100000 })
+			dispatch({ type: "DUPLICATE_POLYGON", id: id, newId: generateId() })
 		}
 	}
 

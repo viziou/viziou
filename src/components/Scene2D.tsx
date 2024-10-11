@@ -6,7 +6,7 @@ import { useContext } from "react";
 import { PolygonContext } from "../contexts/PolygonContext";
 import IOUPolygon from './IOUPolygon.tsx'
 
-const Scene2D = ({ polygons, iouPolygons, iouDispatch }: Scene2DProps) => {
+const Scene2D = ({ polygons, iouPolygons, iouDispatch, generateId }: Scene2DProps) => {
 	const { dispatch, currentlyMousedOverPolygons } = useContext(PolygonContext)!;
 
 	const handleCanvasClick = () => {
@@ -34,6 +34,7 @@ const Scene2D = ({ polygons, iouPolygons, iouDispatch }: Scene2DProps) => {
 					opacity={polygon.opacity}
 					selectable={true}
 					polygons={polygons}
+          generateId={generateId}
 				/>
 			))}
 			{Array.from(iouPolygons.values()).map((polygon, index) => (
@@ -46,7 +47,8 @@ const Scene2D = ({ polygons, iouPolygons, iouDispatch }: Scene2DProps) => {
 					opacity={polygon.opacity}
 					parentIDa={polygon.parentIDa}
 					parentIDb={polygon.parentIDb}
-				/>
+				  generateId={generateId}
+        />
 			))}
 
 			<OrbitControls
