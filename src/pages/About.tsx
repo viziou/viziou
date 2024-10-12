@@ -52,9 +52,9 @@ function About() {
                   <img className="developer-photo mubasshir-photo" src={mub} alt="Mubasshir" />
                   <h3>Mubasshir</h3>
                   <ul>
-                      <li>Hey, I'm Mub, I am a electrical engineering and computer science student at Monash University.</li>
-                      <li>I primarily work with deep learning models and teach algorithms at Monash University.</li>
-                      <li>I am very passionate about building elegant software and enjoy playing badminton, chess, and Pokemon in my spare time.</li>
+                      <li>Hey, I'm Mub! I study Electrical Engineering and Computer Science at Monash University.</li>
+                      <li>I primarily work with deep learning models and teach algorithms at Monash University, planning to pursue a PhD in machine learning.</li>
+                      <li>I am very passionate about building elegant software and in my downtime I enjoy playing badminton, chess, and Pokemon.</li>
                   </ul>
               </div>
 
