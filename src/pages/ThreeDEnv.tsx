@@ -115,6 +115,7 @@ const ThreeDEnv = () => {
       if (polyhedronData) {
         console.log("Dispatching SET_POLYHEDRON");
         dispatch({ type: "SET_POLYHEDRONS", payload: polyhedronData });
+        iouDispatch( {type: "CLEAR_POLYHEDRONS"} );
       }
     }
 
