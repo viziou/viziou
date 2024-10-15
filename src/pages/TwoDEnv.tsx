@@ -218,6 +218,7 @@ const TwoDEnv = () => {
       if (polygonData) {
           console.log("Dispatching SET_POLYGONS");
           dispatch({ type: "SET_POLYGONS", payload: polygonData });
+          iouDispatch( {type: "CLEAR_POLYGONS"} );
       }
   };
 
