@@ -18,6 +18,8 @@ import ConfirmationModal from "../modals/ConfirmationModal";
 
 const getSquare = (): THREE.PlaneGeometry => {
   return new THREE.PlaneGeometry(1, 1);
+  // const vertices = [[0,0], [0,1], [1,1], [1,0]].map(p => new THREE.Vector3(p[0], p[1], 0));
+  // return ConvexGeometry.fromPoints(vertices)
 };
 
 const getRandomGeometry =
@@ -84,6 +86,7 @@ const TwoDEnv = () => {
         colour: colour,
         id: generateId(),
         opacity: 1,
+        generateId: generateId
       };
       dispatch({ type: "ADD_RANDOM_POLYGON", payload: newPolygon });
     }
@@ -99,7 +102,8 @@ const TwoDEnv = () => {
       ],
       colour: getRandomColour(),
       id: generateId(),
-      opacity: 1
+      opacity: 1,
+      generateId: generateId
     };
 
     console.log("Dispatching ADD_SQUARE:", newPolygon);
@@ -116,7 +120,8 @@ const TwoDEnv = () => {
       ],
       colour: getRandomColour(),
       opacity: 1,
-      id: generateId()
+      id: generateId(),
+      generateId: generateId
     };
 
     console.log("Dispatching ADD_RANDOM_POLYGON:", newPolygon);
@@ -171,7 +176,7 @@ const TwoDEnv = () => {
       },
     });
   };
-  
+
   const showIoUs = () => {
       const IoUs: IOUPolygonData[] = [];
       for (const [a, b] of generatePairs(Array.from(polygons.values()))) {
@@ -186,6 +191,7 @@ const TwoDEnv = () => {
               colour: '#ce206b',
               id: generateId(),
               opacity: 1.0,
+              generateId: generateId
           };
           IoUs.push(IoUPolygon);
       }
@@ -204,7 +210,7 @@ const TwoDEnv = () => {
       console.log("Saving canvas...");
       Storage.save2D(Array.from(polygons.values()), "export");
   };
-  
+
   const loadPolygons = async () => {
       console.log("Opening file dialog...");
       const polygonData = await Storage.load2D();
@@ -212,6 +218,7 @@ const TwoDEnv = () => {
       if (polygonData) {
           console.log("Dispatching SET_POLYGONS");
           dispatch({ type: "SET_POLYGONS", payload: polygonData });
+          iouDispatch( {type: "CLEAR_POLYGONS"} );
       }
   };
 
@@ -254,7 +261,10 @@ const TwoDEnv = () => {
                   id: selectedPolygonID!,
                 });
                 console.log(polygons);
-                dispatch({ type: "SET_EDIT", id: null });
+                dispatch({ type: "SET_EDIT", id: null })
+                if (iouDispatch) {
+                  iouDispatch({type: "RECALCULATE_CHILD_IOUS_USING_ID", payload: {id: selectedPolygonID!, polygons: polygons}} )
+                }
               }
             }}
             initialPoints={Backend2D._threeGeometryToPolygon2D(polygons.get(`${selectedPolygonID}`)!.geometry).vertices.map(v => [v.x, v.y])}
@@ -263,7 +273,7 @@ const TwoDEnv = () => {
           ) : null}
 
         <main className="twod-canvas-container">
-            <Scene2D polygons={polygons} iouPolygons={iouPolygons} iouDispatch={iouDispatch} />
+            <Scene2D polygons={polygons} iouPolygons={iouPolygons} iouDispatch={iouDispatch} generateId={generateId} />
         </main>
         <ConfirmationModal
         isOpen={confirmationInfo.isOpen}

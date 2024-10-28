@@ -153,7 +153,10 @@ const Sidebar2D = (props: SidebarProps2D) => {
                                     src={edit}
                                     alt="Edit"
                                     className="icon-2d"
-                                    onClick={() => dispatch!({ type: "SET_EDIT", id: polygon.id })}
+                                    onClick={() => {
+                                        dispatch!({ type: "SELECT_POLYGON", id: polygon.id });
+                                        dispatch!({ type: "SET_EDIT", id: polygon.id });
+                                    }}
                                 />
                                 
                                 <img

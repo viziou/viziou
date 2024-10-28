@@ -74,7 +74,7 @@ const PolygonEditor = ({
   };
 
   // add a point at the position where the user clicked:
-  
+
   const handleCanvasClick = (event: ThreeEvent<MouseEvent>) => {
     if (draggedPoint !== null || event.button !== 0) return;
 
@@ -93,7 +93,7 @@ const PolygonEditor = ({
   const handleRightMouseUp = (event: ThreeEvent<MouseEvent>) => {
     if (event.button === 2 && isRightMouseDown) {
       const endPosition = getWorldPosition(event);
-      if (rightClickStartPosition.current && 
+      if (rightClickStartPosition.current &&
           endPosition.distanceTo(rightClickStartPosition.current) < 0.1) {
         removeNearestPoint(endPosition);
       }
@@ -188,6 +188,7 @@ const PolygonEditor = ({
           index={points.length + 2}
           selectable={false}
           opacity={1}
+          generateId={() => -1} // from what I understand this is okay because this is temp?
         />
       ) : (
         <></>
